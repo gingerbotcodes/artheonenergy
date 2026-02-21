@@ -18,7 +18,7 @@ export const Footer = () => {
         className="relative z-30 border-t border-white/10 bg-ink-950/40 px-4 py-20 sm:px-6 md:py-24 lg:px-10"
       >
         <div className="mx-auto grid w-full max-w-[1320px] gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-7 shadow-[0_35px_80px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl sm:p-9">
+          <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-7 shadow-[0_35px_80px_-42px_rgba(15,23,42,0.95)] backdrop-blur-md sm:p-9">
             <p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200/85">
               Free Checkup
             </p>
@@ -74,7 +74,7 @@ export const Footer = () => {
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 shadow-[0_35px_80px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl sm:p-8"
+            className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 shadow-[0_35px_80px_-42px_rgba(15,23,42,0.95)] backdrop-blur-md sm:p-8"
           >
             <p className="font-mono text-xs uppercase tracking-[0.24em] text-emerald-200/85">
               Request Callback

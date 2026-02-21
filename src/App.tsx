@@ -38,6 +38,11 @@ type ThemeMode = 'system' | 'lite' | 'dark';
 type ResolvedTheme = 'lite' | 'dark';
 
 const BATTERY_STAGE_POINTS = [0, 0.2, 0.42, 0.6, 0.78, 1];
+const INITIAL_SCORES: ScoreSnapshot = {
+  recovery: 82,
+  savings: 54,
+  uptime: 90,
+};
 
 const THEME_MODE_STORAGE_KEY = 'artheon-theme-mode';
 
@@ -198,34 +203,13 @@ const StoryChapterCard = ({
   chapter: StoryChapter;
   index: number;
 }) => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start 88%', 'end 24%'],
-  });
-
-  const smoothLocalProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 26,
-    mass: 0.4,
-    restDelta: 0.001,
-  });
-
-  const cardY = useTransform(smoothLocalProgress, [0, 1], [64, -20]);
-  const cardScale = useTransform(smoothLocalProgress, [0, 0.7, 1], [0.97, 1, 1.015]);
-  const cardOpacity = useTransform(smoothLocalProgress, [0, 0.2, 1], [0.52, 1, 1]);
-
   return (
     <section
-      ref={sectionRef}
       id={chapter.id}
       className="min-h-[70svh] scroll-mt-[7.2rem] pt-3 md:min-h-[76vh] md:scroll-mt-32"
     >
       <FadeInBlock delay={index * 0.05}>
-        <motion.article
-          style={{ y: cardY, scale: cardScale, opacity: cardOpacity }}
-          className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 shadow-[0_26px_60px_-32px_rgba(7,89,133,0.75)] backdrop-blur-2xl sm:p-7 lg:p-10"
-        >
+        <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 shadow-[0_26px_60px_-32px_rgba(7,89,133,0.75)] backdrop-blur-md sm:p-7 lg:p-10">
           <div className={`absolute inset-0 ${chapter.accent}`} />
           <div className="absolute inset-0 bg-[linear-gradient(150deg,rgba(255,255,255,0.08),transparent_28%,transparent_66%,rgba(255,255,255,0.06))] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
@@ -260,7 +244,7 @@ const StoryChapterCard = ({
               </span>
             </div>
           </div>
-        </motion.article>
+        </article>
       </FadeInBlock>
     </section>
   );
@@ -351,10 +335,9 @@ function App() {
 
   const orbPrimaryY = useTransform(smoothProgress, [0, 1], ['-10%', '56%']);
   const orbSecondaryY = useTransform(smoothProgress, [0, 1], ['8%', '-34%']);
-  const gridOffsetY = useTransform(smoothProgress, [0, 1], ['0%', '18%']);
-  const stageTilt = useTransform(smoothProgress, [0, 1], [0, 4]);
+  const stageTilt = useTransform(smoothProgress, [0, 1], [0, 2.5]);
   const timelineHeight = useTransform(smoothProgress, [0, 1], ['0%', '100%']);
-  const mobileStageLift = useTransform(smoothProgress, [0, 1], [0, -10]);
+  const mobileStageLift = useTransform(smoothProgress, [0, 1], [0, -6]);
 
   const recoveryScoreValue = useTransform(
     smoothProgress,
@@ -372,20 +355,67 @@ function App() {
     [90, 62, 56, 74, 82, 97],
   );
 
-  const [scores, setScores] = useState<ScoreSnapshot>({
-    recovery: 82,
-    savings: 54,
-    uptime: 90,
-  });
+  const [scores, setScores] = useState<ScoreSnapshot>(INITIAL_SCORES);
+  const pendingScoresRef = useRef<ScoreSnapshot>(INITIAL_SCORES);
+  const scoreAnimationFrameRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (scoreAnimationFrameRef.current !== null) {
+        window.cancelAnimationFrame(scoreAnimationFrameRef.current);
+      }
+    };
+  }, []);
+
+  const queueScoreFlush = () => {
+    if (scoreAnimationFrameRef.current !== null) {
+      return;
+    }
+
+    scoreAnimationFrameRef.current = window.requestAnimationFrame(() => {
+      scoreAnimationFrameRef.current = null;
+      const nextScores = pendingScoresRef.current;
+
+      setScores((previousScores) => {
+        if (
+          previousScores.recovery === nextScores.recovery &&
+          previousScores.savings === nextScores.savings &&
+          previousScores.uptime === nextScores.uptime
+        ) {
+          return previousScores;
+        }
+
+        return nextScores;
+      });
+    });
+  };
 
   useMotionValueEvent(recoveryScoreValue, 'change', (latest) => {
-    setScores((prev) => ({ ...prev, recovery: Math.round(latest) }));
+    const roundedValue = Math.round(latest);
+    if (pendingScoresRef.current.recovery === roundedValue) {
+      return;
+    }
+
+    pendingScoresRef.current = { ...pendingScoresRef.current, recovery: roundedValue };
+    queueScoreFlush();
   });
   useMotionValueEvent(savingsScoreValue, 'change', (latest) => {
-    setScores((prev) => ({ ...prev, savings: Math.round(latest) }));
+    const roundedValue = Math.round(latest);
+    if (pendingScoresRef.current.savings === roundedValue) {
+      return;
+    }
+
+    pendingScoresRef.current = { ...pendingScoresRef.current, savings: roundedValue };
+    queueScoreFlush();
   });
   useMotionValueEvent(uptimeScoreValue, 'change', (latest) => {
-    setScores((prev) => ({ ...prev, uptime: Math.round(latest) }));
+    const roundedValue = Math.round(latest);
+    if (pendingScoresRef.current.uptime === roundedValue) {
+      return;
+    }
+
+    pendingScoresRef.current = { ...pendingScoresRef.current, uptime: roundedValue };
+    queueScoreFlush();
   });
 
   return (
@@ -394,16 +424,13 @@ function App() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,184,166,0.15),transparent_52%),radial-gradient(circle_at_84%_22%,rgba(56,189,248,0.16),transparent_48%),linear-gradient(145deg,#020712,#040b1a_46%,#030817)]" />
         <motion.div
           style={{ y: orbPrimaryY }}
-          className="absolute right-[-16%] top-[-8%] h-[42vw] w-[42vw] max-h-[540px] max-w-[540px] rounded-full bg-cyan-400/15 blur-[130px]"
+          className="absolute right-[-16%] top-[-8%] h-[42vw] w-[42vw] max-h-[540px] max-w-[540px] rounded-full bg-cyan-400/14 blur-[96px]"
         />
         <motion.div
           style={{ y: orbSecondaryY }}
-          className="absolute bottom-[4%] left-[-20%] h-[46vw] w-[46vw] max-h-[620px] max-w-[620px] rounded-full bg-emerald-500/16 blur-[140px]"
+          className="absolute bottom-[4%] left-[-20%] h-[46vw] w-[46vw] max-h-[620px] max-w-[620px] rounded-full bg-emerald-500/14 blur-[104px]"
         />
-        <motion.div
-          style={{ backgroundPositionY: gridOffsetY }}
-          className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:44px_44px] opacity-35"
-        />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:44px_44px] opacity-35" />
       </div>
 
       <Header
@@ -420,7 +447,7 @@ function App() {
       >
         <section className="lg:hidden">
           <FadeInBlock>
-            <article className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_30px_70px_-40px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
+            <article className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_30px_70px_-40px_rgba(15,23,42,0.95)] backdrop-blur-md">
               <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(56,189,248,0.12),transparent_44%,rgba(16,185,129,0.14))]" />
               <div className="relative z-10 space-y-4">
                 <p className="font-mono text-xs uppercase tracking-[0.22em] text-cyan-200/90">
@@ -445,7 +472,7 @@ function App() {
         <div className="sticky top-[5.7rem] z-30 lg:hidden">
           <motion.div
             style={{ y: mobileStageLift }}
-            className="rounded-[1.65rem] border border-white/10 bg-ink-900/78 p-3 shadow-[0_24px_54px_-34px_rgba(8,47,73,0.9)] backdrop-blur-2xl"
+            className="rounded-[1.65rem] border border-white/10 bg-ink-900/78 p-3 shadow-[0_24px_54px_-34px_rgba(8,47,73,0.9)] backdrop-blur-md"
           >
             <div className="flex items-center gap-3">
               <BatteryGraphic scrollProgress={smoothProgress} compact />
@@ -462,7 +489,7 @@ function App() {
         <aside className="relative hidden w-full lg:sticky lg:top-28 lg:block lg:h-[calc(100vh-8.25rem)] lg:w-[46%]">
           <motion.div
             style={{ rotateX: stageTilt }}
-            className="relative h-full overflow-visible rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_36px_90px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl sm:p-7 lg:p-8"
+            className="relative h-full overflow-visible rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_36px_90px_-42px_rgba(15,23,42,0.95)] backdrop-blur-md sm:p-7 lg:p-8"
           >
             <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(56,189,248,0.08),transparent_42%,rgba(16,185,129,0.08))]" />
             <div className="relative z-10 flex h-full flex-col gap-8">

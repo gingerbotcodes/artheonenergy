@@ -43,7 +43,7 @@ export const Header = ({
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      <div className="mx-auto flex h-20 w-full max-w-[1480px] items-center justify-between border-b border-white/10 bg-ink-950/75 px-4 backdrop-blur-2xl sm:px-6 lg:px-10">
+      <div className="mx-auto flex h-20 w-full max-w-[1480px] items-center justify-between border-b border-white/10 bg-ink-950/75 px-4 backdrop-blur-md sm:px-6 lg:px-10">
         <a
           href="#"
           className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5"
@@ -119,7 +119,7 @@ export const Header = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -14 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="border-b border-white/10 bg-ink-950/95 px-4 py-4 backdrop-blur-2xl sm:px-6 lg:hidden"
+            className="border-b border-white/10 bg-ink-950/95 px-4 py-4 backdrop-blur-md sm:px-6 lg:hidden"
           >
             <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-2">
               <button

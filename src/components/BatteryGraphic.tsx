@@ -23,7 +23,7 @@ type ParticleSpec = {
 
 const PLATE_COUNT = 6;
 
-const PARTICLE_SPECS: ParticleSpec[] = Array.from({ length: 10 }, (_, index) => {
+const PARTICLE_SPECS: ParticleSpec[] = Array.from({ length: 8 }, (_, index) => {
   const left = 12 + ((index * 37) % 74);
   const top = 42 + ((index * 19) % 35);
   const drift = (index % 2 === 0 ? 1 : -1) * (14 + (index % 5) * 8);
@@ -84,30 +84,25 @@ export const BatteryGraphic = ({
   const jitterX = useTransform(
     smoothProgress,
     [0, 0.52, 0.57, 0.62, 0.67, 0.72, 1],
-    [0, 0, -2, 2, -2, 1, 0],
+    [0, 0, -1.1, 1.1, -1.1, 0.7, 0],
   );
 
   const jitterY = useTransform(
     smoothProgress,
     [0, 0.52, 0.57, 0.62, 0.67, 0.72, 1],
-    [0, 0, 1, -1, 1, -1, 0],
+    [0, 0, 0.6, -0.6, 0.6, -0.6, 0],
   );
 
-  const haloShadow = useTransform(
+  const haloOpacity = useTransform(
     smoothProgress,
     [0, 0.28, 0.6, 1],
-    [
-      '0 0 70px rgba(16,185,129,0.26)',
-      '0 0 90px rgba(244,63,94,0.28)',
-      '0 0 130px rgba(34,211,238,0.42)',
-      '0 0 110px rgba(16,185,129,0.52)',
-    ],
+    [0.28, 0.36, 0.5, 0.42],
   );
 
   const badgeScale = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [0, 0, 1.12, 1]);
   const badgeRotate = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [-92, -92, 16, 10]);
 
-  const particleSpecs = compact ? PARTICLE_SPECS.slice(0, 5) : PARTICLE_SPECS;
+  const particleSpecs = compact ? PARTICLE_SPECS.slice(0, 3) : PARTICLE_SPECS.slice(0, 6);
 
   const frameWidthClass = compact
     ? 'max-w-[148px] sm:max-w-[168px]'
@@ -126,11 +121,11 @@ export const BatteryGraphic = ({
   return (
     <motion.div
       style={{ x: jitterX, y: jitterY }}
-      className={`relative mx-auto aspect-[4/5] w-full ${frameWidthClass}`}
+      className={`relative mx-auto aspect-[4/5] w-full will-change-transform ${frameWidthClass}`}
     >
       <motion.div
-        style={{ boxShadow: haloShadow }}
-        className="absolute -inset-5 rounded-[2.8rem]"
+        style={{ opacity: haloOpacity }}
+        className="absolute -inset-5 rounded-[2.8rem] bg-[radial-gradient(circle,rgba(34,211,238,0.45),rgba(16,185,129,0.2)_44%,transparent_72%)] blur-3xl"
       />
 
       <div
@@ -143,7 +138,7 @@ export const BatteryGraphic = ({
       </div>
 
       <div
-        className={`absolute inset-x-0 bottom-0 ${shellTopClass} overflow-hidden border border-white/15 bg-slate-900/70 shadow-[inset_0_0_35px_rgba(2,6,23,0.95)] backdrop-blur-xl ${shellPaddingClass} ${shellRoundClass}`}
+        className={`absolute inset-x-0 bottom-0 ${shellTopClass} overflow-hidden border border-white/15 bg-slate-900/70 shadow-[inset_0_0_35px_rgba(2,6,23,0.95)] ${shellPaddingClass} ${shellRoundClass}`}
       >
         <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.08),transparent_22%,transparent_68%,rgba(56,189,248,0.12))]" />
 
@@ -187,7 +182,7 @@ export const BatteryGraphic = ({
             className="pointer-events-none absolute inset-0"
           >
             <div className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-cyan-200/55 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]" />
-            <div className="absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/35 animate-[ping_1.8s_cubic-bezier(0,0,0.2,1)_infinite]" />
+            <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/35 animate-[ping_1.8s_cubic-bezier(0,0,0.2,1)_infinite]" />
           </motion.div>
 
           <motion.div
@@ -220,7 +215,7 @@ export const BatteryGraphic = ({
         </div>
 
         <div
-          className={`absolute left-1/2 z-30 -translate-x-1/2 border border-white/20 bg-slate-900/78 text-center shadow-[0_20px_40px_-20px_rgba(6,182,212,0.7)] backdrop-blur-lg ${labelClass}`}
+          className={`absolute left-1/2 z-30 -translate-x-1/2 border border-white/20 bg-slate-900/78 text-center shadow-[0_20px_40px_-20px_rgba(6,182,212,0.7)] ${labelClass}`}
         >
           <p
             className={`font-mono uppercase text-slate-400 ${
