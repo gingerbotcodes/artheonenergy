@@ -8,6 +8,7 @@ import {
 
 interface BatteryGraphicProps {
   scrollProgress: MotionValue<number>;
+  compact?: boolean;
 }
 
 type ParticleSpec = {
@@ -41,7 +42,10 @@ const PARTICLE_SPECS: ParticleSpec[] = Array.from({ length: 10 }, (_, index) => 
   };
 });
 
-export const BatteryGraphic = ({ scrollProgress }: BatteryGraphicProps) => {
+export const BatteryGraphic = ({
+  scrollProgress,
+  compact = false,
+}: BatteryGraphicProps) => {
   const smoothProgress = useSpring(scrollProgress, {
     stiffness: 80,
     damping: 24,
@@ -103,27 +107,47 @@ export const BatteryGraphic = ({ scrollProgress }: BatteryGraphicProps) => {
   const badgeScale = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [0, 0, 1.12, 1]);
   const badgeRotate = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [-92, -92, 16, 10]);
 
+  const particleSpecs = compact ? PARTICLE_SPECS.slice(0, 5) : PARTICLE_SPECS;
+
+  const frameWidthClass = compact
+    ? 'max-w-[148px] sm:max-w-[168px]'
+    : 'max-w-[370px]';
+
+  const terminalWidthClass = compact ? 'w-[62%]' : 'w-[68%]';
+  const terminalSlotClass = compact ? 'h-5 w-8' : 'h-6 w-10';
+  const shellTopClass = compact ? 'top-3' : 'top-4';
+  const shellPaddingClass = compact ? 'p-2' : 'p-3 sm:p-4';
+  const shellRoundClass = compact ? 'rounded-[1.8rem]' : 'rounded-[2.5rem]';
+  const coreRoundClass = compact ? 'rounded-[1.35rem]' : 'rounded-[2rem]';
+  const labelClass = compact
+    ? 'bottom-3 w-[66%] max-w-[110px] rounded-lg px-2 py-1'
+    : 'bottom-5 w-[62%] max-w-[180px] rounded-xl px-3 py-2';
+
   return (
     <motion.div
       style={{ x: jitterX, y: jitterY }}
-      className="relative mx-auto aspect-[4/5] w-full max-w-[370px]"
+      className={`relative mx-auto aspect-[4/5] w-full ${frameWidthClass}`}
     >
       <motion.div
         style={{ boxShadow: haloShadow }}
         className="absolute -inset-5 rounded-[2.8rem]"
       />
 
-      <div className="absolute left-1/2 top-0 z-20 flex w-[68%] -translate-x-1/2 justify-between">
-        <div className="h-6 w-10 rounded-t-xl border border-slate-500 bg-gradient-to-b from-slate-400 to-slate-600" />
-        <div className="relative h-6 w-10 rounded-t-xl border border-rose-400/80 bg-gradient-to-b from-rose-400 to-rose-600">
+      <div
+        className={`absolute left-1/2 top-0 z-20 flex -translate-x-1/2 justify-between ${terminalWidthClass}`}
+      >
+        <div className={`${terminalSlotClass} rounded-t-xl border border-slate-500 bg-gradient-to-b from-slate-400 to-slate-600`} />
+        <div className={`relative ${terminalSlotClass} rounded-t-xl border border-rose-400/80 bg-gradient-to-b from-rose-400 to-rose-600`}>
           <span className="absolute inset-0 grid place-items-center text-sm font-bold text-white">+</span>
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 top-4 overflow-hidden rounded-[2.5rem] border border-white/15 bg-slate-900/70 p-3 shadow-[inset_0_0_35px_rgba(2,6,23,0.95)] backdrop-blur-xl sm:p-4">
+      <div
+        className={`absolute inset-x-0 bottom-0 ${shellTopClass} overflow-hidden border border-white/15 bg-slate-900/70 shadow-[inset_0_0_35px_rgba(2,6,23,0.95)] backdrop-blur-xl ${shellPaddingClass} ${shellRoundClass}`}
+      >
         <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.08),transparent_22%,transparent_68%,rgba(56,189,248,0.12))]" />
 
-        <div className="relative h-full overflow-hidden rounded-[2rem] border border-white/10 bg-[#020712]">
+        <div className={`relative h-full overflow-hidden border border-white/10 bg-[#020712] ${coreRoundClass}`}>
           <div className="absolute inset-0 grid grid-cols-6 gap-[2px] p-2">
             {Array.from({ length: PLATE_COUNT }).map((_, index) => (
               <div
@@ -170,7 +194,7 @@ export const BatteryGraphic = ({ scrollProgress }: BatteryGraphicProps) => {
             style={{ opacity: sparkleOpacity }}
             className="pointer-events-none absolute -inset-8"
           >
-            {PARTICLE_SPECS.map((particle) => (
+            {particleSpecs.map((particle) => (
               <motion.div
                 key={particle.id}
                 className="absolute h-2 w-2 rounded-full bg-emerald-200 shadow-[0_0_14px_rgba(110,231,183,0.85)]"
@@ -195,24 +219,46 @@ export const BatteryGraphic = ({ scrollProgress }: BatteryGraphicProps) => {
           </motion.div>
         </div>
 
-        <div className="absolute bottom-5 left-1/2 z-30 w-[62%] max-w-[180px] -translate-x-1/2 rounded-xl border border-white/20 bg-slate-900/78 px-3 py-2 text-center shadow-[0_20px_40px_-20px_rgba(6,182,212,0.7)] backdrop-blur-lg">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-400">
+        <div
+          className={`absolute left-1/2 z-30 -translate-x-1/2 border border-white/20 bg-slate-900/78 text-center shadow-[0_20px_40px_-20px_rgba(6,182,212,0.7)] backdrop-blur-lg ${labelClass}`}
+        >
+          <p
+            className={`font-mono uppercase text-slate-400 ${
+              compact ? 'text-[8px] tracking-[0.16em]' : 'text-[10px] tracking-[0.2em]'
+            }`}
+          >
             Artheon Energy
           </p>
-          <p className="font-display text-lg font-bold tracking-[0.08em] text-white">RG-16X</p>
+          <p className={`font-display font-bold text-white ${compact ? 'text-sm' : 'text-lg tracking-[0.08em]'}`}>
+            RG-16X
+          </p>
         </div>
       </div>
 
       <motion.div
         style={{ scale: badgeScale, rotate: badgeRotate }}
-        className="absolute -right-8 top-0 z-40 grid h-28 w-28 place-items-center rounded-full border-4 border-amber-100/90 bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 text-center shadow-[0_22px_60px_-25px_rgba(245,158,11,0.85)]"
+        className={`absolute z-40 grid place-items-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 text-center shadow-[0_22px_60px_-25px_rgba(245,158,11,0.85)] ${
+          compact
+            ? '-right-3 -top-1 h-16 w-16 border-2 border-amber-100/90'
+            : '-right-8 top-0 h-28 w-28 border-4 border-amber-100/90'
+        }`}
       >
         <div>
-          <p className="font-display text-3xl font-black leading-none text-amber-950">1-2</p>
-          <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-900/95">
+          <p className={`font-display font-black leading-none text-amber-950 ${compact ? 'text-lg' : 'text-3xl'}`}>
+            1-2
+          </p>
+          <p
+            className={`font-semibold uppercase text-amber-900/95 ${
+              compact ? 'mt-0.5 text-[8px] tracking-[0.14em]' : 'mt-0.5 text-[11px] tracking-[0.2em]'
+            }`}
+          >
             Years
           </p>
-          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/90">
+          <p
+            className={`font-bold uppercase text-white/90 ${
+              compact ? 'text-[7px] tracking-[0.12em]' : 'text-[9px] tracking-[0.2em]'
+            }`}
+          >
             Warranty
           </p>
         </div>

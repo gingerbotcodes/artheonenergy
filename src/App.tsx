@@ -23,6 +23,12 @@ type StoryChapter = {
   accent: string;
 };
 
+type ScoreSnapshot = {
+  recovery: number;
+  savings: number;
+  uptime: number;
+};
+
 const STORY_CHAPTERS: StoryChapter[] = [
   {
     id: 'problem',
@@ -31,12 +37,12 @@ const STORY_CHAPTERS: StoryChapter[] = [
     eyebrow: 'Failure Pattern',
     title: 'Sulfation Gradually Strangles Healthy Cells',
     description:
-      'High-cycling fleets lose runtime because hardened sulfate crystals lock active material on lead plates. The battery still looks normal while usable capacity drops week by week.',
+      'High-cycling fleets lose runtime because hardened sulfate crystals lock active material on lead plates. The battery still looks stable while usable capacity drops week by week.',
     highlights: [
       'Runtime fades before voltage alarms trigger.',
-      'Replacement cycles accelerate across entire fleets.',
+      'Replacement cycles accelerate across fleets.',
       'Idle charging windows hide structural damage.',
-      'Unplanned downtime compounds logistics cost.',
+      'Downtime costs stack across peak operations.',
     ],
     impactLabel: 'Typical pre-regeneration retention',
     impactValue: '35-55%',
@@ -50,12 +56,12 @@ const STORY_CHAPTERS: StoryChapter[] = [
     eyebrow: 'Signal Scan',
     title: 'RG-16X Maps Degradation Before It Treats',
     description:
-      'Each battery is profiled for resistance behavior and pulse response. That diagnostic pass determines the regeneration band so energy is focused on crystal breakup instead of plate stress.',
+      'Each battery is profiled for resistance behavior and pulse response. That diagnostic pass sets a treatment band so energy focuses on crystal breakup instead of plate stress.',
     highlights: [
       'Cell behavior is profiled before pulse application.',
       'Pulse width and cadence are tuned by response curve.',
-      'Process windows are built for repeated industrial use.',
-      'Technician workflow is standardized across sites.',
+      'Treatment windows are repeatable across sites.',
+      'Technician workflow is standardized for scale.',
     ],
     impactLabel: 'Initial screening turnaround',
     impactValue: '8-12 min',
@@ -69,12 +75,12 @@ const STORY_CHAPTERS: StoryChapter[] = [
     eyebrow: 'Pulse Treatment',
     title: 'High-Frequency Pulses Dissolve Crystal Buildup',
     description:
-      'Targeted resonance disrupts sulfate structures and returns active material to the electrolyte cycle. The process restores performance while preserving the battery chassis and lead architecture.',
+      'Targeted resonance disrupts sulfate structures and returns active material to the electrolyte cycle. The process restores performance while preserving lead architecture.',
     highlights: [
       'Crystal fragmentation happens in controlled stages.',
       'Thermal profile remains stable during pulse cycles.',
       'Electrolyte activity recovers without harsh stripping.',
-      'Reconditioning can be repeated across battery lifespan.',
+      'Reconditioning can repeat over battery lifespan.',
     ],
     impactLabel: 'Primary cycle duration',
     impactValue: '2-4 hrs',
@@ -88,9 +94,9 @@ const STORY_CHAPTERS: StoryChapter[] = [
     eyebrow: 'Operational ROI',
     title: 'Recovered Capacity, Lower Spend, Longer Asset Life',
     description:
-      'Most treated batteries recover into an operational range that eliminates urgent replacement pressure. Teams gain predictable uptime and redirect capital away from avoidable battery swaps.',
+      'Most treated batteries recover into an operational range that removes urgent replacement pressure. Teams gain predictable uptime and redirect capital away from avoidable swaps.',
     highlights: [
-      'Recovered batteries re-enter rotation immediately.',
+      'Recovered batteries re-enter rotation quickly.',
       'Replacement budget drops by up to 70%.',
       'Fleet reliability improves across peak shifts.',
       'Warranty-backed output supports procurement confidence.',
@@ -119,16 +125,127 @@ const FadeInBlock = ({
   </motion.div>
 );
 
-const MetricCard = ({ label, value }: { label: string; value: string }) => (
-  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3 shadow-[0_18px_30px_-24px_rgba(8,145,178,0.7)] backdrop-blur-xl sm:p-4">
-    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+const MetricCard = ({
+  label,
+  value,
+  compact = false,
+}: {
+  label: string;
+  value: string;
+  compact?: boolean;
+}) => (
+  <div
+    className={`rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl ${
+      compact
+        ? 'p-2 shadow-[0_16px_28px_-24px_rgba(8,145,178,0.7)]'
+        : 'p-3 shadow-[0_18px_30px_-24px_rgba(8,145,178,0.7)] sm:p-4'
+    }`}
+  >
+    <p
+      className={`font-semibold uppercase text-slate-400 ${
+        compact ? 'text-[9px] tracking-[0.18em]' : 'text-[10px] tracking-[0.2em]'
+      }`}
+    >
       {label}
     </p>
-    <p className="mt-1 font-display text-xl font-bold text-slate-100 sm:text-2xl">
+    <p
+      className={`font-display font-bold text-slate-100 ${
+        compact ? 'mt-1 text-lg' : 'mt-1 text-xl sm:text-2xl'
+      }`}
+    >
       {value}
     </p>
   </div>
 );
+
+const MetricsRow = ({
+  scores,
+  compact = false,
+}: {
+  scores: ScoreSnapshot;
+  compact?: boolean;
+}) => (
+  <div className={`grid grid-cols-3 ${compact ? 'gap-2' : 'gap-3 sm:gap-4'}`}>
+    <MetricCard compact={compact} label="Recovered" value={`${scores.recovery}%`} />
+    <MetricCard compact={compact} label="Savings" value={`${scores.savings}%`} />
+    <MetricCard compact={compact} label="Uptime" value={`${scores.uptime}%`} />
+  </div>
+);
+
+const StoryChapterCard = ({
+  chapter,
+  index,
+}: {
+  chapter: StoryChapter;
+  index: number;
+}) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start 88%', 'end 24%'],
+  });
+
+  const smoothLocalProgress = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 26,
+    mass: 0.4,
+    restDelta: 0.001,
+  });
+
+  const cardY = useTransform(smoothLocalProgress, [0, 1], [64, -20]);
+  const cardScale = useTransform(smoothLocalProgress, [0, 0.7, 1], [0.97, 1, 1.015]);
+  const cardOpacity = useTransform(smoothLocalProgress, [0, 0.2, 1], [0.52, 1, 1]);
+
+  return (
+    <section
+      ref={sectionRef}
+      id={chapter.id}
+      className="min-h-[70svh] scroll-mt-[7.2rem] pt-3 md:min-h-[76vh] md:scroll-mt-32"
+    >
+      <FadeInBlock delay={index * 0.05}>
+        <motion.article
+          style={{ y: cardY, scale: cardScale, opacity: cardOpacity }}
+          className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 shadow-[0_26px_60px_-32px_rgba(7,89,133,0.75)] backdrop-blur-2xl sm:p-7 lg:p-10"
+        >
+          <div className={`absolute inset-0 ${chapter.accent}`} />
+          <div className="absolute inset-0 bg-[linear-gradient(150deg,rgba(255,255,255,0.08),transparent_28%,transparent_66%,rgba(255,255,255,0.06))] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+          <div className="relative z-10 space-y-5 sm:space-y-6">
+            <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-cyan-200/90 sm:text-xs sm:tracking-[0.28em]">
+              {chapter.sequence} / {chapter.eyebrow}
+            </p>
+            <h2 className="font-display text-2xl font-bold leading-tight text-white sm:text-4xl lg:text-[2.8rem]">
+              {chapter.title}
+            </h2>
+            <p className="text-base leading-relaxed text-slate-200 sm:text-lg">
+              {chapter.description}
+            </p>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {chapter.highlights.map((item) => (
+                <p
+                  key={item}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm leading-relaxed text-slate-200"
+                >
+                  {item}
+                </p>
+              ))}
+            </div>
+
+            <div className="inline-flex items-baseline gap-3 rounded-full border border-cyan-200/30 bg-cyan-200/10 px-4 py-2">
+              <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan-100/90">
+                {chapter.impactLabel}
+              </span>
+              <span className="font-display text-2xl font-bold text-cyan-100">
+                {chapter.impactValue}
+              </span>
+            </div>
+          </div>
+        </motion.article>
+      </FadeInBlock>
+    </section>
+  );
+};
 
 function App() {
   const containerRef = useRef<HTMLElement>(null);
@@ -150,23 +267,26 @@ function App() {
   const gridOffsetY = useTransform(smoothProgress, [0, 1], ['0%', '18%']);
   const stageTilt = useTransform(smoothProgress, [0, 1], [0, 4]);
   const timelineHeight = useTransform(smoothProgress, [0, 1], ['0%', '100%']);
+  const mobileStageLift = useTransform(smoothProgress, [0, 1], [0, -10]);
 
   const recoveryScoreValue = useTransform(smoothProgress, [0, 1], [38, 94]);
   const savingsScoreValue = useTransform(smoothProgress, [0, 1], [18, 70]);
   const uptimeScoreValue = useTransform(smoothProgress, [0, 1], [71, 97]);
 
-  const [recoveryScore, setRecoveryScore] = useState(38);
-  const [savingsScore, setSavingsScore] = useState(18);
-  const [uptimeScore, setUptimeScore] = useState(71);
+  const [scores, setScores] = useState<ScoreSnapshot>({
+    recovery: 38,
+    savings: 18,
+    uptime: 71,
+  });
 
   useMotionValueEvent(recoveryScoreValue, 'change', (latest) => {
-    setRecoveryScore(Math.round(latest));
+    setScores((prev) => ({ ...prev, recovery: Math.round(latest) }));
   });
   useMotionValueEvent(savingsScoreValue, 'change', (latest) => {
-    setSavingsScore(Math.round(latest));
+    setScores((prev) => ({ ...prev, savings: Math.round(latest) }));
   });
   useMotionValueEvent(uptimeScoreValue, 'change', (latest) => {
-    setUptimeScore(Math.round(latest));
+    setScores((prev) => ({ ...prev, uptime: Math.round(latest) }));
   });
 
   return (
@@ -194,9 +314,50 @@ function App() {
 
       <main
         ref={containerRef}
-        className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-14 px-4 pb-24 pt-28 sm:px-6 md:pt-32 lg:flex-row lg:items-start lg:gap-14 lg:px-10"
+        className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-10 px-4 pb-24 pt-28 sm:px-6 md:pt-32 lg:flex-row lg:items-start lg:gap-14 lg:px-10"
       >
-        <aside className="relative w-full lg:sticky lg:top-28 lg:h-[calc(100vh-8.25rem)] lg:w-[46%]">
+        <section className="lg:hidden">
+          <FadeInBlock>
+            <article className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_30px_70px_-40px_rgba(15,23,42,0.95)] backdrop-blur-2xl">
+              <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(56,189,248,0.12),transparent_44%,rgba(16,185,129,0.14))]" />
+              <div className="relative z-10 space-y-4">
+                <p className="font-mono text-xs uppercase tracking-[0.22em] text-cyan-200/90">
+                  Regeneration Storyline
+                </p>
+                <h1 className="font-display text-4xl font-bold leading-[1.05] text-white">
+                  Don&apos;t Replace.
+                  <br />
+                  <span className="text-transparent bg-gradient-to-r from-emerald-300 via-cyan-200 to-cyan-400 bg-clip-text">
+                    Recover Battery Life.
+                  </span>
+                </h1>
+                <p className="text-sm leading-relaxed text-slate-200">
+                  Scroll through the four treatment chapters and track live battery
+                  state from sulfation through post-regeneration recovery.
+                </p>
+              </div>
+            </article>
+          </FadeInBlock>
+        </section>
+
+        <div className="sticky top-[5.7rem] z-30 lg:hidden">
+          <motion.div
+            style={{ y: mobileStageLift }}
+            className="rounded-[1.65rem] border border-white/10 bg-ink-900/78 p-3 shadow-[0_24px_54px_-34px_rgba(8,47,73,0.9)] backdrop-blur-2xl"
+          >
+            <div className="flex items-center gap-3">
+              <BatteryGraphic scrollProgress={smoothProgress} compact />
+              <div className="min-w-0 flex-1 space-y-2">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-200/90">
+                  Live State
+                </p>
+                <MetricsRow scores={scores} compact />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        <aside className="relative hidden w-full lg:sticky lg:top-28 lg:block lg:h-[calc(100vh-8.25rem)] lg:w-[46%]">
           <motion.div
             style={{ rotateX: stageTilt }}
             className="relative h-full overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_36px_90px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl sm:p-7 lg:p-9"
@@ -215,7 +376,7 @@ function App() {
                   </span>
                 </h1>
                 <p className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-                  A single scroll shows the full cycle from sulfation damage to
+                  A single scroll maps the full cycle from sulfation damage to
                   measurable recovery with Artheon&apos;s RG-16X pulse regeneration.
                 </p>
               </div>
@@ -224,16 +385,26 @@ function App() {
                 <BatteryGraphic scrollProgress={smoothProgress} />
               </div>
 
-              <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                <MetricCard label="Recovered" value={`${recoveryScore}%`} />
-                <MetricCard label="Savings" value={`${savingsScore}%`} />
-                <MetricCard label="Uptime" value={`${uptimeScore}%`} />
-              </div>
+              <MetricsRow scores={scores} />
             </div>
           </motion.div>
         </aside>
 
-        <div className="relative flex w-full flex-col gap-12 pb-8 lg:w-[54%] lg:gap-16">
+        <div className="relative flex w-full flex-col gap-8 pb-8 lg:w-[54%] lg:gap-16">
+          <div className="-mx-4 overflow-x-auto px-4 pb-1 lg:hidden [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+            <div className="flex w-max gap-2">
+              {STORY_CHAPTERS.map((chapter) => (
+                <a
+                  key={`chip-${chapter.id}`}
+                  href={`#${chapter.id}`}
+                  className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-slate-200"
+                >
+                  {chapter.navLabel}
+                </a>
+              ))}
+            </div>
+          </div>
+
           <div className="pointer-events-none absolute -left-6 top-0 hidden h-full w-px bg-white/10 lg:block" />
           <motion.div
             style={{ height: timelineHeight }}
@@ -241,50 +412,7 @@ function App() {
           />
 
           {STORY_CHAPTERS.map((chapter, index) => (
-            <section
-              key={chapter.id}
-              id={chapter.id}
-              className="min-h-[76vh] scroll-mt-28 pt-3 md:scroll-mt-32"
-            >
-              <FadeInBlock delay={index * 0.05}>
-                <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_26px_60px_-32px_rgba(7,89,133,0.75)] backdrop-blur-2xl sm:p-8 lg:p-10">
-                  <div className={`absolute inset-0 ${chapter.accent}`} />
-                  <div className="absolute inset-0 bg-[linear-gradient(150deg,rgba(255,255,255,0.08),transparent_28%,transparent_66%,rgba(255,255,255,0.06))] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-                  <div className="relative z-10 space-y-6">
-                    <p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200/90">
-                      {chapter.sequence} / {chapter.eyebrow}
-                    </p>
-                    <h2 className="font-display text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-[2.85rem]">
-                      {chapter.title}
-                    </h2>
-                    <p className="text-base leading-relaxed text-slate-200 sm:text-lg">
-                      {chapter.description}
-                    </p>
-
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {chapter.highlights.map((item) => (
-                        <p
-                          key={item}
-                          className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm leading-relaxed text-slate-200"
-                        >
-                          {item}
-                        </p>
-                      ))}
-                    </div>
-
-                    <div className="inline-flex items-baseline gap-3 rounded-full border border-cyan-200/30 bg-cyan-200/10 px-4 py-2">
-                      <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan-100/90">
-                        {chapter.impactLabel}
-                      </span>
-                      <span className="font-display text-2xl font-bold text-cyan-100">
-                        {chapter.impactValue}
-                      </span>
-                    </div>
-                  </div>
-                </article>
-              </FadeInBlock>
-            </section>
+            <StoryChapterCard key={chapter.id} chapter={chapter} index={index} />
           ))}
         </div>
       </main>

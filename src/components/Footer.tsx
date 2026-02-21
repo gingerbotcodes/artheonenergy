@@ -88,10 +88,12 @@ export const Footer = () => {
                 </label>
                 <input
                   id="contact-name"
+                  name="name"
+                  autoComplete="organization"
                   type="text"
                   required
                   placeholder="Acme Logistics"
-                  className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
+                  className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                 />
               </div>
 
@@ -101,10 +103,13 @@ export const Footer = () => {
                 </label>
                 <input
                   id="contact-phone"
+                  name="phone"
+                  autoComplete="tel"
+                  inputMode="tel"
                   type="tel"
                   required
                   placeholder="+1 (555) 000-0000"
-                  className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
+                  className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                 />
               </div>
 
@@ -115,9 +120,10 @@ export const Footer = () => {
                   </label>
                   <select
                     id="contact-setup"
+                    name="setup"
                     required
                     defaultValue=""
-                    className="w-full cursor-pointer rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
+                    className="w-full cursor-pointer rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                   >
                     <option value="" disabled>
                       Select setup
@@ -135,11 +141,13 @@ export const Footer = () => {
                   </label>
                   <input
                     id="contact-volume"
+                    name="volume"
+                    inputMode="numeric"
                     type="number"
                     required
                     min="1"
                     placeholder="12"
-                    className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
+                    className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                   />
                 </div>
               </div>
