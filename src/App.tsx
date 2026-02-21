@@ -444,7 +444,7 @@ function App() {
 
       <main
         ref={containerRef}
-        className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-10 px-4 pb-24 pt-28 sm:px-6 md:pt-32 lg:flex-row lg:items-start lg:gap-14 lg:px-10"
+        className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-10 px-4 pb-12 pt-28 sm:px-6 md:pb-14 md:pt-32 lg:flex-row lg:items-start lg:gap-14 lg:px-10"
       >
         <section className="lg:hidden">
           <FadeInBlock>
@@ -519,7 +519,7 @@ function App() {
           </motion.div>
         </aside>
 
-        <div className="relative flex w-full flex-col gap-6 pb-8 md:gap-8 lg:w-[54%] lg:gap-10">
+        <div className="relative flex w-full flex-col gap-6 pb-2 md:gap-8 lg:w-[54%] lg:gap-10">
           <div className="-mx-4 overflow-x-auto px-4 pb-1 lg:hidden [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
             <div className="flex w-max gap-2">
               {STORY_CHAPTERS.map((chapter) => (

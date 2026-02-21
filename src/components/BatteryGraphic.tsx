@@ -84,8 +84,41 @@ export const BatteryGraphic = ({
     [0.22, 0.3, 0.42, 0.36],
   );
 
-  const badgeScale = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [0, 0, 1.1, 1]);
-  const badgeRotate = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [-92, -92, 14, 10]);
+  const badgeScale = useTransform(
+    smoothProgress,
+    [0, 0.84, 0.91, 0.95, 0.99, 1],
+    [0, 0, 1.72, 1.18, 1.05, 1],
+  );
+  const badgeRotate = useTransform(
+    smoothProgress,
+    [0, 0.84, 0.91, 0.95, 0.99, 1],
+    [-108, -108, -4, 8, 11, 10],
+  );
+  const badgeX = useTransform(
+    smoothProgress,
+    [0, 0.84, 0.91, 0.96, 1],
+    [0, 0, compact ? -22 : -86, compact ? -8 : -20, 0],
+  );
+  const badgeY = useTransform(
+    smoothProgress,
+    [0, 0.84, 0.91, 0.96, 1],
+    [0, 0, compact ? 24 : 58, compact ? 6 : 14, 0],
+  );
+  const badgeGlowOpacity = useTransform(
+    smoothProgress,
+    [0, 0.84, 0.91, 0.96, 1],
+    [0, 0, 1, 0.45, 0.3],
+  );
+  const badgeBurstOpacity = useTransform(
+    smoothProgress,
+    [0, 0.84, 0.91, 0.96, 1],
+    [0, 0, 0.9, 0.22, 0],
+  );
+  const badgeBurstScale = useTransform(
+    smoothProgress,
+    [0, 0.84, 0.91, 1],
+    [0.76, 0.76, 1.22, 1.72],
+  );
 
   const frameWidthClass = compact
     ? 'max-w-[148px] sm:max-w-[168px]'
@@ -213,8 +246,22 @@ export const BatteryGraphic = ({
       </div>
 
       <motion.div
-        style={{ scale: badgeScale, rotate: badgeRotate }}
-        className={`absolute z-40 grid place-items-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 text-center shadow-[0_22px_60px_-25px_rgba(245,158,11,0.85)] ${
+        style={{ opacity: badgeGlowOpacity, x: badgeX, y: badgeY }}
+        className={`pointer-events-none absolute z-30 rounded-full bg-[radial-gradient(circle,rgba(251,191,36,0.82),rgba(245,158,11,0.25)_52%,transparent_72%)] blur-xl ${
+          compact ? '-right-4 -top-2 h-20 w-20' : '-right-10 -top-2 h-36 w-36'
+        }`}
+      />
+
+      <motion.div
+        style={{ opacity: badgeBurstOpacity, scale: badgeBurstScale, x: badgeX, y: badgeY }}
+        className={`pointer-events-none absolute z-[35] rounded-full border border-amber-100/90 ${
+          compact ? '-right-3 -top-1 h-16 w-16' : '-right-8 top-0 h-28 w-28'
+        }`}
+      />
+
+      <motion.div
+        style={{ scale: badgeScale, rotate: badgeRotate, x: badgeX, y: badgeY }}
+        className={`absolute z-40 grid place-items-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 text-center shadow-[0_26px_80px_-26px_rgba(245,158,11,0.95)] ${
           compact
             ? '-right-3 -top-1 h-16 w-16 border-2 border-amber-100/90'
             : '-right-8 top-0 h-28 w-28 border-4 border-amber-100/90'
