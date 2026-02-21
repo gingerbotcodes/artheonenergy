@@ -161,20 +161,21 @@ const MetricCard = ({
   <div
     className={`rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl ${
       compact
-        ? 'p-2 shadow-[0_16px_28px_-24px_rgba(8,145,178,0.7)]'
+        ? 'min-w-0 p-1.5 shadow-[0_16px_28px_-24px_rgba(8,145,178,0.7)]'
         : 'p-3 shadow-[0_18px_30px_-24px_rgba(8,145,178,0.7)] sm:p-4'
     }`}
   >
     <p
-      className={`font-semibold uppercase text-slate-400 ${
-        compact ? 'text-[9px] tracking-[0.18em]' : 'text-[10px] tracking-[0.2em]'
+      className={`font-semibold text-slate-400 ${
+        compact ? 'truncate text-[8px] tracking-normal' : 'uppercase text-[10px] tracking-[0.2em]'
       }`}
+      title={label}
     >
       {label}
     </p>
     <p
       className={`font-display font-bold text-slate-100 ${
-        compact ? 'mt-1 text-lg' : 'mt-1 text-xl sm:text-2xl'
+        compact ? 'mt-0.5 text-[13px] leading-none sm:text-[14px]' : 'mt-1 text-xl sm:text-2xl'
       }`}
     >
       {value}
@@ -189,7 +190,7 @@ const MetricsRow = ({
   scores: ScoreSnapshot;
   compact?: boolean;
 }) => (
-  <div className={`grid grid-cols-3 ${compact ? 'gap-2' : 'gap-3 sm:gap-4'}`}>
+  <div className={`grid min-w-0 grid-cols-3 ${compact ? 'gap-1.5' : 'gap-3 sm:gap-4'}`}>
     <MetricCard compact={compact} label="Recovered" value={`${scores.recovery}%`} />
     <MetricCard compact={compact} label="Savings" value={`${scores.savings}%`} />
     <MetricCard compact={compact} label="Uptime" value={`${scores.uptime}%`} />
