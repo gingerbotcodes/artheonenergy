@@ -141,10 +141,8 @@ export const BatteryGraphic: React.FC<BatteryGraphicProps> = ({ scrollProgress }
                                 style={{
                                     opacity: crystalsOpacity,
                                     scale: crystalsScale,
-                                    backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><path d='M6 6l6-6 6 6v12l-6 6-6-6z' fill='%23a1a1aa' opacity='0.7'/><path d='M10 10l5-3 3 5-5 3z' fill='%23eab308' opacity='0.8'/><path d='M4 14l3-2 2 3-3 2z' fill='%23fef08a' opacity='0.6'/></svg>")`,
-                                    backgroundSize: '30px 30px'
                                 }}
-                                className="absolute inset-0 z-10 mix-blend-hard-light origin-bottom"
+                                className="absolute inset-0 z-10 mix-blend-hard-light origin-bottom bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyNCcgaGVpZ2h0PScyNCc+PHBhdGggZD0nTTYgNmw2LTYgNiA2djEybC02IDYtNi02eicgZmlsbD0nI2ExYTFhYScgb3BhY2l0eT0nMC43Jy8+PHBhdGggZD0nTTEwIDEwbDUtMyAzIDUtNSAzWicgZmlsbD0nI2VhYjMwOCcgb3BhY2l0eT0nMC44Jy8+PHBhdGggZD0nTTQgMTRsMy0yIDIgMy0zIDJaJyBmaWxsPScjZmVmMDhhJyBvcGFjaXR5PScwLjYnLz48L3N2Zz4=')] bg-[length:30px_30px]"
                             />
 
                             {/* Pulsing Energy Effect on plates (The RG-16X Tech) */}
@@ -169,11 +167,8 @@ export const BatteryGraphic: React.FC<BatteryGraphicProps> = ({ scrollProgress }
 
                         {/* Bubbles / Energy Particles inside liquid during pulse */}
                         <motion.div
-                            style={{
-                                opacity: pulseOpacity,
-                                backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='20' cy='80' r='3' fill='%2367e8f9' opacity='0.5'/><circle cx='50' cy='60' r='5' fill='%23cffafe' opacity='0.7'/><circle cx='80' cy='90' r='2' fill='%2322d3ee' opacity='0.4'/></svg>")`
-                            }}
-                            className="absolute inset-x-0 bottom-0 h-full bg-[length:50px_50px] animate-[slideUp_3s_linear_infinite]"
+                            style={{ opacity: pulseOpacity }}
+                            className="absolute inset-x-0 bottom-0 h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJz48Y2lyY2xlIGN4PScyMCcgY3k9JzgwJyByPSczJyBmaWxsPScjNjdlOGY5JyBvcGFjaXR5PScwLjUnLz48Y2lyY2xlIGN4PSc1MCcgY3k9JzYwJyByPSc1JyBmaWxsPScjY2ZmYWZlJyBvcGFjaXR5PScwLjcnLz48Y2lyY2xlIGN4PSc4MCcgY3k9JzkwJyByPScyJyBmaWxsPScjMjJkM2VlJyBvcGFjaXR5PScwLjQnLz48L3N2Zz4=')] bg-[length:50px_50px] animate-[slideUp_3s_linear_infinite]"
                         />
 
                         {/* High-frequency energetic glow deep in the liquid */}
@@ -184,12 +179,8 @@ export const BatteryGraphic: React.FC<BatteryGraphicProps> = ({ scrollProgress }
 
                         {/* Restored Sparkles inside liquid */}
                         <motion.div
-                            style={{
-                                opacity: particlesOpacity,
-                                y: particlesY,
-                                backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><path d='M20 0 L22 18 L40 20 L22 22 L20 40 L18 22 L0 20 L18 18 Z' fill='%23fff' opacity='0.3'/></svg>")`
-                            }}
-                            className="absolute inset-0 bg-[length:60px_60px]"
+                            style={{ opacity: particlesOpacity, y: particlesY }}
+                            className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc0MCcgaGVpZ2h0PSc0MCc+PHBhdGggZD0nTTIwIDAgTDIyIDE4IEw0MCAyMCBMMjIgMjIgTDIwIDQwIEwxOCAyMiBMMCAyMCBMMTggMTggWicgZmlsbD0nI2ZmZicgb3BhY2l0eT0nMC4zJy8+PC9zdmc+')] bg-[length:60px_60px]"
                         />
                     </motion.div>
 

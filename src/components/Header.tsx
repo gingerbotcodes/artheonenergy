@@ -4,10 +4,11 @@ export const Header = () => {
     return (
         <header className="fixed top-0 left-0 right-0 h-20 bg-slate-950/80 backdrop-blur-md z-50 border-b border-slate-900 flex items-center justify-between px-6 lg:px-12 shadow-sm shadow-slate-900/50">
             <div className="flex items-center gap-3">
-                {/* Simple SVG Logo visually distinct */}
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center font-black text-slate-950 text-xl leading-none">
-                    A
-                </div>
+                <img
+                    src="/logo.png"
+                    alt="Artheon Energy Logo"
+                    className="w-10 h-10 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] object-cover"
+                />
                 <span className="text-xl md:text-2xl font-bold text-white tracking-wide flex items-center gap-1">
                     Artheon<span className="text-emerald-500">Energy</span>
                 </span>
