@@ -1,30 +1,113 @@
+import { useState } from 'react';
+import { AnimatePresence, motion, type MotionValue } from 'framer-motion';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
 
+type ChapterLink = {
+  id: string;
+  label: string;
+};
 
-export const Header = () => {
-    return (
-        <header className="fixed top-0 left-0 right-0 h-20 bg-slate-950/80 backdrop-blur-md z-50 border-b border-slate-900 flex items-center justify-between px-6 lg:px-12 shadow-sm shadow-slate-900/50">
-            <div className="flex items-center gap-3">
-                <img
-                    src="/logo.png"
-                    alt="Artheon Energy Logo"
-                    className="w-10 h-10 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] object-cover"
-                />
-                <span className="text-xl md:text-2xl font-bold text-white tracking-wide flex items-center gap-1">
-                    Artheon<span className="text-emerald-500">Energy</span>
-                </span>
-            </div>
-            <nav className="hidden md:flex gap-8 text-sm font-semibold text-slate-300">
-                <a href="#problem" className="hover:text-emerald-400 hover:scale-105 transition-all">The Problem</a>
-                <a href="#solution" className="hover:text-emerald-400 hover:scale-105 transition-all">Our Tech</a>
-                <a href="#result" className="hover:text-emerald-400 hover:scale-105 transition-all">The Result</a>
-            </nav>
-            <a href="#contact" className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/50 px-6 py-2.5 rounded-full text-sm font-bold hover:bg-emerald-500 hover:text-slate-950 transition-all shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap hidden sm:flex">
-                Contact Us
+interface HeaderProps {
+  chapters: ChapterLink[];
+  progress: MotionValue<number>;
+}
+
+export const Header = ({ chapters, progress }: HeaderProps) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const closeMenu = () => setIsMenuOpen(false);
+
+  return (
+    <header className="fixed inset-x-0 top-0 z-50">
+      <div className="mx-auto flex h-20 w-full max-w-[1480px] items-center justify-between border-b border-white/10 bg-ink-950/75 px-4 backdrop-blur-2xl sm:px-6 lg:px-10">
+        <a
+          href="#"
+          className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5"
+          onClick={closeMenu}
+        >
+          <img
+            src="/logo.png"
+            alt="Artheon Energy"
+            className="h-8 w-8 rounded-lg object-cover shadow-[0_0_20px_rgba(45,212,191,0.35)]"
+          />
+          <span className="font-display text-lg font-semibold text-white">
+            Artheon
+            <span className="text-emerald-300">Energy</span>
+          </span>
+        </a>
+
+        <nav className="hidden items-center gap-2 lg:flex">
+          {chapters.map((chapter) => (
+            <a
+              key={chapter.id}
+              href={`#${chapter.id}`}
+              className="rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:text-cyan-200"
+            >
+              {chapter.label}
             </a>
-            {/* Mobile Menu Icon Placeholder */}
-            <button className="sm:hidden text-slate-400">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
-        </header>
-    );
+          ))}
+        </nav>
+
+        <div className="hidden lg:block">
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-300/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100 transition-all hover:border-emerald-200 hover:bg-emerald-300/20"
+          >
+            Book Assessment
+            <ArrowUpRight className="h-4 w-4" />
+          </a>
+        </div>
+
+        <button
+          type="button"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-slate-200 lg:hidden"
+          onClick={() => setIsMenuOpen((open) => !open)}
+          aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={isMenuOpen}
+        >
+          {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
+
+      <div className="relative h-[2px] w-full bg-white/10">
+        <motion.div
+          style={{ scaleX: progress }}
+          className="h-full origin-left bg-gradient-to-r from-cyan-300 via-emerald-400 to-emerald-300"
+        />
+      </div>
+
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.nav
+            initial={{ opacity: 0, y: -14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -14 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="border-b border-white/10 bg-ink-950/95 px-4 py-4 backdrop-blur-2xl sm:px-6 lg:hidden"
+          >
+            <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-2">
+              {chapters.map((chapter) => (
+                <a
+                  key={chapter.id}
+                  href={`#${chapter.id}`}
+                  onClick={closeMenu}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-slate-100"
+                >
+                  {chapter.label}
+                </a>
+              ))}
+              <a
+                href="#contact"
+                onClick={closeMenu}
+                className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300/40 bg-emerald-300/14 px-4 py-3 text-sm font-semibold text-emerald-100"
+              >
+                Book Assessment
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
+    </header>
+  );
 };

@@ -1,103 +1,182 @@
-import { motion } from 'framer-motion';
+import { useRef, useState, type FormEvent } from 'react';
+import { Factory, Mail, Phone, ShieldCheck } from 'lucide-react';
 
 export const Footer = () => {
-    return (
-        <>
-            {/* CTA Section */}
-            <section id="contact" className="w-full relative z-30 bg-slate-950 py-24 md:py-32 px-4 md:px-8 border-t border-slate-800">
-                <div className="max-w-4xl mx-auto bg-slate-900/50 backdrop-blur-xl p-6 md:p-16 rounded-[2rem] border border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.6)] relative overflow-hidden group">
-                    {/* Glowing background effect on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-cyan-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+  const formRef = useRef<HTMLFormElement>(null);
+  const [submitted, setSubmitted] = useState(false);
 
-                    <div className="relative z-10 text-center mb-10 md:mb-12">
-                        <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6 leading-tight">
-                            Book Your Complimentary <br className="hidden md:block" />
-                            <span className="text-emerald-500 shadow-emerald-500/20 drop-shadow-md">Battery Health Checkup</span>
-                        </h3>
-                        <p className="text-base md:text-xl text-slate-400 max-w-2xl mx-auto">
-                            Our experts will test your fleet's batteries and demonstrate exactly how much you can save with regeneration.
-                        </p>
-                    </div>
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitted(true);
+    formRef.current?.reset();
+  };
 
-                    <form className="space-y-6 relative z-10 max-w-3xl mx-auto">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-slate-300 ml-1">Name / Company</label>
-                                <input
-                                    type="text"
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all placeholder-slate-600 shadow-inner"
-                                    placeholder="e.g. Acme Logistics"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-slate-300 ml-1">Phone Number</label>
-                                <input
-                                    type="tel"
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all placeholder-slate-600 shadow-inner"
-                                    placeholder="+1 (555) 000-0000"
-                                />
-                            </div>
-                        </div>
+  return (
+    <>
+      <section
+        id="contact"
+        className="relative z-30 border-t border-white/10 bg-ink-950/40 px-4 py-20 sm:px-6 md:py-24 lg:px-10"
+      >
+        <div className="mx-auto grid w-full max-w-[1320px] gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-7 shadow-[0_35px_80px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl sm:p-9">
+            <p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200/85">
+              Fleet Assessment
+            </p>
+            <h3 className="mt-4 font-display text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
+              Schedule a Regeneration
+              <span className="text-transparent bg-gradient-to-r from-cyan-200 via-emerald-300 to-emerald-400 bg-clip-text">
+                {' '}
+                Site Check.
+              </span>
+            </h3>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-200 sm:text-lg">
+              Share your setup and we will estimate recoverable battery capacity,
+              expected savings, and treatment volume for your operation.
+            </p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-slate-300 ml-1">Setup Type</label>
-                                <div className="relative">
-                                    <select defaultValue="" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all appearance-none cursor-pointer shadow-inner">
-                                        <option value="" disabled>Select Application</option>
-                                        <option value="e-rickshaw">E-Rickshaw</option>
-                                        <option value="forklift">Forklift / Material Handling</option>
-                                        <option value="ups">UPS / Inverter</option>
-                                        <option value="solar">Solar Storage Ecosystem</option>
-                                    </select>
-                                    <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none">
-                                        <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-slate-300 ml-1">Number of Batteries</label>
-                                <input
-                                    type="number"
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all placeholder-slate-600 shadow-inner"
-                                    placeholder="e.g. 12"
-                                    min="1"
-                                />
-                            </div>
-                        </div>
-
-                        <motion.button
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            whileTap={{ scale: 0.98 }}
-                            type="button"
-                            className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-lg md:text-xl py-4 md:py-5 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] mt-4 md:mt-8"
-                        >
-                            Get My Free Assessment
-                        </motion.button>
-                    </form>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-cyan-200/20 text-cyan-100">
+                  <ShieldCheck className="h-4 w-4" />
                 </div>
-            </section>
-
-            {/* Actual Footer */}
-            <footer className="bg-slate-950 py-8 md:py-12 border-t border-slate-900 border-dashed relative z-30">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-0">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-slate-800 flex items-center justify-center font-black text-slate-400 leading-none text-xs">
-                            A
-                        </div>
-                        <span className="text-sm font-bold text-slate-400 tracking-wide">
-                            Artheon Energy
-                        </span>
-                    </div>
-                    <div className="text-xs md:text-sm text-slate-500 font-medium text-center md:text-left">
-                        &copy; {new Date().getFullYear()} Artheon Energy. All rights reserved.
-                    </div>
-                    <div className="flex gap-4 md:gap-6 text-xs md:text-sm font-medium text-slate-500">
-                        <a href="#" className="hover:text-emerald-400 transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-emerald-400 transition-colors">Terms of Service</a>
-                    </div>
+                <p className="mt-3 text-sm text-slate-300">
+                  Warranty-backed treatment window for regenerated batteries.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-200/20 text-emerald-100">
+                  <Factory className="h-4 w-4" />
                 </div>
-            </footer>
-        </>
-    );
+                <p className="mt-3 text-sm text-slate-300">
+                  Built for high-cycle fleets: logistics, warehousing, and energy
+                  backup.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-200">
+              <a
+                href="tel:+15550000000"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-4 py-2"
+              >
+                <Phone className="h-4 w-4 text-cyan-200" />
+                +1 (555) 000-0000
+              </a>
+              <a
+                href="mailto:hello@artheonenergy.com"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-4 py-2"
+              >
+                <Mail className="h-4 w-4 text-emerald-200" />
+                hello@artheonenergy.com
+              </a>
+            </div>
+          </div>
+
+          <form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 shadow-[0_35px_80px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl sm:p-8"
+          >
+            <p className="font-mono text-xs uppercase tracking-[0.24em] text-emerald-200/85">
+              Request Callback
+            </p>
+
+            <div className="mt-5 space-y-4">
+              <div>
+                <label htmlFor="contact-name" className="mb-2 block text-sm font-medium text-slate-200">
+                  Name or Company
+                </label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  required
+                  placeholder="Acme Logistics"
+                  className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="contact-phone" className="mb-2 block text-sm font-medium text-slate-200">
+                  Phone Number
+                </label>
+                <input
+                  id="contact-phone"
+                  type="tel"
+                  required
+                  placeholder="+1 (555) 000-0000"
+                  className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="contact-setup" className="mb-2 block text-sm font-medium text-slate-200">
+                    Setup Type
+                  </label>
+                  <select
+                    id="contact-setup"
+                    required
+                    defaultValue=""
+                    className="w-full cursor-pointer rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
+                  >
+                    <option value="" disabled>
+                      Select setup
+                    </option>
+                    <option value="e-rickshaw">E-Rickshaw Fleet</option>
+                    <option value="forklift">Forklift / Material Handling</option>
+                    <option value="backup">UPS / Backup Power</option>
+                    <option value="solar">Solar Storage</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="contact-volume" className="mb-2 block text-sm font-medium text-slate-200">
+                    Batteries in Rotation
+                  </label>
+                  <input
+                    id="contact-volume"
+                    type="number"
+                    required
+                    min="1"
+                    placeholder="12"
+                    className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-300/90 px-5 py-3.5 font-semibold text-ink-950 transition hover:bg-emerald-200"
+            >
+              Get My Free Assessment
+            </button>
+
+            <p
+              aria-live="polite"
+              className="mt-3 min-h-6 text-sm text-emerald-100"
+            >
+              {submitted
+                ? 'Request sent. Artheon team will contact you shortly with assessment slots.'
+                : ''}
+            </p>
+          </form>
+        </div>
+      </section>
+
+      <footer className="relative z-30 border-t border-white/10 bg-ink-950 px-4 py-8 sm:px-6 lg:px-10">
+        <div className="mx-auto flex w-full max-w-[1320px] flex-col items-start justify-between gap-4 text-sm text-slate-400 md:flex-row md:items-center">
+          <p>© {new Date().getFullYear()} Artheon Energy. Battery Regeneration Systems.</p>
+          <div className="flex gap-5">
+            <a href="#" className="transition-colors hover:text-cyan-200">
+              Privacy Policy
+            </a>
+            <a href="#" className="transition-colors hover:text-cyan-200">
+              Terms of Service
+            </a>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
 };
