@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { AnimatePresence, motion, type MotionValue } from 'framer-motion';
-import { ArrowUpRight, Menu, X } from 'lucide-react';
+import {
+  ArrowUpRight,
+  LaptopMinimal,
+  Menu,
+  MoonStar,
+  SunMedium,
+  X,
+} from 'lucide-react';
 
 type ChapterLink = {
   id: string;
@@ -10,12 +17,29 @@ type ChapterLink = {
 interface HeaderProps {
   chapters: ChapterLink[];
   progress: MotionValue<number>;
+  themeMode: 'system' | 'lite' | 'dark';
+  resolvedTheme: 'lite' | 'dark';
+  onCycleTheme: () => void;
 }
 
-export const Header = ({ chapters, progress }: HeaderProps) => {
+export const Header = ({
+  chapters,
+  progress,
+  themeMode,
+  resolvedTheme,
+  onCycleTheme,
+}: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  const themeLabel = themeMode === 'system' ? 'Auto' : resolvedTheme === 'lite' ? 'Lite' : 'Dark';
+  const ThemeIcon =
+    themeMode === 'system'
+      ? LaptopMinimal
+      : resolvedTheme === 'lite'
+        ? SunMedium
+        : MoonStar;
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
@@ -48,25 +72,37 @@ export const Header = ({ chapters, progress }: HeaderProps) => {
           ))}
         </nav>
 
-        <div className="hidden lg:block">
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-300/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100 transition-all hover:border-emerald-200 hover:bg-emerald-300/20"
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onCycleTheme}
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-100 transition hover:border-cyan-200/50 hover:text-cyan-100"
+            aria-label="Switch color mode"
           >
-            Book Free Checkup
-            <ArrowUpRight className="h-4 w-4" />
-          </a>
-        </div>
+            <ThemeIcon className="h-3.5 w-3.5" />
+            <span>{themeLabel}</span>
+          </button>
 
-        <button
-          type="button"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-slate-200 lg:hidden"
-          onClick={() => setIsMenuOpen((open) => !open)}
-          aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          aria-expanded={isMenuOpen}
-        >
-          {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+          <div className="hidden lg:block">
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-300/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100 transition-all hover:border-emerald-200 hover:bg-emerald-300/20"
+            >
+              Book Free Checkup
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+          </div>
+
+          <button
+            type="button"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] text-slate-200 lg:hidden"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={isMenuOpen}
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       <div className="relative h-[2px] w-full bg-white/10">
@@ -86,6 +122,20 @@ export const Header = ({ chapters, progress }: HeaderProps) => {
             className="border-b border-white/10 bg-ink-950/95 px-4 py-4 backdrop-blur-2xl sm:px-6 lg:hidden"
           >
             <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-2">
+              <button
+                type="button"
+                onClick={onCycleTheme}
+                className="inline-flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-slate-100"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <ThemeIcon className="h-4 w-4" />
+                  Theme
+                </span>
+                <span className="font-semibold uppercase tracking-[0.12em] text-cyan-100">
+                  {themeLabel}
+                </span>
+              </button>
+
               {chapters.map((chapter) => (
                 <a
                   key={chapter.id}

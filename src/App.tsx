@@ -1,4 +1,9 @@
-import { useRef, useState, type ReactNode } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import {
   motion,
   useMotionValueEvent,
@@ -29,7 +34,19 @@ type ScoreSnapshot = {
   uptime: number;
 };
 
+type ThemeMode = 'system' | 'lite' | 'dark';
+type ResolvedTheme = 'lite' | 'dark';
+
 const BATTERY_STAGE_POINTS = [0, 0.2, 0.42, 0.6, 0.78, 1];
+
+const THEME_MODE_STORAGE_KEY = 'artheon-theme-mode';
+
+const parseStoredThemeMode = (value: string | null): ThemeMode | null => {
+  if (value === 'system' || value === 'lite' || value === 'dark') {
+    return value;
+  }
+  return null;
+};
 
 const STORY_CHAPTERS: StoryChapter[] = [
   {
@@ -250,6 +267,74 @@ const StoryChapterCard = ({
 };
 
 function App() {
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    if (typeof window === 'undefined') {
+      return 'system';
+    }
+    const storedThemeMode = parseStoredThemeMode(
+      window.localStorage.getItem(THEME_MODE_STORAGE_KEY),
+    );
+    return storedThemeMode ?? 'system';
+  });
+
+  const [systemPrefersDark, setSystemPrefersDark] = useState<boolean>(() => {
+    if (typeof window === 'undefined') {
+      return true;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  const resolvedTheme: ResolvedTheme =
+    themeMode === 'system' ? (systemPrefersDark ? 'dark' : 'lite') : themeMode;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleMediaChange = (event: MediaQueryListEvent) => {
+      setSystemPrefersDark(event.matches);
+    };
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleMediaChange);
+      return () => mediaQuery.removeEventListener('change', handleMediaChange);
+    }
+
+    mediaQuery.addListener(handleMediaChange);
+    return () => mediaQuery.removeListener(handleMediaChange);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', resolvedTheme);
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (themeMode === 'system') {
+      window.localStorage.removeItem(THEME_MODE_STORAGE_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(THEME_MODE_STORAGE_KEY, themeMode);
+  }, [themeMode]);
+
+  const cycleThemeMode = () => {
+    setThemeMode((currentMode) => {
+      if (currentMode === 'system') {
+        return 'lite';
+      }
+      if (currentMode === 'lite') {
+        return 'dark';
+      }
+      return 'system';
+    });
+  };
+
   const containerRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -304,7 +389,7 @@ function App() {
   });
 
   return (
-    <div className="relative overflow-x-clip bg-ink-950 text-slate-100">
+    <div className="theme-canvas relative overflow-x-clip bg-ink-950 text-slate-100">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,184,166,0.15),transparent_52%),radial-gradient(circle_at_84%_22%,rgba(56,189,248,0.16),transparent_48%),linear-gradient(145deg,#020712,#040b1a_46%,#030817)]" />
         <motion.div
@@ -324,6 +409,9 @@ function App() {
       <Header
         chapters={STORY_CHAPTERS.map(({ id, navLabel }) => ({ id, label: navLabel }))}
         progress={smoothProgress}
+        themeMode={themeMode}
+        resolvedTheme={resolvedTheme}
+        onCycleTheme={cycleThemeMode}
       />
 
       <main
