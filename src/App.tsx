@@ -34,17 +34,17 @@ const STORY_CHAPTERS: StoryChapter[] = [
     id: 'problem',
     navLabel: 'Problem',
     sequence: '01',
-    eyebrow: 'Failure Pattern',
-    title: 'Sulfation Gradually Strangles Healthy Cells',
+    eyebrow: 'What Goes Wrong',
+    title: 'Sulfation Slowly Steals Battery Power',
     description:
-      'High-cycling fleets lose runtime because hardened sulfate crystals lock active material on lead plates. The battery still looks stable while usable capacity drops week by week.',
+      'Over time, a hard layer called sulfation builds up inside lead-acid batteries. That buildup blocks normal power flow, so the battery gives less runtime even when it still looks fine from the outside.',
     highlights: [
-      'Runtime fades before voltage alarms trigger.',
-      'Replacement cycles accelerate across fleets.',
-      'Idle charging windows hide structural damage.',
-      'Downtime costs stack across peak operations.',
+      'Your battery runs out faster than before.',
+      'Charging feels normal, but performance keeps dropping.',
+      'You end up replacing batteries sooner than expected.',
+      'Breakdowns interrupt daily work and deliveries.',
     ],
-    impactLabel: 'Typical pre-regeneration retention',
+    impactLabel: 'Typical battery strength before treatment',
     impactValue: '35-55%',
     accent:
       'bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.24),transparent_58%)]',
@@ -53,17 +53,17 @@ const STORY_CHAPTERS: StoryChapter[] = [
     id: 'diagnostics',
     navLabel: 'Diagnostics',
     sequence: '02',
-    eyebrow: 'Signal Scan',
-    title: 'RG-16X Maps Degradation Before It Treats',
+    eyebrow: 'Quick Check',
+    title: 'We First Check Battery Health',
     description:
-      'Each battery is profiled for resistance behavior and pulse response. That diagnostic pass sets a treatment band so energy focuses on crystal breakup instead of plate stress.',
+      'Before treatment starts, the RG-16X checks how weak the battery is and how it responds. This helps set the right treatment level for safe, consistent recovery.',
     highlights: [
-      'Cell behavior is profiled before pulse application.',
-      'Pulse width and cadence are tuned by response curve.',
-      'Treatment windows are repeatable across sites.',
-      'Technician workflow is standardized for scale.',
+      'Each battery is tested before any pulse is applied.',
+      'Settings are adjusted for that battery, not guessed.',
+      'The process is repeatable across fleets and shops.',
+      'Results are easier to track and compare over time.',
     ],
-    impactLabel: 'Initial screening turnaround',
+    impactLabel: 'Typical check time',
     impactValue: '8-12 min',
     accent:
       'bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.24),transparent_58%)]',
@@ -73,16 +73,16 @@ const STORY_CHAPTERS: StoryChapter[] = [
     navLabel: 'Regeneration',
     sequence: '03',
     eyebrow: 'Pulse Treatment',
-    title: 'High-Frequency Pulses Dissolve Crystal Buildup',
+    title: 'Targeted Pulses Break Sulfation Buildup',
     description:
-      'Targeted resonance disrupts sulfate structures and returns active material to the electrolyte cycle. The process restores performance while preserving lead architecture.',
+      'Controlled electrical pulses help break down sulfation so the battery can work normally again. This improves performance without replacing the whole battery.',
     highlights: [
-      'Crystal fragmentation happens in controlled stages.',
-      'Thermal profile remains stable during pulse cycles.',
-      'Electrolyte activity recovers without harsh stripping.',
-      'Reconditioning can repeat over battery lifespan.',
+      'Sulfation buildup is reduced step by step.',
+      'Treatment is controlled to avoid unnecessary stress.',
+      'Usable power comes back after the process.',
+      'The same battery can be treated again later if needed.',
     ],
-    impactLabel: 'Primary cycle duration',
+    impactLabel: 'Typical treatment time',
     impactValue: '2-4 hrs',
     accent:
       'bg-[radial-gradient(circle_at_top_right,rgba(20,184,166,0.24),transparent_58%)]',
@@ -91,17 +91,17 @@ const STORY_CHAPTERS: StoryChapter[] = [
     id: 'impact',
     navLabel: 'Impact',
     sequence: '04',
-    eyebrow: 'Operational ROI',
-    title: 'Recovered Capacity, Lower Spend, Longer Asset Life',
+    eyebrow: 'Final Result',
+    title: 'Better Runtime, Lower Cost, Longer Battery Life',
     description:
-      'Most treated batteries recover into an operational range that removes urgent replacement pressure. Teams gain predictable uptime and redirect capital away from avoidable swaps.',
+      'After regeneration, many batteries return to strong day-to-day use. That means fewer urgent replacements, better uptime, and more money saved.',
     highlights: [
-      'Recovered batteries re-enter rotation quickly.',
-      'Replacement budget drops by up to 70%.',
-      'Fleet reliability improves across peak shifts.',
-      'Warranty-backed output supports procurement confidence.',
+      'Recovered batteries can go back to work quickly.',
+      'Replacement spend can drop by up to 70%.',
+      'Operations stay more reliable during busy hours.',
+      'You get clearer planning and less surprise downtime.',
     ],
-    impactLabel: 'Post-regeneration usable capacity',
+    impactLabel: 'Usable battery strength after treatment',
     impactValue: '80-100%',
     accent:
       'bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.24),transparent_58%)]',
@@ -332,8 +332,8 @@ function App() {
                   </span>
                 </h1>
                 <p className="text-sm leading-relaxed text-slate-200">
-                  Scroll through the four treatment chapters and track live battery
-                  state from sulfation through post-regeneration recovery.
+                  Scroll through four simple steps, from sulfation buildup to
+                  battery recovery, and watch the battery animation change live.
                 </p>
               </div>
             </article>
@@ -360,7 +360,7 @@ function App() {
         <aside className="relative hidden w-full lg:sticky lg:top-28 lg:block lg:h-[calc(100vh-8.25rem)] lg:w-[46%]">
           <motion.div
             style={{ rotateX: stageTilt }}
-            className="relative h-full overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_36px_90px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl sm:p-7 lg:p-9"
+            className="relative h-full overflow-visible rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_36px_90px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl sm:p-7 lg:p-8"
           >
             <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(56,189,248,0.08),transparent_42%,rgba(16,185,129,0.08))]" />
             <div className="relative z-10 flex h-full flex-col gap-8">
@@ -368,7 +368,7 @@ function App() {
                 <p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-300/90">
                   Regeneration Storyline
                 </p>
-                <h1 className="font-display text-4xl font-bold leading-[1.04] text-white sm:text-5xl lg:text-[3.35rem]">
+                <h1 className="font-display text-4xl font-bold leading-[1.04] text-white sm:text-5xl lg:text-[3rem]">
                   Don&apos;t Replace.
                   <br />
                   <span className="text-transparent bg-gradient-to-r from-emerald-300 via-cyan-200 to-cyan-400 bg-clip-text">
@@ -376,12 +376,12 @@ function App() {
                   </span>
                 </h1>
                 <p className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-                  A single scroll maps the full cycle from sulfation damage to
-                  measurable recovery with Artheon&apos;s RG-16X pulse regeneration.
+                  One scroll shows how sulfation reduces performance, then how
+                  RG-16X helps bring battery power back.
                 </p>
               </div>
 
-              <div className="grid flex-1 place-items-center">
+              <div className="grid min-h-0 flex-1 place-items-center pb-1">
                 <BatteryGraphic scrollProgress={smoothProgress} />
               </div>
 

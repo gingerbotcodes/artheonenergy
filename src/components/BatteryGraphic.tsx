@@ -111,7 +111,7 @@ export const BatteryGraphic = ({
 
   const frameWidthClass = compact
     ? 'max-w-[148px] sm:max-w-[168px]'
-    : 'max-w-[370px]';
+    : 'max-w-[clamp(11.5rem,21vh,19rem)]';
 
   const terminalWidthClass = compact ? 'w-[62%]' : 'w-[68%]';
   const terminalSlotClass = compact ? 'h-5 w-8' : 'h-6 w-10';
