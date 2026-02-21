@@ -7,6 +7,24 @@ interface BatteryGraphicProps {
 
 const PLATE_COUNT = 6;
 
+type ElectronBubbleSpec = {
+  id: string;
+  left: number;
+  top: number;
+  travel: number;
+  duration: number;
+  delay: number;
+};
+
+const ELECTRON_BUBBLES: ElectronBubbleSpec[] = Array.from({ length: 12 }, (_, index) => ({
+  id: `electron-${index}`,
+  left: 8 + ((index * 17) % 84),
+  top: 14 + ((index * 13) % 64),
+  travel: 3 + (index % 4),
+  duration: 2.2 + (index % 5) * 0.25,
+  delay: (index % 6) * 0.18,
+}));
+
 export const BatteryGraphic = ({
   scrollProgress,
   compact = false,
@@ -42,16 +60,16 @@ export const BatteryGraphic = ({
     [0, 0, 1, 0.62, 0],
   );
 
-  const electronFlowX = useTransform(
+  const electronDriftX = useTransform(
     smoothProgress,
-    [0, 0.28, 0.55, 0.78, 1],
-    [-16, 20, -14, 18, -8],
+    [0, 0.3, 0.42, 0.6, 0.78, 1],
+    [0, 10, 16, 5, -7, -14],
   );
 
   const electronOpacity = useTransform(
     smoothProgress,
-    [0, 0.18, 0.42, 0.75, 1],
-    [0.1, 0.18, 0.32, 0.28, 0.2],
+    [0, 0.2, 0.42, 0.75, 1],
+    [0.14, 0.24, 0.34, 0.3, 0.2],
   );
 
   const shakeX = useTransform(
@@ -82,9 +100,12 @@ export const BatteryGraphic = ({
   const labelClass = compact
     ? 'bottom-3 w-[66%] max-w-[110px] rounded-lg px-2 py-1'
     : 'bottom-5 w-[62%] max-w-[180px] rounded-xl px-3 py-2';
-  const electronStops = compact
-    ? ['16%', '48%', '78%']
-    : ['12%', '30%', '48%', '66%', '84%'];
+  const electronBubbles = compact
+    ? ELECTRON_BUBBLES.slice(0, 6)
+    : ELECTRON_BUBBLES;
+  const electronBubbleClass = compact
+    ? 'absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-100/40 bg-cyan-300/18 px-[1px] py-[1px] font-mono text-[5px] font-semibold leading-none text-cyan-100'
+    : 'absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-100/40 bg-cyan-300/18 px-[2px] py-[1px] font-mono text-[6px] font-semibold leading-none text-cyan-100';
 
   return (
     <motion.div
@@ -135,21 +156,24 @@ export const BatteryGraphic = ({
           />
 
           <motion.div
-            style={{ opacity: electronOpacity }}
-            className="pointer-events-none absolute left-[11%] right-[11%] top-[37%] h-[2px] rounded-full bg-gradient-to-r from-cyan-200/15 via-cyan-200/45 to-cyan-200/15"
-          />
-          <motion.div
-            style={{ x: electronFlowX, opacity: electronOpacity }}
-            className="pointer-events-none absolute inset-x-[11%] top-[33%] h-8 transform-gpu will-change-transform"
+            style={{ x: electronDriftX, opacity: electronOpacity }}
+            className="pointer-events-none absolute inset-0 transform-gpu will-change-transform"
           >
-            {electronStops.map((left, index) => (
-              <div
-                key={`electron-${index}`}
-                style={{ left }}
-                className="absolute top-1/2 -translate-y-1/2 rounded-full border border-cyan-100/45 bg-cyan-300/15 px-1.5 py-[1px] font-mono text-[8px] font-semibold leading-none text-cyan-100"
+            {electronBubbles.map((bubble) => (
+              <motion.div
+                key={bubble.id}
+                style={{ left: `${bubble.left}%`, top: `${bubble.top}%` }}
+                className={electronBubbleClass}
+                animate={{ y: [0, -bubble.travel, 0, bubble.travel, 0] }}
+                transition={{
+                  duration: bubble.duration,
+                  delay: bubble.delay,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: 'easeInOut',
+                }}
               >
                 e-
-              </div>
+              </motion.div>
             ))}
           </motion.div>
 
@@ -184,9 +208,6 @@ export const BatteryGraphic = ({
             }`}
           >
             Artheon Energy
-          </p>
-          <p className={`font-display font-bold text-white ${compact ? 'text-sm' : 'text-lg tracking-[0.08em]'}`}>
-            RG-16X
           </p>
         </div>
       </div>
