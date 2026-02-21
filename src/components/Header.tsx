@@ -33,13 +33,31 @@ export const Header = ({
 
   const closeMenu = () => setIsMenuOpen(false);
 
-  const themeLabel = themeMode === 'system' ? 'Auto' : resolvedTheme === 'lite' ? 'Lite' : 'Dark';
+  const themeLabel =
+    themeMode === 'system'
+      ? 'System theme'
+      : resolvedTheme === 'lite'
+        ? 'Light theme'
+        : 'Dark theme';
   const ThemeIcon =
     themeMode === 'system'
       ? LaptopMinimal
       : resolvedTheme === 'lite'
         ? SunMedium
         : MoonStar;
+  const themeIconKey = `${themeMode}-${resolvedTheme}`;
+  const themeAuraClass =
+    themeMode === 'system'
+      ? 'from-cyan-300/55 via-slate-200/25 to-emerald-300/55'
+      : resolvedTheme === 'lite'
+        ? 'from-amber-200/90 via-amber-100/55 to-sky-200/65'
+        : 'from-indigo-300/45 via-slate-100/20 to-cyan-300/45';
+  const themeIconClass =
+    themeMode === 'system'
+      ? 'text-cyan-50'
+      : resolvedTheme === 'lite'
+        ? 'text-amber-50'
+        : 'text-slate-100';
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
@@ -73,15 +91,63 @@ export const Header = ({
         </nav>
 
         <div className="flex items-center gap-2">
-          <button
+          <motion.button
             type="button"
             onClick={onCycleTheme}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-100 transition hover:border-cyan-200/50 hover:text-cyan-100"
-            aria-label="Switch color mode"
+            whileTap={{ scale: 0.94 }}
+            className="relative inline-flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/[0.03] transition hover:border-cyan-200/55"
+            aria-label={`Switch color mode. Current mode: ${themeLabel}`}
           >
-            <ThemeIcon className="h-3.5 w-3.5" />
-            <span>{themeLabel}</span>
-          </button>
+            <motion.span
+              className={`pointer-events-none absolute inset-[2px] rounded-full bg-gradient-to-br ${themeAuraClass}`}
+              animate={{
+                scale: [1, 1.04, 1],
+                opacity:
+                  themeMode === 'system'
+                    ? [0.68, 0.9, 0.68]
+                    : resolvedTheme === 'lite'
+                      ? [0.85, 1, 0.85]
+                      : [0.56, 0.76, 0.56],
+              }}
+              transition={{
+                duration: themeMode === 'system' ? 1.7 : 2.1,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: 'easeInOut',
+              }}
+            />
+            <span className="pointer-events-none absolute inset-[2px] rounded-full bg-[radial-gradient(circle_at_30%_24%,rgba(255,255,255,0.48),transparent_56%)]" />
+            <span className="relative z-10 grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-ink-950/60 shadow-[inset_0_0_12px_rgba(15,23,42,0.42)]">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={themeIconKey}
+                  initial={{ opacity: 0, rotate: -56, scale: 0.5, y: 4 }}
+                  animate={{ opacity: 1, rotate: 0, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, rotate: 56, scale: 0.45, y: -4 }}
+                  transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+                  className={themeIconClass}
+                >
+                  <ThemeIcon className="h-[18px] w-[18px]" />
+                </motion.span>
+              </AnimatePresence>
+            </span>
+
+            <AnimatePresence>
+              {themeMode === 'system' && (
+                <motion.span
+                  key="system-scanline"
+                  className="pointer-events-none absolute bottom-[5px] left-1/2 z-20 h-[2px] w-5 -translate-x-1/2 rounded-full bg-cyan-100/90"
+                  initial={{ opacity: 0, scaleX: 0.5 }}
+                  animate={{ opacity: [0.2, 0.95, 0.2], scaleX: [0.6, 1, 0.6] }}
+                  exit={{ opacity: 0, scaleX: 0.45 }}
+                  transition={{
+                    duration: 1.45,
+                    repeat: Number.POSITIVE_INFINITY,
+                    ease: 'easeInOut',
+                  }}
+                />
+              )}
+            </AnimatePresence>
+          </motion.button>
 
           <div className="hidden lg:block">
             <a
@@ -122,20 +188,6 @@ export const Header = ({
             className="border-b border-white/10 bg-ink-950/95 px-4 py-4 backdrop-blur-md sm:px-6 lg:hidden"
           >
             <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-2">
-              <button
-                type="button"
-                onClick={onCycleTheme}
-                className="inline-flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-slate-100"
-              >
-                <span className="inline-flex items-center gap-2">
-                  <ThemeIcon className="h-4 w-4" />
-                  Theme
-                </span>
-                <span className="font-semibold uppercase tracking-[0.12em] text-cyan-100">
-                  {themeLabel}
-                </span>
-              </button>
-
               {chapters.map((chapter) => (
                 <a
                   key={chapter.id}

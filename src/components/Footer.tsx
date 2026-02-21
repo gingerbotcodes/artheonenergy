@@ -73,7 +73,7 @@ export const Footer = () => {
             </p>
             <h3 className="mt-4 font-display text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
               Book a Free
-              <span className="text-transparent bg-gradient-to-r from-cyan-200 via-emerald-300 to-emerald-400 bg-clip-text">
+              <span className="gradient-cyan-text text-transparent bg-gradient-to-r from-cyan-200 via-emerald-300 to-emerald-400 bg-clip-text">
                 {' '}
                 Battery Checkup.
               </span>

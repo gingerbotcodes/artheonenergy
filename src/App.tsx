@@ -457,7 +457,7 @@ function App() {
                 <h1 className="font-display text-4xl font-bold leading-[1.05] text-white">
                   Don&apos;t Replace.
                   <br />
-                  <span className="hero-recover-text text-transparent bg-gradient-to-r from-emerald-300 via-cyan-200 to-cyan-400 bg-clip-text">
+                  <span className="hero-recover-text gradient-cyan-text text-transparent bg-gradient-to-r from-emerald-300 via-cyan-200 to-cyan-400 bg-clip-text">
                     Recover Battery Life.
                   </span>
                 </h1>
@@ -501,7 +501,7 @@ function App() {
                 <h1 className="font-display text-4xl font-bold leading-[1.04] text-white sm:text-5xl lg:text-[3rem]">
                   Don&apos;t Replace.
                   <br />
-                  <span className="hero-recover-text text-transparent bg-gradient-to-r from-emerald-300 via-cyan-200 to-cyan-400 bg-clip-text">
+                  <span className="hero-recover-text gradient-cyan-text text-transparent bg-gradient-to-r from-emerald-300 via-cyan-200 to-cyan-400 bg-clip-text">
                     Recover Battery Life.
                   </span>
                 </h1>
