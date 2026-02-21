@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Artheon Energy">
+  <defs>
+    <linearGradient id="bg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f172a" />
+      <stop offset="1" stop-color="#052e2b" />
+    </linearGradient>
+    <linearGradient id="bolt" x1="28" y1="16" x2="43" y2="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6ee7b7" />
+      <stop offset="1" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bg)" />
+  <path
+    d="M18 46 30.5 18h3L46 46h-7.4l-1.7-4.8H27L25.2 46Zm11.6-10.9h4.7L32 28.4Z"
+    fill="#f8fafc"
+  />
+  <path d="M38.6 14 33 29.7h5l-3.3 11.2L46 24h-5.6L44.6 14Z" fill="url(#bolt)" />
+</svg>
