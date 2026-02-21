@@ -462,8 +462,8 @@ function App() {
                   </span>
                 </h1>
                 <p className="text-sm leading-relaxed text-slate-200">
-                  Scroll through four simple steps, from sulfation buildup to
-                  battery recovery, and watch the battery animation change live.
+                  with just this four simple steps, from sulfation buildup to
+                  battery recovery, and watch your battery come back to life.
                 </p>
               </div>
             </article>
