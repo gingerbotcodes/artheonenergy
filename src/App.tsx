@@ -37,31 +37,31 @@ const STORY_CHAPTERS: StoryChapter[] = [
     eyebrow: 'What Goes Wrong',
     title: 'Sulfation Slowly Steals Battery Power',
     description:
-      'Over time, a hard layer called sulfation builds up inside lead-acid batteries. That buildup blocks normal power flow, so the battery gives less runtime even when it still looks fine from the outside.',
+      'Inside old batteries, a hard layer called sulfation builds up. This blocks smooth power flow, so your battery gives less backup and drains faster.',
     highlights: [
       'Your battery runs out faster than before.',
       'Charging feels normal, but performance keeps dropping.',
       'You end up replacing batteries sooner than expected.',
       'Breakdowns interrupt daily work and deliveries.',
     ],
-    impactLabel: 'Typical battery strength before treatment',
+    impactLabel: 'Battery strength before checkup',
     impactValue: '35-55%',
     accent:
       'bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.24),transparent_58%)]',
   },
   {
     id: 'diagnostics',
-    navLabel: 'Diagnostics',
+    navLabel: 'Checkup',
     sequence: '02',
     eyebrow: 'Quick Check',
     title: 'We First Check Battery Health',
     description:
-      'Before treatment starts, the RG-16X checks how weak the battery is and how it responds. This helps set the right treatment level for safe, consistent recovery.',
+      'Before we start, we do a quick health check to see your battery condition. This helps us choose the right level for a safe and useful result.',
     highlights: [
-      'Each battery is tested before any pulse is applied.',
-      'Settings are adjusted for that battery, not guessed.',
-      'The process is repeatable across fleets and shops.',
-      'Results are easier to track and compare over time.',
+      'We test first, then treat.',
+      'Settings are based on your battery condition.',
+      'The process stays consistent across all batteries.',
+      'You get clear before-and-after results.',
     ],
     impactLabel: 'Typical check time',
     impactValue: '8-12 min',
@@ -70,19 +70,19 @@ const STORY_CHAPTERS: StoryChapter[] = [
   },
   {
     id: 'regeneration',
-    navLabel: 'Regeneration',
+    navLabel: 'Fix',
     sequence: '03',
-    eyebrow: 'Pulse Treatment',
+    eyebrow: 'Battery Fix',
     title: 'Targeted Pulses Break Sulfation Buildup',
     description:
-      'Controlled electrical pulses help break down sulfation so the battery can work normally again. This improves performance without replacing the whole battery.',
+      'We use controlled pulses to break the sulfation layer. This helps your battery hold charge better again without replacing it right away.',
     highlights: [
-      'Sulfation buildup is reduced step by step.',
-      'Treatment is controlled to avoid unnecessary stress.',
-      'Usable power comes back after the process.',
-      'The same battery can be treated again later if needed.',
+      'Sulfation gets reduced step by step.',
+      'The process is controlled and safe.',
+      'Battery backup improves after treatment.',
+      'You can treat the same battery again later if needed.',
     ],
-    impactLabel: 'Typical treatment time',
+    impactLabel: 'Typical fix time',
     impactValue: '2-4 hrs',
     accent:
       'bg-[radial-gradient(circle_at_top_right,rgba(20,184,166,0.24),transparent_58%)]',
@@ -94,14 +94,14 @@ const STORY_CHAPTERS: StoryChapter[] = [
     eyebrow: 'Final Result',
     title: 'Better Runtime, Lower Cost, Longer Battery Life',
     description:
-      'After regeneration, many batteries return to strong day-to-day use. That means fewer urgent replacements, better uptime, and more money saved.',
+      'After this process, many batteries work much better in daily use. You save money, avoid surprise battery failure, and get more life from each unit.',
     highlights: [
       'Recovered batteries can go back to work quickly.',
       'Replacement spend can drop by up to 70%.',
       'Operations stay more reliable during busy hours.',
       'You get clearer planning and less surprise downtime.',
     ],
-    impactLabel: 'Usable battery strength after treatment',
+    impactLabel: 'Battery strength after checkup',
     impactValue: '80-100%',
     accent:
       'bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.24),transparent_58%)]',
@@ -322,7 +322,7 @@ function App() {
               <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(56,189,248,0.12),transparent_44%,rgba(16,185,129,0.14))]" />
               <div className="relative z-10 space-y-4">
                 <p className="font-mono text-xs uppercase tracking-[0.22em] text-cyan-200/90">
-                  Regeneration Storyline
+                  How It Works
                 </p>
                 <h1 className="font-display text-4xl font-bold leading-[1.05] text-white">
                   Don&apos;t Replace.
@@ -366,7 +366,7 @@ function App() {
             <div className="relative z-10 flex h-full flex-col gap-8">
               <div className="space-y-3">
                 <p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-300/90">
-                  Regeneration Storyline
+                  How It Works
                 </p>
                 <h1 className="font-display text-4xl font-bold leading-[1.04] text-white sm:text-5xl lg:text-[3rem]">
                   Don&apos;t Replace.

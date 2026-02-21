@@ -20,18 +20,18 @@ export const Footer = () => {
         <div className="mx-auto grid w-full max-w-[1320px] gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-7 shadow-[0_35px_80px_-42px_rgba(15,23,42,0.95)] backdrop-blur-2xl sm:p-9">
             <p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200/85">
-              Fleet Assessment
+              Free Checkup
             </p>
             <h3 className="mt-4 font-display text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
-              Schedule a Regeneration
+              Book a Free
               <span className="text-transparent bg-gradient-to-r from-cyan-200 via-emerald-300 to-emerald-400 bg-clip-text">
                 {' '}
-                Site Check.
+                Battery Checkup.
               </span>
             </h3>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-200 sm:text-lg">
-              Share your setup and we will estimate recoverable battery capacity,
-              expected savings, and treatment volume for your operation.
+              Tell us about your setup and we will show you if your batteries can
+              be improved instead of replaced.
             </p>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -40,7 +40,7 @@ export const Footer = () => {
                   <ShieldCheck className="h-4 w-4" />
                 </div>
                 <p className="mt-3 text-sm text-slate-300">
-                  Warranty-backed treatment window for regenerated batteries.
+                  Warranty support on treated batteries.
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -48,19 +48,18 @@ export const Footer = () => {
                   <Factory className="h-4 w-4" />
                 </div>
                 <p className="mt-3 text-sm text-slate-300">
-                  Built for high-cycle fleets: logistics, warehousing, and energy
-                  backup.
+                  Useful for shops, warehouses, transport, and backup systems.
                 </p>
               </div>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-200">
               <a
-                href="tel:+15550000000"
+                href="tel:+919876543210"
                 className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-4 py-2"
               >
                 <Phone className="h-4 w-4 text-cyan-200" />
-                +1 (555) 000-0000
+                +91 98765 43210
               </a>
               <a
                 href="mailto:hello@artheonenergy.com"
@@ -108,7 +107,7 @@ export const Footer = () => {
                   inputMode="tel"
                   type="tel"
                   required
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+91 98765 43210"
                   className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                 />
               </div>
@@ -157,7 +156,7 @@ export const Footer = () => {
               type="submit"
               className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-300/90 px-5 py-3.5 font-semibold text-ink-950 transition hover:bg-emerald-200"
             >
-              Get My Free Assessment
+              Book My Free Checkup
             </button>
 
             <p
@@ -165,7 +164,7 @@ export const Footer = () => {
               className="mt-3 min-h-6 text-sm text-emerald-100"
             >
               {submitted
-                ? 'Request sent. Artheon team will contact you shortly with assessment slots.'
+                ? 'Request sent. Our team will call you shortly to schedule your free checkup.'
                 : ''}
             </p>
           </form>
