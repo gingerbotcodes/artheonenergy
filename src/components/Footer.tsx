@@ -1,14 +1,59 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { Factory, Mail, Phone, ShieldCheck } from 'lucide-react';
 
+const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
+const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY as string | undefined;
+
 export const Footer = () => {
   const formRef = useRef<HTMLFormElement>(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
-    formRef.current?.reset();
+
+    if (!formRef.current) {
+      return;
+    }
+
+    if (!WEB3FORMS_ACCESS_KEY) {
+      setSubmitState('error');
+      setFeedbackMessage('Form is not configured yet. Please set VITE_WEB3FORMS_ACCESS_KEY.');
+      return;
+    }
+
+    setSubmitState('submitting');
+    setFeedbackMessage('');
+
+    const formData = new FormData(formRef.current);
+    formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+    formData.append('subject', 'New Free Battery Checkup Request');
+    formData.append('from_name', 'Artheon Energy Website');
+
+    try {
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
+        body: formData,
+      });
+
+      const result = (await response.json()) as { success?: boolean; message?: string };
+
+      if (response.ok && result.success) {
+        setSubmitState('success');
+        setFeedbackMessage('Request sent. Our team will call you shortly to schedule your free checkup.');
+        formRef.current.reset();
+        return;
+      }
+
+      setSubmitState('error');
+      setFeedbackMessage(result.message ?? 'Could not send request. Please try again.');
+    } catch {
+      setSubmitState('error');
+      setFeedbackMessage('Network issue while sending request. Please try again.');
+    }
   };
 
   return (
@@ -97,6 +142,22 @@ export const Footer = () => {
               </div>
 
               <div>
+                <label htmlFor="contact-email" className="mb-2 block text-sm font-medium text-slate-200">
+                  Email
+                </label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  type="email"
+                  required
+                  placeholder="you@company.com"
+                  className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
+                />
+              </div>
+
+              <div>
                 <label htmlFor="contact-phone" className="mb-2 block text-sm font-medium text-slate-200">
                   Phone Number
                 </label>
@@ -111,6 +172,14 @@ export const Footer = () => {
                   className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                 />
               </div>
+
+              <input
+                type="checkbox"
+                name="botcheck"
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+              />
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
@@ -154,18 +223,19 @@ export const Footer = () => {
 
             <button
               type="submit"
+              disabled={submitState === 'submitting'}
               className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-300/90 px-5 py-3.5 font-semibold text-ink-950 transition hover:bg-emerald-200"
             >
-              Book My Free Checkup
+              {submitState === 'submitting' ? 'Sending...' : 'Book My Free Checkup'}
             </button>
 
             <p
               aria-live="polite"
-              className="mt-3 min-h-6 text-sm text-emerald-100"
+              className={`mt-3 min-h-6 text-sm ${
+                submitState === 'error' ? 'text-rose-200' : 'text-emerald-100'
+              }`}
             >
-              {submitted
-                ? 'Request sent. Our team will call you shortly to schedule your free checkup.'
-                : ''}
+              {feedbackMessage}
             </p>
           </form>
         </div>

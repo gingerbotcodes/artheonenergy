@@ -13,6 +13,7 @@ Marketing website for Artheon Energy's RG-16X battery regeneration service.
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev
 ```
 
@@ -36,4 +37,11 @@ Site runs at `http://localhost:5173` by default.
 ## Notes
 
 - The website is designed as a single-page narrative with anchor-based section navigation.
-- Form submission is currently front-end only and shows a success acknowledgement message.
+- Contact form submits directly to Web3Forms (no backend required).
+
+## Web3Forms Setup
+
+1. Create or open your account at [Web3Forms](https://web3forms.com/).
+2. Copy your access key.
+3. Set `VITE_WEB3FORMS_ACCESS_KEY` in `.env`.
+4. Restart dev server after updating `.env`.
