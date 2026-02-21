@@ -469,10 +469,11 @@ function App() {
           </FadeInBlock>
         </section>
 
-        <div className="sticky top-[5.7rem] z-30 lg:hidden">
+        <div className="relative sticky top-[calc(var(--header-height)+2px)] z-40 -mt-1 lg:hidden">
+          <div className="pointer-events-none absolute inset-x-0 -top-2 h-2 bg-ink-950/95" />
           <motion.div
             style={{ y: mobileStageLift }}
-            className="rounded-[1.65rem] border border-white/10 bg-ink-900/78 p-3 shadow-[0_24px_54px_-34px_rgba(8,47,73,0.9)] backdrop-blur-md"
+            className="relative rounded-[1.65rem] border border-white/10 bg-ink-900/78 p-3 shadow-[0_24px_54px_-34px_rgba(8,47,73,0.9)] backdrop-blur-md"
           >
             <div className="flex items-center gap-3">
               <BatteryGraphic scrollProgress={smoothProgress} compact />
