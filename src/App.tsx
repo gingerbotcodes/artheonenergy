@@ -29,6 +29,8 @@ type ScoreSnapshot = {
   uptime: number;
 };
 
+const BATTERY_STAGE_POINTS = [0, 0.2, 0.42, 0.6, 0.78, 1];
+
 const STORY_CHAPTERS: StoryChapter[] = [
   {
     id: 'problem',
@@ -269,14 +271,26 @@ function App() {
   const timelineHeight = useTransform(smoothProgress, [0, 1], ['0%', '100%']);
   const mobileStageLift = useTransform(smoothProgress, [0, 1], [0, -10]);
 
-  const recoveryScoreValue = useTransform(smoothProgress, [0, 1], [38, 94]);
-  const savingsScoreValue = useTransform(smoothProgress, [0, 1], [18, 70]);
-  const uptimeScoreValue = useTransform(smoothProgress, [0, 1], [71, 97]);
+  const recoveryScoreValue = useTransform(
+    smoothProgress,
+    BATTERY_STAGE_POINTS,
+    [82, 38, 32, 58, 68, 94],
+  );
+  const savingsScoreValue = useTransform(
+    smoothProgress,
+    BATTERY_STAGE_POINTS,
+    [54, 22, 18, 40, 52, 70],
+  );
+  const uptimeScoreValue = useTransform(
+    smoothProgress,
+    BATTERY_STAGE_POINTS,
+    [90, 62, 56, 74, 82, 97],
+  );
 
   const [scores, setScores] = useState<ScoreSnapshot>({
-    recovery: 38,
-    savings: 18,
-    uptime: 71,
+    recovery: 82,
+    savings: 54,
+    uptime: 90,
   });
 
   useMotionValueEvent(recoveryScoreValue, 'change', (latest) => {
