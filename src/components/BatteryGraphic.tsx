@@ -42,6 +42,18 @@ export const BatteryGraphic = ({
     [0, 0, 1, 0.62, 0],
   );
 
+  const electronFlowX = useTransform(
+    smoothProgress,
+    [0, 0.28, 0.55, 0.78, 1],
+    [-16, 20, -14, 18, -8],
+  );
+
+  const electronOpacity = useTransform(
+    smoothProgress,
+    [0, 0.18, 0.42, 0.75, 1],
+    [0.1, 0.18, 0.32, 0.28, 0.2],
+  );
+
   const shakeX = useTransform(
     smoothProgress,
     [0, 0.54, 0.58, 0.64, 0.7, 1],
@@ -70,6 +82,9 @@ export const BatteryGraphic = ({
   const labelClass = compact
     ? 'bottom-3 w-[66%] max-w-[110px] rounded-lg px-2 py-1'
     : 'bottom-5 w-[62%] max-w-[180px] rounded-xl px-3 py-2';
+  const electronStops = compact
+    ? ['16%', '48%', '78%']
+    : ['12%', '30%', '48%', '66%', '84%'];
 
   return (
     <motion.div
@@ -118,6 +133,25 @@ export const BatteryGraphic = ({
             style={{ opacity: pulseOpacity }}
             className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(6,182,212,0),rgba(34,211,238,0.44),rgba(6,182,212,0))]"
           />
+
+          <motion.div
+            style={{ opacity: electronOpacity }}
+            className="pointer-events-none absolute left-[11%] right-[11%] top-[37%] h-[2px] rounded-full bg-gradient-to-r from-cyan-200/15 via-cyan-200/45 to-cyan-200/15"
+          />
+          <motion.div
+            style={{ x: electronFlowX, opacity: electronOpacity }}
+            className="pointer-events-none absolute inset-x-[11%] top-[33%] h-8 transform-gpu will-change-transform"
+          >
+            {electronStops.map((left, index) => (
+              <div
+                key={`electron-${index}`}
+                style={{ left }}
+                className="absolute top-1/2 -translate-y-1/2 rounded-full border border-cyan-100/45 bg-cyan-300/15 px-1.5 py-[1px] font-mono text-[8px] font-semibold leading-none text-cyan-100"
+              >
+                e-
+              </div>
+            ))}
+          </motion.div>
 
           <motion.div
             style={{ scaleY: fluidScaleY, backgroundColor: fluidColor, originY: 1 }}
