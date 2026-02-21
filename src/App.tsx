@@ -207,7 +207,7 @@ const StoryChapterCard = ({
   return (
     <section
       id={chapter.id}
-      className="min-h-[70svh] scroll-mt-[7.2rem] pt-3 md:min-h-[76vh] md:scroll-mt-32"
+      className="scroll-mt-[7.2rem] py-1 md:scroll-mt-32 md:py-2"
     >
       <FadeInBlock delay={index * 0.05}>
         <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 shadow-[0_26px_60px_-32px_rgba(7,89,133,0.75)] backdrop-blur-md sm:p-7 lg:p-10">
@@ -519,7 +519,7 @@ function App() {
           </motion.div>
         </aside>
 
-        <div className="relative flex w-full flex-col gap-8 pb-8 lg:w-[54%] lg:gap-16">
+        <div className="relative flex w-full flex-col gap-6 pb-8 md:gap-8 lg:w-[54%] lg:gap-10">
           <div className="-mx-4 overflow-x-auto px-4 pb-1 lg:hidden [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
             <div className="flex w-max gap-2">
               {STORY_CHAPTERS.map((chapter) => (
