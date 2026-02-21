@@ -1,6 +1,6 @@
 # Artheon Energy Scrolltelling Site
 
-Marketing website for Artheon Energy's RG-16X battery regeneration service.
+Marketing website for Artheon Energy's battery regeneration service.
 
 ## Stack
 
@@ -29,7 +29,7 @@ Site runs at `http://localhost:5173` by default.
 ## Project Structure
 
 - `src/App.tsx` main scrolltelling layout and chapter content.
-- `src/components/BatteryGraphic.tsx` scroll-reactive RG-16X battery visualization.
+- `src/components/BatteryGraphic.tsx` scroll-reactive battery visualization.
 - `src/components/Header.tsx` top navigation, mobile menu, and progress indicator.
 - `src/components/Footer.tsx` contact CTA and callback form.
 - `src/index.css` design tokens, typography, and global styles.

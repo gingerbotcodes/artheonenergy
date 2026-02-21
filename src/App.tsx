@@ -462,8 +462,7 @@ function App() {
                   </span>
                 </h1>
                 <p className="text-sm leading-relaxed text-slate-200">
-                  with just this four simple steps, from sulfation buildup to
-                  battery recovery, and watch your battery come back to life.
+                  with just this four simple steps, from sulfation buildup to battery recovery, watch your battery come back to life
                 </p>
               </div>
             </article>
@@ -507,8 +506,7 @@ function App() {
                   </span>
                 </h1>
                 <p className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-                  One scroll shows how sulfation reduces performance, then how
-                  RG-16X helps bring battery power back.
+                  with just this four simple steps, from sulfation buildup to battery recovery, watch your battery come back to life
                 </p>
               </div>
 
