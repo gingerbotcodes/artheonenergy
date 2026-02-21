@@ -1,108 +1,61 @@
-import {
-  motion,
-  type MotionValue,
-  useMotionTemplate,
-  useSpring,
-  useTransform,
-} from 'framer-motion';
+import { motion, type MotionValue, useSpring, useTransform } from 'framer-motion';
 
 interface BatteryGraphicProps {
   scrollProgress: MotionValue<number>;
   compact?: boolean;
 }
 
-type ParticleSpec = {
-  id: string;
-  left: number;
-  top: number;
-  drift: number;
-  travel: number;
-  duration: number;
-  delay: number;
-};
-
 const PLATE_COUNT = 6;
-
-const PARTICLE_SPECS: ParticleSpec[] = Array.from({ length: 8 }, (_, index) => {
-  const left = 12 + ((index * 37) % 74);
-  const top = 42 + ((index * 19) % 35);
-  const drift = (index % 2 === 0 ? 1 : -1) * (14 + (index % 5) * 8);
-  const travel = 34 + (index % 4) * 14;
-  const duration = 2.3 + (index % 4) * 0.4;
-  const delay = (index % 6) * 0.22;
-
-  return {
-    id: `particle-${index}`,
-    left,
-    top,
-    drift,
-    travel,
-    duration,
-    delay,
-  };
-});
 
 export const BatteryGraphic = ({
   scrollProgress,
   compact = false,
 }: BatteryGraphicProps) => {
   const smoothProgress = useSpring(scrollProgress, {
-    stiffness: 80,
-    damping: 24,
-    mass: 0.4,
+    stiffness: 90,
+    damping: 28,
+    mass: 0.32,
     restDelta: 0.001,
   });
 
-  const fluidLevel = useTransform(
+  const fluidScaleY = useTransform(
     smoothProgress,
     [0, 0.2, 0.42, 0.6, 0.78, 1],
-    ['78%', '20%', '16%', '48%', '58%', '96%'],
+    [0.78, 0.2, 0.16, 0.48, 0.58, 0.96],
   );
 
-  const fluidHue = useTransform(
+  const fluidColor = useTransform(
     smoothProgress,
     [0, 0.25, 0.5, 0.7, 1],
-    [160, 4, 42, 168, 154],
+    ['#10b981', '#ef4444', '#eab308', '#14b8a6', '#10b981'],
   );
-
-  const fluidColor = useMotionTemplate`hsl(${fluidHue} 82% 53%)`;
 
   const crystalOpacity = useTransform(
     smoothProgress,
     [0, 0.2, 0.3, 0.52, 0.65, 1],
-    [0, 0, 0.9, 0.95, 0.12, 0],
+    [0, 0, 0.86, 0.86, 0.08, 0],
   );
 
   const pulseOpacity = useTransform(
     smoothProgress,
     [0, 0.48, 0.62, 0.84, 1],
-    [0, 0, 1, 0.7, 0],
+    [0, 0, 1, 0.62, 0],
   );
 
-  const sparkleOpacity = useTransform(smoothProgress, [0, 0.72, 0.88, 1], [0, 0, 0.55, 1]);
-
-  const jitterX = useTransform(
+  const shakeX = useTransform(
     smoothProgress,
-    [0, 0.52, 0.57, 0.62, 0.67, 0.72, 1],
-    [0, 0, -1.1, 1.1, -1.1, 0.7, 0],
-  );
-
-  const jitterY = useTransform(
-    smoothProgress,
-    [0, 0.52, 0.57, 0.62, 0.67, 0.72, 1],
-    [0, 0, 0.6, -0.6, 0.6, -0.6, 0],
+    [0, 0.54, 0.58, 0.64, 0.7, 1],
+    [0, 0, -0.8, 0.8, 0, 0],
   );
 
   const haloOpacity = useTransform(
     smoothProgress,
     [0, 0.28, 0.6, 1],
-    [0.28, 0.36, 0.5, 0.42],
+    [0.22, 0.3, 0.42, 0.36],
   );
 
-  const badgeScale = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [0, 0, 1.12, 1]);
-  const badgeRotate = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [-92, -92, 16, 10]);
-
-  const particleSpecs = compact ? PARTICLE_SPECS.slice(0, 3) : PARTICLE_SPECS.slice(0, 6);
+  const badgeScale = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [0, 0, 1.1, 1]);
+  const badgeRotate = useTransform(smoothProgress, [0, 0.86, 0.96, 1], [-92, -92, 14, 10]);
 
   const frameWidthClass = compact
     ? 'max-w-[148px] sm:max-w-[168px]'
@@ -120,25 +73,27 @@ export const BatteryGraphic = ({
 
   return (
     <motion.div
-      style={{ x: jitterX, y: jitterY }}
-      className={`relative mx-auto aspect-[4/5] w-full will-change-transform ${frameWidthClass}`}
+      style={{ x: shakeX }}
+      className={`relative mx-auto aspect-[4/5] w-full transform-gpu will-change-transform ${frameWidthClass}`}
     >
       <motion.div
         style={{ opacity: haloOpacity }}
-        className="absolute -inset-5 rounded-[2.8rem] bg-[radial-gradient(circle,rgba(34,211,238,0.45),rgba(16,185,129,0.2)_44%,transparent_72%)] blur-3xl"
+        className="absolute -inset-4 rounded-[2.8rem] bg-[radial-gradient(circle,rgba(34,211,238,0.45),rgba(16,185,129,0.18)_46%,transparent_70%)] blur-xl"
       />
 
       <div
         className={`absolute left-1/2 top-0 z-20 flex -translate-x-1/2 justify-between ${terminalWidthClass}`}
       >
-        <div className={`${terminalSlotClass} rounded-t-xl border border-slate-500 bg-gradient-to-b from-slate-400 to-slate-600`} />
+        <div className={`relative ${terminalSlotClass} rounded-t-xl border border-slate-500 bg-gradient-to-b from-slate-400 to-slate-600`}>
+          <span className="absolute inset-0 grid place-items-center text-sm font-bold text-slate-900">-</span>
+        </div>
         <div className={`relative ${terminalSlotClass} rounded-t-xl border border-rose-400/80 bg-gradient-to-b from-rose-400 to-rose-600`}>
           <span className="absolute inset-0 grid place-items-center text-sm font-bold text-white">+</span>
         </div>
       </div>
 
       <div
-        className={`absolute inset-x-0 bottom-0 ${shellTopClass} overflow-hidden border border-white/15 bg-slate-900/70 shadow-[inset_0_0_35px_rgba(2,6,23,0.95)] ${shellPaddingClass} ${shellRoundClass}`}
+        className={`absolute inset-x-0 bottom-0 ${shellTopClass} overflow-hidden border border-white/15 bg-slate-900/70 shadow-[inset_0_0_24px_rgba(2,6,23,0.92)] ${shellPaddingClass} ${shellRoundClass}`}
       >
         <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.08),transparent_22%,transparent_68%,rgba(56,189,248,0.12))]" />
 
@@ -150,30 +105,28 @@ export const BatteryGraphic = ({
                 className="relative overflow-hidden rounded-md border border-white/10 bg-gradient-to-b from-slate-300/30 via-slate-600/35 to-slate-900/60"
               >
                 <div className="absolute inset-0 bg-[linear-gradient(transparent_74%,rgba(2,6,23,0.4)_74%)] [background-size:100%_8px]" />
-                <motion.div
-                  style={{ opacity: crystalOpacity }}
-                  className="absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(251,191,36,0.45),transparent_34%),radial-gradient(circle_at_72%_72%,rgba(254,242,153,0.4),transparent_34%)] mix-blend-hard-light"
-                />
-                <motion.div
-                  style={{ opacity: pulseOpacity }}
-                  className="absolute inset-0 bg-[linear-gradient(to_top,rgba(6,182,212,0),rgba(34,211,238,0.55),rgba(6,182,212,0))]"
-                />
               </div>
             ))}
           </div>
 
           <motion.div
-            style={{ height: fluidLevel, background: fluidColor }}
-            className="absolute inset-x-0 bottom-0 overflow-hidden border-t border-white/20"
+            style={{ opacity: crystalOpacity }}
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(251,191,36,0.44),transparent_34%),radial-gradient(circle_at_72%_72%,rgba(254,242,153,0.35),transparent_34%)] mix-blend-hard-light"
+          />
+
+          <motion.div
+            style={{ opacity: pulseOpacity }}
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(6,182,212,0),rgba(34,211,238,0.44),rgba(6,182,212,0))]"
+          />
+
+          <motion.div
+            style={{ scaleY: fluidScaleY, backgroundColor: fluidColor, originY: 1 }}
+            className="absolute inset-x-0 bottom-0 h-full overflow-hidden border-t border-white/20 transform-gpu will-change-transform"
           >
             <div className="absolute inset-x-0 top-0 h-3 bg-gradient-to-b from-white/55 to-transparent" />
             <motion.div
               style={{ opacity: pulseOpacity }}
-              className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(165,243,252,0.4),transparent_60%)]"
-            />
-            <motion.div
-              style={{ opacity: sparkleOpacity }}
-              className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.26)_0%,transparent_32%,transparent_68%,rgba(255,255,255,0.22)_100%)]"
+              className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(165,243,252,0.38),transparent_60%)]"
             />
           </motion.div>
 
@@ -181,36 +134,10 @@ export const BatteryGraphic = ({
             style={{ opacity: pulseOpacity }}
             className="pointer-events-none absolute inset-0"
           >
-            <div className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-cyan-200/55 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]" />
-            <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/35 animate-[ping_1.8s_cubic-bezier(0,0,0.2,1)_infinite]" />
-          </motion.div>
-
-          <motion.div
-            style={{ opacity: sparkleOpacity }}
-            className="pointer-events-none absolute -inset-8"
-          >
-            {particleSpecs.map((particle) => (
-              <motion.div
-                key={particle.id}
-                className="absolute h-2 w-2 rounded-full bg-emerald-200 shadow-[0_0_14px_rgba(110,231,183,0.85)]"
-                style={{
-                  left: `${particle.left}%`,
-                  top: `${particle.top}%`,
-                }}
-                animate={{
-                  y: [0, -particle.travel],
-                  x: [0, particle.drift],
-                  opacity: [0, 0.9, 0],
-                  scale: [0.2, 1.2, 0.1],
-                }}
-                transition={{
-                  duration: particle.duration,
-                  delay: particle.delay,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: 'easeInOut',
-                }}
-              />
-            ))}
+            <div className="absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-cyan-200/50 animate-[ping_1.6s_cubic-bezier(0,0,0.2,1)_infinite]" />
+            {!compact && (
+              <div className="absolute left-1/2 top-1/2 h-[8.5rem] w-[8.5rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/32 animate-[ping_1.9s_cubic-bezier(0,0,0.2,1)_infinite]" />
+            )}
           </motion.div>
         </div>
 
