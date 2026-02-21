@@ -203,7 +203,7 @@ export const BatteryGraphic = ({
           className={`absolute left-1/2 z-30 -translate-x-1/2 border border-white/20 bg-slate-900/78 text-center shadow-[0_20px_40px_-20px_rgba(6,182,212,0.7)] ${labelClass}`}
         >
           <p
-            className={`font-mono uppercase text-slate-400 ${
+            className={`battery-brand-text font-mono uppercase text-slate-400 ${
               compact ? 'text-[8px] tracking-[0.16em]' : 'text-[10px] tracking-[0.2em]'
             }`}
           >
