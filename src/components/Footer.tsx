@@ -140,7 +140,6 @@ export const Footer = () => {
                   autoComplete="organization"
                   type="text"
                   required
-                  placeholder="Acme Logistics"
                   className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                 />
               </div>
@@ -156,7 +155,6 @@ export const Footer = () => {
                   inputMode="email"
                   type="email"
                   required
-                  placeholder="you@company.com"
                   className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                 />
               </div>
@@ -172,7 +170,6 @@ export const Footer = () => {
                   inputMode="tel"
                   type="tel"
                   required
-                  placeholder="+91 98765 43210"
                   className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                 />
               </div>
@@ -218,7 +215,6 @@ export const Footer = () => {
                     type="number"
                     required
                     min="1"
-                    placeholder="12"
                     className="w-full rounded-xl border border-white/15 bg-ink-950/70 px-4 py-3 text-base text-slate-100 outline-none transition focus:border-cyan-300/70 focus:ring-2 focus:ring-cyan-300/25"
                   />
                 </div>
