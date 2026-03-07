@@ -338,7 +338,8 @@ function App() {
   const orbSecondaryY = useTransform(smoothProgress, [0, 1], ['8%', '-34%']);
   const stageTilt = useTransform(smoothProgress, [0, 1], [0, 2.5]);
   const timelineHeight = useTransform(smoothProgress, [0, 1], ['0%', '100%']);
-  const mobileStageLift = useTransform(smoothProgress, [0, 1], [0, -6]);
+  const mobileStageLift = useTransform(smoothProgress, [0, 0.92, 1], [0, -6, 34]);
+  const mobileStageOpacity = useTransform(smoothProgress, [0, 0.92, 0.985, 1], [1, 1, 0.22, 0]);
 
   const recoveryScoreValue = useTransform(
     smoothProgress,
@@ -469,11 +470,10 @@ function App() {
           </FadeInBlock>
         </section>
 
-        <div className="relative sticky top-[calc(var(--header-height)+2px)] z-40 -mt-1 lg:hidden">
-          <div className="pointer-events-none absolute inset-x-0 -top-2 h-2 bg-ink-950/95" />
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+0.85rem)] sm:px-6 lg:hidden">
           <motion.div
-            style={{ y: mobileStageLift }}
-            className="relative rounded-[1.65rem] border border-white/10 bg-ink-900/78 p-3 shadow-[0_24px_54px_-34px_rgba(8,47,73,0.9)] backdrop-blur-md"
+            style={{ y: mobileStageLift, opacity: mobileStageOpacity }}
+            className="pointer-events-auto relative mx-auto w-full max-w-[1440px] rounded-[1.65rem] border border-white/10 bg-ink-900/82 p-3 shadow-[0_24px_54px_-34px_rgba(8,47,73,0.9)] backdrop-blur-md"
           >
             <div className="flex items-center gap-3">
               <BatteryGraphic scrollProgress={smoothProgress} compact />
