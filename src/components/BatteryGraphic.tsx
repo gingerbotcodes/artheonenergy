@@ -115,7 +115,7 @@ export const BatteryGraphic = ({ scrollProgress }: BatteryGraphicProps) => {
 
   return (
     <motion.div
-      className="relative mx-auto aspect-[0.76] w-full max-w-[min(18rem,78vw)] sm:max-w-[20rem] lg:max-w-[24rem]"
+      className="relative mx-auto aspect-[0.76] w-full max-w-[min(13.5rem,56vw)] sm:max-w-[15.5rem] lg:max-w-[19rem] xl:max-w-[20.5rem]"
       aria-hidden="true"
     >
       <motion.div

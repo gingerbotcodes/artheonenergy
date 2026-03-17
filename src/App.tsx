@@ -259,13 +259,14 @@ function App() {
   };
 
   const scrollytellingRef = useRef<HTMLElement>(null);
+  const panelTrackRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<(HTMLElement | null)[]>([]);
   const visibilityRatiosRef = useRef(new Map<number, number>());
   const pendingReadoutsRef = useRef<InstrumentReadouts>(getInstrumentReadouts(0));
   const readoutAnimationFrameRef = useRef<number | null>(null);
 
   const { scrollYProgress } = useScroll({
-    target: scrollytellingRef,
+    target: panelTrackRef,
     offset: ['start start', 'end end'],
   });
 
@@ -362,31 +363,28 @@ function App() {
         >
           <aside className="relative z-20 mb-12 border-b border-white/10 pb-8 lg:mb-0 lg:border-b-0 lg:border-r lg:border-white/10 lg:pr-10">
             <div className="sticky top-[calc(var(--header-height)+0.75rem)]">
-              <div className="relative overflow-hidden px-1 py-2 lg:flex lg:h-[calc(100vh-var(--header-height)-1.75rem)] lg:flex-col lg:justify-between lg:py-4">
+              <div className="relative overflow-hidden px-1 py-2 lg:grid lg:h-[calc(100vh-var(--header-height)-1.75rem)] lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:py-4">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,255,136,0.08),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.08),transparent_32%),linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.06)_1px,transparent_1px)] [background-size:auto,auto,28px_28px,28px_28px] opacity-75" />
                 <div className="pointer-events-none absolute inset-y-6 left-4 w-px bg-gradient-to-b from-transparent via-cyan-300/25 to-transparent" />
 
-                <div className="relative z-10 space-y-5">
+                <div className="relative z-10 border-b border-white/8 pb-4 lg:pb-5">
                   <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-cyan-300/72">
                     VRLA Regeneration Live
                   </p>
 
-                  <div className="flex flex-wrap items-end justify-between gap-5">
-                    <div className="max-w-[30rem]">
-                      <h1 className="font-display text-[clamp(2.35rem,6vw,4.6rem)] font-semibold leading-[0.88] text-white">
-                        Battery restoration, mapped directly to scroll.
-                      </h1>
-                      <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-300 sm:text-base">
-                        The battery on the left never moves. Its state changes in place from depleted
-                        red to restored green while the right side walks through the recovery story.
+                  <div className="mt-3 flex items-start justify-between gap-4">
+                    <div className="max-w-[18rem]">
+                      <p className="text-sm leading-relaxed text-slate-400 sm:text-[15px]">
+                        Scroll the panels on the right. The battery stays fixed here and changes state
+                        in place from empty red to restored green.
                       </p>
                     </div>
 
-                    <div className="min-w-[9rem]">
+                    <div className="min-w-[8rem] text-right">
                       <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">
                         Current State
                       </p>
-                      <p className="mt-2 font-display text-5xl font-semibold leading-none text-white">
+                      <p className="mt-2 font-display text-4xl font-semibold leading-none text-white sm:text-5xl">
                         {readouts.charge}%
                       </p>
                       <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.24em] text-cyan-200">
@@ -396,11 +394,11 @@ function App() {
                   </div>
                 </div>
 
-                <div className="relative z-10 flex min-h-[22rem] items-center justify-center py-8 sm:min-h-[24rem] lg:min-h-0 lg:flex-1 lg:py-10">
+                <div className="relative z-10 flex min-h-[16rem] items-center justify-center py-5 sm:min-h-[18rem] lg:min-h-0 lg:py-6">
                   <BatteryGraphic scrollProgress={scrollYProgress} />
                 </div>
 
-                <div className="relative z-10 space-y-5">
+                <div className="relative z-10 space-y-4 border-t border-white/8 pt-4 lg:pt-5">
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
                     <ReadoutBar
                       label="Charge"
@@ -424,7 +422,23 @@ function App() {
                     />
                   </div>
 
-                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                  <div className="grid grid-cols-5 gap-2 lg:hidden">
+                    {STORY_PANELS.map((panel, index) => {
+                      const isActive = index === activePanelIndex;
+                      return (
+                        <span
+                          key={`dot-${panel.id}`}
+                          className="h-1.5 rounded-full"
+                          style={{
+                            backgroundColor: isActive ? panel.accentColor : 'rgba(148,163,184,0.18)',
+                            boxShadow: isActive ? `0 0 14px ${panel.accentGlow}` : 'none',
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  <div className="hidden gap-2 lg:grid">
                     {STORY_PANELS.map((panel, index) => {
                       const isActive = index === activePanelIndex;
                       return (
@@ -456,7 +470,7 @@ function App() {
             </div>
           </aside>
 
-          <div className="relative lg:pl-10">
+          <div ref={panelTrackRef} className="relative lg:pl-10">
             {STORY_PANELS.map((panel, index) => {
               const isActive = index === activePanelIndex;
 
@@ -468,7 +482,7 @@ function App() {
                   ref={(node) => {
                     panelRefs.current[index] = node;
                   }}
-                  className="relative flex min-h-[72vh] scroll-mt-[calc(var(--header-height)+1rem)] items-center border-t border-white/10 py-12 first:border-t-0 sm:min-h-[78vh] sm:py-14 lg:min-h-[92vh] lg:py-20"
+                  className="relative flex min-h-[62vh] scroll-mt-[calc(var(--header-height)+1rem)] items-center border-t border-white/10 py-10 first:border-t-0 sm:min-h-[70vh] sm:py-12 lg:min-h-[100vh] lg:py-16"
                 >
                   <div
                     className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300"
