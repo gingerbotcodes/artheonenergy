@@ -222,6 +222,38 @@ function App() {
   });
 
   const activePanel = STORY_PANELS[activePanelIndex];
+  const panelPalette =
+    resolvedTheme === 'dark'
+      ? {
+          surfaceTop: 'rgba(6,12,20,0.46)',
+          surfaceBottom: 'rgba(6,12,20,0.16)',
+          heroSurfaceTop: 'rgba(6,12,20,0.32)',
+          heroSurfaceBottom: 'rgba(6,12,20,0.1)',
+          sheen: 'rgba(255,255,255,0.16)',
+          cornerGlow: 'rgba(255,255,255,0.12)',
+          edgeGlow: 'rgba(255,255,255,0.04)',
+          title: '#f8fafc',
+          body: '#cbd5e1',
+          meta: '#94a3b8',
+          metric: '#f8fafc',
+          shadow: '0 34px 100px -52px rgba(2,8,20,0.84)',
+          activeRing: 'rgba(255,255,255,0.06)',
+        }
+      : {
+          surfaceTop: 'rgba(255,255,255,0.52)',
+          surfaceBottom: 'rgba(255,255,255,0.16)',
+          heroSurfaceTop: 'rgba(255,255,255,0.4)',
+          heroSurfaceBottom: 'rgba(255,255,255,0.12)',
+          sheen: 'rgba(255,255,255,0.4)',
+          cornerGlow: 'rgba(255,255,255,0.3)',
+          edgeGlow: 'rgba(255,255,255,0.12)',
+          title: '#0f172a',
+          body: '#334155',
+          meta: '#475569',
+          metric: '#0f172a',
+          shadow: '0 30px 84px -58px rgba(15,23,42,0.22)',
+          activeRing: 'rgba(15,23,42,0.06)',
+        };
 
   return (
     <div className="theme-canvas relative overflow-x-clip bg-ink-950 text-slate-100">
@@ -322,6 +354,13 @@ function App() {
             <div ref={panelTrackRef} className="relative z-10 pt-24 sm:pt-28 lg:pt-0 snap-y snap-proximity">
               {STORY_PANELS.map((panel, index) => {
                 const isActive = index === activePanelIndex;
+                const isLeadPanel = index === 0;
+                const cardBackground = isLeadPanel
+                  ? `linear-gradient(180deg, ${panelPalette.heroSurfaceTop}, ${panelPalette.heroSurfaceBottom})`
+                  : `linear-gradient(180deg, ${panelPalette.surfaceTop}, ${panelPalette.surfaceBottom})`;
+                const cardShadow = isActive
+                  ? `${panelPalette.shadow}, 0 0 0 1px ${panelPalette.activeRing}, 0 24px 54px -42px ${panel.accentGlow}`
+                  : panelPalette.shadow;
 
                 return (
                   <section
@@ -329,27 +368,33 @@ function App() {
                     id={panel.id}
                     className="relative flex min-h-[72vh] snap-start items-start py-10 first:pt-0 sm:min-h-[82vh] sm:py-12 lg:min-h-[100vh] lg:items-center lg:py-16"
                   >
-                    <div
-                      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300"
-                      style={{
-                        opacity: isActive ? 1 : 0,
-                        backgroundImage: `radial-gradient(circle at top left, ${panel.accentGlow}, transparent 56%)`,
-                      }}
-                    />
-
                     <article
-                      className={`relative max-w-[42rem] overflow-hidden rounded-[2rem] border border-white/14 bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06))] p-6 shadow-[0_34px_100px_-52px_rgba(2,8,20,0.9)] backdrop-blur-2xl transition-all duration-300 sm:p-8 lg:p-10 ${
+                      className={`relative max-w-[42rem] overflow-hidden rounded-[2rem] border border-white/14 p-6 backdrop-blur-[28px] transition-all duration-300 sm:p-8 lg:p-10 ${
                         isActive ? 'opacity-100' : 'opacity-80'
                       }`}
+                      style={{
+                        background: cardBackground,
+                        boxShadow: cardShadow,
+                      }}
                     >
-                      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.22),transparent_24%,transparent_72%,rgba(255,255,255,0.05))]" />
-                      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.08),transparent_38%)]" />
+                      <div
+                        className="pointer-events-none absolute inset-0"
+                        style={{
+                          backgroundImage: `linear-gradient(140deg, ${panelPalette.sheen}, transparent 24%, transparent 72%, ${panelPalette.edgeGlow})`,
+                        }}
+                      />
+                      <div
+                        className="pointer-events-none absolute inset-0"
+                        style={{
+                          backgroundImage: `radial-gradient(circle at top left, ${panelPalette.cornerGlow}, transparent 34%), radial-gradient(circle at bottom right, ${panelPalette.edgeGlow}, transparent 38%)`,
+                        }}
+                      />
                       <div className="pointer-events-none absolute inset-[1px] rounded-[calc(2rem-1px)] border border-white/10" />
                       <div
                         className="absolute inset-x-0 top-0 h-px"
                         style={{
                           background: `linear-gradient(90deg, transparent, ${panel.accentColor}, transparent)`,
-                          opacity: isActive ? 0.95 : 0.35,
+                          opacity: isActive ? 0.78 : 0,
                         }}
                       />
 
@@ -361,23 +406,35 @@ function App() {
                           >
                             {panel.sequence} / {panel.eyebrow}
                           </p>
-                          <h2 className="max-w-[16ch] font-display text-3xl font-semibold leading-[0.98] text-white sm:text-4xl lg:text-[3.4rem]">
+                          <h2
+                            className="max-w-[16ch] font-display text-3xl font-semibold leading-[0.98] sm:text-4xl lg:text-[3.4rem]"
+                            style={{ color: panelPalette.title }}
+                          >
                             {panel.title}
                           </h2>
                         </div>
 
-                        <div className="max-w-[38rem] space-y-3 text-base leading-relaxed text-slate-300 sm:text-lg">
+                        <div
+                          className="max-w-[38rem] space-y-3 text-base leading-relaxed sm:text-lg"
+                          style={{ color: panelPalette.body }}
+                        >
                           {panel.copy.map((line) => (
                             <p key={line}>{line}</p>
                           ))}
                         </div>
 
                         <div className="pt-2">
-                          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500">
+                          <p
+                            className="font-mono text-[10px] uppercase tracking-[0.28em]"
+                            style={{ color: panelPalette.meta }}
+                          >
                             {panel.metricLabel}
                           </p>
                           <div className="mt-3 flex items-end gap-3">
-                            <p className="font-display text-5xl font-semibold leading-none text-white sm:text-6xl lg:text-7xl">
+                            <p
+                              className="font-display text-5xl font-semibold leading-none sm:text-6xl lg:text-7xl"
+                              style={{ color: panelPalette.metric }}
+                            >
                               {panel.metricValue}
                             </p>
                           </div>
