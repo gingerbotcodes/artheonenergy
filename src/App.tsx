@@ -1,11 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  motion,
-  type MotionValue,
-  useMotionValueEvent,
-  useScroll,
-  useTransform,
-} from 'framer-motion';
+import { motion, useMotionValueEvent, useScroll, useTransform } from 'framer-motion';
 import { BatteryGraphic } from './components/BatteryGraphic';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -27,13 +21,6 @@ type StoryPanel = {
   accentGlow: string;
 };
 
-type InstrumentReadouts = {
-  charge: number;
-  plateHealth: number;
-  sulfation: number;
-  savings: number;
-};
-
 const THEME_MODE_STORAGE_KEY = 'artheon-theme-mode';
 const PANEL_STOPS = [0, 0.25, 0.5, 0.75, 1];
 
@@ -44,16 +31,16 @@ const STORY_PANELS: StoryPanel[] = [
     sequence: '0%',
     eyebrow: 'The Problem',
     stageLabel: 'Depleted',
-    title: 'A tired VRLA battery falls flat long before the job is done.',
+    title: 'A tired battery starts the day almost empty.',
     copy: [
-      'Sulfation locks usable energy away inside the plates, so runtime drops and charge response gets sluggish.',
-      'The battery still looks intact from the outside, but it cannot deliver stable backup under real load.',
-      'That is where avoidable replacements, missed shifts, and downtime usually begin.',
+      'Sulfation blocks active plate area, so the battery cannot store or deliver energy the way it used to.',
+      'What looks like a normal battery from outside is already losing useful runtime and backup strength.',
+      'That slow drop is what pushes fleets and backup systems toward early replacement.',
     ],
     metricValue: '0-15%',
     metricLabel: 'usable capacity left',
     accentColor: '#cc2200',
-    accentGlow: 'rgba(204,34,0,0.22)',
+    accentGlow: 'rgba(204,34,0,0.2)',
   },
   {
     id: 'diagnosis',
@@ -61,11 +48,11 @@ const STORY_PANELS: StoryPanel[] = [
     sequence: '25%',
     eyebrow: 'Diagnosis',
     stageLabel: 'Charging',
-    title: 'The system checks how the battery accepts energy before recovery starts.',
+    title: 'The recovery cycle first checks how the cell accepts charge.',
     copy: [
-      'VRLA regeneration reads voltage behavior, internal resistance, and how quickly the cell can take charge.',
-      'That first scan shows whether the battery is still recoverable and how aggressively it should be treated.',
-      'Instead of guessing, the process starts from measured battery health.',
+      'The system reads how the battery responds under load and while taking energy back in.',
+      'That gives a clear picture of how severe the sulfation is and how recoverable the battery still looks.',
+      'The process starts from measured condition, not guesswork.',
     ],
     metricValue: '5',
     metricLabel: 'health signals checked',
@@ -78,11 +65,11 @@ const STORY_PANELS: StoryPanel[] = [
     sequence: '50%',
     eyebrow: 'The Process',
     stageLabel: 'Mid-Charge',
-    title: 'Controlled desulfation pulses reopen blocked plate area step by step.',
+    title: 'Controlled desulfation pulses reopen blocked plate area.',
     copy: [
-      'Targeted current breaks down hardened sulfate so more active material can work again.',
-      'As the blockage loosens, the battery starts holding charge instead of bleeding it away.',
-      'Recovery is gradual, visible, and tied directly to the battery response.',
+      'As the pulses work through the cell, hardened sulfate begins to loosen and charge flow becomes cleaner.',
+      'The battery does not move anywhere on screen because the change is happening inside the same unit.',
+      'Mid-cycle is where the regeneration becomes visibly active.',
     ],
     metricValue: '3',
     metricLabel: 'desulfation phases',
@@ -95,11 +82,11 @@ const STORY_PANELS: StoryPanel[] = [
     sequence: '75%',
     eyebrow: 'Recovery',
     stageLabel: 'Regenerating',
-    title: 'Charge acceptance stabilizes and usable capacity starts coming back online.',
+    title: 'Capacity and charge acceptance come back into a usable range.',
     copy: [
-      'The cell moves from weak response to reliable delivery as sulfation drops and charge flow clears up.',
-      'At this stage the battery can once again support real operating loads, not just bench numbers.',
-      'The improvement is visible in both stored charge and runtime confidence.',
+      'The battery begins holding more energy, responding more cleanly, and delivering steadier output.',
+      'This is the point where the battery starts feeling dependable again in real use, not just on paper.',
+      'The improvement is visible in the fill, glow, and reduced internal damage.',
     ],
     metricValue: '+32%',
     metricLabel: 'capacity regained',
@@ -112,11 +99,11 @@ const STORY_PANELS: StoryPanel[] = [
     sequence: '100%',
     eyebrow: 'Result',
     stageLabel: 'Restored',
-    title: 'A restored battery goes back to work without the cost of immediate replacement.',
+    title: 'A restored battery goes back to work instead of straight to replacement.',
     copy: [
-      'The battery finishes the cycle bright, stable, and ready for useful service again.',
-      'That means longer battery life, better planning, and fewer surprise failures in the field.',
-      'When recovery works, replacement spend can be pushed back instead of pulled forward.',
+      'At full recovery the battery is stable, bright, and ready for useful service again.',
+      'That means lower replacement pressure, fewer surprise failures, and better value from each battery.',
+      'The whole story finishes with the same battery regenerated in place.',
     ],
     metricValue: '70%',
     metricLabel: 'saved vs replacement',
@@ -145,65 +132,6 @@ const getActivePanelIndex = (progress: number) => {
   }, 0);
 };
 
-const interpolateStops = (progress: number, values: number[]) => {
-  if (values.length !== PANEL_STOPS.length) {
-    return values[0] ?? 0;
-  }
-
-  if (progress <= PANEL_STOPS[0]) {
-    return values[0];
-  }
-
-  const lastStopIndex = PANEL_STOPS.length - 1;
-  if (progress >= PANEL_STOPS[lastStopIndex]) {
-    return values[lastStopIndex];
-  }
-
-  for (let index = 0; index < PANEL_STOPS.length - 1; index += 1) {
-    const currentStop = PANEL_STOPS[index];
-    const nextStop = PANEL_STOPS[index + 1];
-
-    if (progress >= currentStop && progress <= nextStop) {
-      const segmentProgress = (progress - currentStop) / (nextStop - currentStop);
-      return values[index] + (values[index + 1] - values[index]) * segmentProgress;
-    }
-  }
-
-  return values[lastStopIndex];
-};
-
-const getInstrumentReadouts = (progress: number): InstrumentReadouts => ({
-  charge: Math.round(interpolateStops(progress, [0, 25, 50, 75, 100])),
-  plateHealth: Math.round(interpolateStops(progress, [12, 28, 52, 79, 98])),
-  sulfation: Math.round(interpolateStops(progress, [94, 78, 52, 21, 4])),
-  savings: Math.round(interpolateStops(progress, [0, 6, 18, 42, 70])),
-});
-
-const ReadoutBar = ({
-  label,
-  value,
-  width,
-  toneClass,
-}: {
-  label: string;
-  value: number;
-  width: MotionValue<string>;
-  toneClass: string;
-}) => (
-  <div className="space-y-2">
-    <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-slate-400">
-      <span>{label}</span>
-      <span className="text-slate-100">{value}%</span>
-    </div>
-    <div className="h-2 overflow-hidden rounded-full bg-white/8">
-      <motion.div
-        style={{ width }}
-        className={`h-full rounded-full bg-gradient-to-r ${toneClass} transition-[width] duration-150`}
-      />
-    </div>
-  </div>
-);
-
 function App() {
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     if (typeof window === 'undefined') {
@@ -223,7 +151,6 @@ function App() {
   });
 
   const [activePanelIndex, setActivePanelIndex] = useState(0);
-  const [readouts, setReadouts] = useState<InstrumentReadouts>(getInstrumentReadouts(0));
 
   const resolvedTheme: ResolvedTheme =
     themeMode === 'system' ? (systemPrefersDark ? 'dark' : 'lite') : themeMode;
@@ -277,58 +204,21 @@ function App() {
   };
 
   const panelTrackRef = useRef<HTMLDivElement>(null);
-  const pendingReadoutsRef = useRef<InstrumentReadouts>(getInstrumentReadouts(0));
-  const pendingPanelIndexRef = useRef(0);
-  const readoutAnimationFrameRef = useRef<number | null>(null);
 
   const { scrollYProgress } = useScroll({
     target: panelTrackRef,
     offset: ['start start', 'end end'],
   });
-  const chargeWidth = useTransform(scrollYProgress, PANEL_STOPS, ['0%', '25%', '50%', '75%', '100%']);
-  const plateHealthWidth = useTransform(scrollYProgress, PANEL_STOPS, ['12%', '28%', '52%', '79%', '98%']);
-  const sulfationWidth = useTransform(scrollYProgress, PANEL_STOPS, ['94%', '78%', '52%', '21%', '4%']);
-  const savingsWidth = useTransform(scrollYProgress, PANEL_STOPS, ['0%', '6%', '18%', '42%', '70%']);
 
-  useEffect(() => {
-    return () => {
-      if (readoutAnimationFrameRef.current !== null) {
-        window.cancelAnimationFrame(readoutAnimationFrameRef.current);
-      }
-    };
-  }, []);
+  const desktopStageProgress = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  const mobileBatteryLift = useTransform(scrollYProgress, [0, 1], [0, -10]);
+  const batteryBackgroundOpacity = useTransform(scrollYProgress, [0, 0.4, 1], [0.72, 0.86, 0.94]);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    const nextProgress = clamp(latest, 0, 1);
-    pendingReadoutsRef.current = getInstrumentReadouts(nextProgress);
-    pendingPanelIndexRef.current = getActivePanelIndex(nextProgress);
-
-    if (readoutAnimationFrameRef.current !== null) {
-      return;
-    }
-
-    readoutAnimationFrameRef.current = window.requestAnimationFrame(() => {
-      readoutAnimationFrameRef.current = null;
-      const nextReadouts = pendingReadoutsRef.current;
-      const nextPanelIndex = pendingPanelIndexRef.current;
-
-      setActivePanelIndex((previousIndex) => (
-        previousIndex === nextPanelIndex ? previousIndex : nextPanelIndex
-      ));
-
-      setReadouts((previousReadouts) => {
-        if (
-          previousReadouts.charge === nextReadouts.charge &&
-          previousReadouts.plateHealth === nextReadouts.plateHealth &&
-          previousReadouts.sulfation === nextReadouts.sulfation &&
-          previousReadouts.savings === nextReadouts.savings
-        ) {
-          return previousReadouts;
-        }
-
-        return nextReadouts;
-      });
-    });
+    const nextPanelIndex = getActivePanelIndex(clamp(latest, 0, 1));
+    setActivePanelIndex((previousIndex) => (
+      previousIndex === nextPanelIndex ? previousIndex : nextPanelIndex
+    ));
   });
 
   const activePanel = STORY_PANELS[activePanelIndex];
@@ -353,112 +243,45 @@ function App() {
       />
 
       <main className="relative mx-auto w-full max-w-[1480px] px-4 pb-20 pt-28 sm:px-6 md:pt-32 lg:px-10">
-        <section className="relative lg:grid lg:grid-cols-[minmax(18rem,40%)_minmax(0,60%)] lg:gap-10">
-          <aside className="relative z-20 mb-12 border-b border-white/10 pb-8 lg:mb-0 lg:border-b-0 lg:border-r lg:border-white/10 lg:pr-10">
-            <div className="sticky top-[calc(var(--header-height)+0.75rem)]">
-              <div className="relative overflow-hidden px-1 py-2 lg:grid lg:h-[calc(100vh-var(--header-height)-1.75rem)] lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:py-4">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,255,136,0.08),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.08),transparent_32%),linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.06)_1px,transparent_1px)] [background-size:auto,auto,28px_28px,28px_28px] opacity-75" />
-                <div className="pointer-events-none absolute inset-y-6 left-4 w-px bg-gradient-to-b from-transparent via-cyan-300/25 to-transparent" />
+        <section className="relative">
+          <div className="hidden lg:block">
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-[40%]">
+              <div className="sticky top-[calc(var(--header-height)+0.8rem)] h-[calc(100vh-var(--header-height)-1.6rem)]">
+                <motion.div
+                  style={{ opacity: batteryBackgroundOpacity }}
+                  className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,136,0.12),transparent_48%),linear-gradient(rgba(148,163,184,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.07)_1px,transparent_1px)] [background-size:auto,30px_30px,30px_30px]"
+                />
+                <div className="absolute left-0 top-[9%] h-[82%] w-px bg-gradient-to-b from-transparent via-cyan-300/25 to-transparent" />
 
-                <div className="relative z-10 border-b border-white/8 pb-4 lg:pb-5">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-cyan-300/72">
-                    VRLA Regeneration Live
+                <div className="relative flex h-full items-center justify-center">
+                  <div className="w-full max-w-[24rem] px-6 xl:max-w-[26rem]">
+                    <BatteryGraphic scrollProgress={scrollYProgress} />
+                  </div>
+                </div>
+
+                <div className="absolute left-6 right-8 top-6">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-cyan-300/72">
+                    Background Regeneration
                   </p>
-
-                  <div className="mt-3 flex items-start justify-between gap-4">
-                    <div className="max-w-[18rem]">
-                      <p className="hidden text-sm leading-relaxed text-slate-400 sm:block sm:text-[15px]">
-                        Scroll the panels on the right. The battery stays fixed here and changes state
-                        in place from empty red to restored green.
-                      </p>
-                      <p className="text-xs leading-relaxed text-slate-400 sm:hidden">
-                        Scroll the panels and watch the battery change state in place.
-                      </p>
-                    </div>
-
-                    <div className="min-w-[8rem] text-right">
-                      <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">
-                        Current State
-                      </p>
-                      <p className="mt-2 font-display text-4xl font-semibold leading-none text-white sm:text-5xl">
-                        {readouts.charge}%
-                      </p>
-                      <p
-                        className="mt-2 font-mono text-[11px] uppercase tracking-[0.24em]"
-                        style={{ color: activePanel.accentColor }}
-                      >
-                        {activePanel.stageLabel}
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
-                <div className="relative z-10 flex min-h-[13rem] items-center justify-center py-4 sm:min-h-[15rem] lg:min-h-0 lg:py-6">
-                  <div className="flex w-full justify-center lg:hidden">
-                    <div className="w-[9rem] sm:w-[10rem]">
-                      <BatteryGraphic scrollProgress={scrollYProgress} compact />
-                    </div>
+                <div className="absolute bottom-8 left-6 right-8 space-y-3">
+                  <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-slate-400">
+                    <span>{activePanel.eyebrow}</span>
+                    <span style={{ color: activePanel.accentColor }}>{activePanel.sequence}</span>
                   </div>
-                  <div className="hidden w-full justify-center lg:flex">
-                    <div className="w-full max-w-[21rem] xl:max-w-[22rem]">
-                      <BatteryGraphic scrollProgress={scrollYProgress} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="relative z-10 space-y-4 border-t border-white/8 pt-4 lg:pt-5">
-                  <div className="hidden gap-4 lg:grid lg:grid-cols-1">
-                    <ReadoutBar
-                      label="Charge"
-                      value={readouts.charge}
-                      width={chargeWidth}
-                      toneClass="from-[#cc2200] via-[#facc15] to-[#00ff88]"
-                    />
-                    <ReadoutBar
-                      label="Plate Health"
-                      value={readouts.plateHealth}
-                      width={plateHealthWidth}
-                      toneClass="from-cyan-500 via-cyan-300 to-emerald-300"
-                    />
-                    <ReadoutBar
-                      label="Sulfation"
-                      value={readouts.sulfation}
-                      width={sulfationWidth}
-                      toneClass="from-[#ff7a59] via-[#f97316] to-[#cc2200]"
-                    />
-                    <ReadoutBar
-                      label="Savings"
-                      value={readouts.savings}
-                      width={savingsWidth}
-                      toneClass="from-emerald-900 via-emerald-500 to-[#00ff88]"
+                  <div className="h-px overflow-hidden bg-white/10">
+                    <motion.div
+                      style={{ width: desktopStageProgress }}
+                      className="h-full bg-gradient-to-r from-[#cc2200] via-[#facc15] to-[#00ff88]"
                     />
                   </div>
-
-                  <div className="grid grid-cols-2 gap-3 lg:hidden">
-                    <div className="rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2">
-                      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-500">
-                        Sulfation
-                      </p>
-                      <p className="mt-1 font-display text-xl font-semibold leading-none text-white">
-                        {readouts.sulfation}%
-                      </p>
-                    </div>
-                    <div className="rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2">
-                      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-500">
-                        Savings
-                      </p>
-                      <p className="mt-1 font-display text-xl font-semibold leading-none text-white">
-                        {readouts.savings}%
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-5 gap-2 lg:hidden">
+                  <div className="grid grid-cols-5 gap-2">
                     {STORY_PANELS.map((panel, index) => {
                       const isActive = index === activePanelIndex;
                       return (
                         <span
-                          key={`dot-${panel.id}`}
+                          key={`desktop-dot-${panel.id}`}
                           className="h-1.5 rounded-full"
                           style={{
                             backgroundColor: isActive ? panel.accentColor : 'rgba(148,163,184,0.18)',
@@ -468,94 +291,100 @@ function App() {
                       );
                     })}
                   </div>
-
-                  <div className="hidden gap-2 lg:grid">
-                    {STORY_PANELS.map((panel, index) => {
-                      const isActive = index === activePanelIndex;
-                      return (
-                        <div
-                          key={panel.id}
-                          className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 border-t border-white/8 py-2 first:border-t-0 ${
-                            isActive ? 'text-white' : 'text-slate-500'
-                          }`}
-                        >
-                          <span
-                            className="h-2.5 w-2.5 rounded-full border border-white/15"
-                            style={{
-                              backgroundColor: isActive ? panel.accentColor : 'rgba(148,163,184,0.2)',
-                              boxShadow: isActive ? `0 0 18px ${panel.accentGlow}` : 'none',
-                            }}
-                          />
-                          <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
-                            {panel.eyebrow}
-                          </span>
-                          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
-                            {panel.sequence}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
                 </div>
               </div>
             </div>
-          </aside>
+          </div>
 
-          <div ref={panelTrackRef} className="relative lg:pl-10">
-            {STORY_PANELS.map((panel, index) => {
-              const isActive = index === activePanelIndex;
-
-              return (
-                <section
-                  key={panel.id}
-                  id={panel.id}
-                  className="relative flex min-h-[62vh] scroll-mt-[calc(var(--header-height)+1rem)] items-center border-t border-white/10 py-10 first:border-t-0 sm:min-h-[70vh] sm:py-12 lg:min-h-[100vh] lg:py-16"
-                >
-                  <div
-                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300"
-                    style={{
-                      opacity: isActive ? 1 : 0,
-                      backgroundImage: `radial-gradient(circle at top left, ${panel.accentGlow}, transparent 58%)`,
-                    }}
-                  />
-
-                  <div
-                    className={`relative max-w-[42rem] space-y-6 transition-opacity duration-300 ${
-                      isActive ? 'opacity-100' : 'opacity-65 lg:opacity-45'
-                    }`}
+          <div className="relative lg:ml-[40%] lg:w-[60%] lg:pl-10">
+            <div className="pointer-events-none sticky top-[calc(var(--header-height)+0.55rem)] z-0 mb-4 h-[12.5rem] sm:h-[14rem] lg:hidden">
+              <motion.div
+                style={{ y: mobileBatteryLift, opacity: batteryBackgroundOpacity }}
+                className="relative h-full"
+              >
+                <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(0,255,136,0.12),transparent_48%),linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.06)_1px,transparent_1px)] [background-size:auto,24px_24px,24px_24px]" />
+                <div className="absolute inset-x-0 top-2 flex justify-center">
+                  <p
+                    className="rounded-full border border-white/10 bg-black/35 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.24em] backdrop-blur-sm"
+                    style={{ color: activePanel.accentColor }}
                   >
-                    <div className="space-y-3">
-                      <p
-                        className="font-mono text-[11px] uppercase tracking-[0.3em]"
-                        style={{ color: panel.accentColor }}
-                      >
-                        {panel.sequence} / {panel.eyebrow}
-                      </p>
-                      <h2 className="max-w-[16ch] font-display text-3xl font-semibold leading-[0.98] text-white sm:text-4xl lg:text-[3.4rem]">
-                        {panel.title}
-                      </h2>
-                    </div>
-
-                    <div className="max-w-[38rem] space-y-3 text-base leading-relaxed text-slate-300 sm:text-lg">
-                      {panel.copy.map((line) => (
-                        <p key={line}>{line}</p>
-                      ))}
-                    </div>
-
-                    <div className="pt-4">
-                      <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500">
-                        {panel.metricLabel}
-                      </p>
-                      <div className="mt-3 flex items-end gap-3">
-                        <p className="font-display text-5xl font-semibold leading-none text-white sm:text-6xl lg:text-7xl">
-                          {panel.metricValue}
-                        </p>
-                      </div>
-                    </div>
+                    {activePanel.stageLabel}
+                  </p>
+                </div>
+                <div className="relative flex h-full items-center justify-center pt-5">
+                  <div className="w-[11rem] sm:w-[12.5rem]">
+                    <BatteryGraphic scrollProgress={scrollYProgress} compact />
                   </div>
-                </section>
-              );
-            })}
+                </div>
+              </motion.div>
+            </div>
+
+            <div ref={panelTrackRef} className="relative z-10 pt-24 sm:pt-28 lg:pt-0 snap-y snap-proximity">
+              {STORY_PANELS.map((panel, index) => {
+                const isActive = index === activePanelIndex;
+
+                return (
+                  <section
+                    key={panel.id}
+                    id={panel.id}
+                    className="relative flex min-h-[72vh] snap-start items-start py-10 first:pt-0 sm:min-h-[82vh] sm:py-12 lg:min-h-[100vh] lg:items-center lg:py-16"
+                  >
+                    <div
+                      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300"
+                      style={{
+                        opacity: isActive ? 1 : 0,
+                        backgroundImage: `radial-gradient(circle at top left, ${panel.accentGlow}, transparent 56%)`,
+                      }}
+                    />
+
+                    <article
+                      className={`relative max-w-[42rem] rounded-[2rem] border border-white/10 bg-ink-950/76 p-6 shadow-[0_30px_80px_-44px_rgba(2,8,20,0.85)] backdrop-blur-xl transition-all duration-300 sm:p-8 lg:p-10 ${
+                        isActive ? 'opacity-100' : 'opacity-80'
+                      }`}
+                    >
+                      <div
+                        className="absolute inset-x-0 top-0 h-px"
+                        style={{
+                          background: `linear-gradient(90deg, transparent, ${panel.accentColor}, transparent)`,
+                          opacity: isActive ? 0.95 : 0.35,
+                        }}
+                      />
+
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <p
+                            className="font-mono text-[11px] uppercase tracking-[0.3em]"
+                            style={{ color: panel.accentColor }}
+                          >
+                            {panel.sequence} / {panel.eyebrow}
+                          </p>
+                          <h2 className="max-w-[16ch] font-display text-3xl font-semibold leading-[0.98] text-white sm:text-4xl lg:text-[3.4rem]">
+                            {panel.title}
+                          </h2>
+                        </div>
+
+                        <div className="max-w-[38rem] space-y-3 text-base leading-relaxed text-slate-300 sm:text-lg">
+                          {panel.copy.map((line) => (
+                            <p key={line}>{line}</p>
+                          ))}
+                        </div>
+
+                        <div className="pt-2">
+                          <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500">
+                            {panel.metricLabel}
+                          </p>
+                          <div className="mt-3 flex items-end gap-3">
+                            <p className="font-display text-5xl font-semibold leading-none text-white sm:text-6xl lg:text-7xl">
+                              {panel.metricValue}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  </section>
+                );
+              })}
+            </div>
           </div>
         </section>
       </main>
