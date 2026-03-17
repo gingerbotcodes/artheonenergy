@@ -213,6 +213,8 @@ function App() {
   const desktopStageProgress = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
   const mobileBatteryLift = useTransform(scrollYProgress, [0, 1], [0, -10]);
   const batteryBackgroundOpacity = useTransform(scrollYProgress, [0, 0.4, 1], [0.72, 0.86, 0.94]);
+  const mobileHeroOpacity = useTransform(scrollYProgress, [0, 0.1, 0.22], [1, 0.78, 0]);
+  const mobileHeroY = useTransform(scrollYProgress, [0, 0.22], [0, -18]);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
     const nextPanelIndex = getActivePanelIndex(clamp(latest, 0, 1));
@@ -329,13 +331,44 @@ function App() {
           </div>
 
           <div className="relative lg:ml-[40%] lg:w-[60%] lg:pl-10">
-            <div className="pointer-events-none sticky top-[calc(var(--header-height)+0.55rem)] z-0 mb-4 h-[12.5rem] sm:h-[14rem] lg:hidden">
+            <div className="pointer-events-none sticky top-[calc(var(--header-height)+0.55rem)] z-0 mb-5 h-[21rem] sm:h-[22rem] lg:hidden">
               <motion.div
                 style={{ y: mobileBatteryLift, opacity: batteryBackgroundOpacity }}
-                className="relative h-full"
+                className="relative flex h-full flex-col items-center overflow-hidden rounded-[2.2rem]"
               >
-                <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(0,255,136,0.12),transparent_48%),linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.06)_1px,transparent_1px)] [background-size:auto,24px_24px,24px_24px]" />
-                <div className="absolute inset-x-0 top-2 flex justify-center">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,136,0.12),transparent_48%),linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.06)_1px,transparent_1px)] [background-size:auto,24px_24px,24px_24px]" />
+                <div className="absolute inset-0 border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.015))]" />
+
+                <motion.div
+                  style={{ opacity: mobileHeroOpacity, y: mobileHeroY }}
+                  className="relative z-10 mx-auto max-w-[19rem] px-4 pt-4 text-center"
+                >
+                  <p className="font-mono text-[10px] uppercase tracking-[0.42em] text-cyan-300/88">
+                    Artheon Energy
+                  </p>
+                  <h1
+                    className="mt-2 font-display text-[1.55rem] font-semibold leading-[0.94] drop-shadow-[0_2px_14px_rgba(2,8,20,0.35)] sm:text-[1.8rem]"
+                    style={{ color: panelPalette.title, textShadow: '0 1px 14px rgba(2,8,20,0.22)' }}
+                  >
+                    <span className="block">Don&apos;t replace</span>
+                    <span className="block">your old battery.</span>
+                  </h1>
+                  <p
+                    className="mt-2 text-[0.86rem] font-semibold uppercase tracking-[0.18em] sm:text-[0.95rem]"
+                    style={{ color: activePanel.accentColor }}
+                  >
+                    Regenerate. Save Earth.
+                  </p>
+                  <p
+                    className="mx-auto mt-3 max-w-[17.5rem] text-[0.88rem] leading-relaxed sm:text-[0.95rem]"
+                    style={{ color: panelPalette.body }}
+                  >
+                    with just this four simple steps, from sulfation buildup to battery recovery,
+                    watch your battery come back to life
+                  </p>
+                </motion.div>
+
+                <div className="relative z-10 mt-4 flex justify-center">
                   <p
                     className="rounded-full border border-white/10 bg-black/35 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.24em] backdrop-blur-sm"
                     style={{ color: activePanel.accentColor }}
@@ -343,15 +376,16 @@ function App() {
                     {activePanel.stageLabel}
                   </p>
                 </div>
-                <div className="relative flex h-full items-center justify-center pt-5">
-                  <div className="w-[11rem] sm:w-[12.5rem]">
+
+                <div className="relative z-10 mt-auto flex w-full items-end justify-center px-4 pb-4">
+                  <div className="w-[11.75rem] sm:w-[13rem]">
                     <BatteryGraphic scrollProgress={scrollYProgress} compact />
                   </div>
                 </div>
               </motion.div>
             </div>
 
-            <div ref={panelTrackRef} className="relative z-10 pt-24 sm:pt-28 lg:pt-0 snap-y snap-proximity">
+            <div ref={panelTrackRef} className="relative z-10 pt-16 sm:pt-20 lg:pt-0 snap-y snap-proximity">
               {STORY_PANELS.map((panel, index) => {
                 const isActive = index === activePanelIndex;
                 const isLeadPanel = index === 0;
