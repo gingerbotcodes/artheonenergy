@@ -338,10 +338,13 @@ function App() {
                     />
 
                     <article
-                      className={`relative max-w-[42rem] rounded-[2rem] border border-white/10 bg-ink-950/76 p-6 shadow-[0_30px_80px_-44px_rgba(2,8,20,0.85)] backdrop-blur-xl transition-all duration-300 sm:p-8 lg:p-10 ${
+                      className={`relative max-w-[42rem] overflow-hidden rounded-[2rem] border border-white/14 bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06))] p-6 shadow-[0_34px_100px_-52px_rgba(2,8,20,0.9)] backdrop-blur-2xl transition-all duration-300 sm:p-8 lg:p-10 ${
                         isActive ? 'opacity-100' : 'opacity-80'
                       }`}
                     >
+                      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.22),transparent_24%,transparent_72%,rgba(255,255,255,0.05))]" />
+                      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.08),transparent_38%)]" />
+                      <div className="pointer-events-none absolute inset-[1px] rounded-[calc(2rem-1px)] border border-white/10" />
                       <div
                         className="absolute inset-x-0 top-0 h-px"
                         style={{
@@ -350,7 +353,7 @@ function App() {
                         }}
                       />
 
-                      <div className="space-y-6">
+                      <div className="relative z-10 space-y-6">
                         <div className="space-y-3">
                           <p
                             className="font-mono text-[11px] uppercase tracking-[0.3em]"
