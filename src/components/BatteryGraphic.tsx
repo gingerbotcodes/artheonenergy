@@ -7,6 +7,7 @@ import {
 
 interface BatteryGraphicProps {
   scrollProgress: MotionValue<number>;
+  compact?: boolean;
 }
 
 const STATE_STOPS = [0, 0.25, 0.5, 0.75, 1];
@@ -45,15 +46,15 @@ const FlowParticle = ({
   const x = useTransform(
     scrollProgress,
     STATE_STOPS,
-    [0, driftX * 0.2, driftX * 0.55, driftX * 0.95, driftX * 1.1],
+    [0, driftX * 0.18, driftX * 0.48, driftX * 0.92, driftX * 0.42],
   );
   const y = useTransform(
     scrollProgress,
     STATE_STOPS,
-    [baseY + 20, baseY + 8, baseY - 6, baseY - 22, baseY - 36],
+    [baseY + 20, baseY + 8, baseY - 6, baseY - 22, baseY - 12],
   );
-  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.12, 0.24, 0.48, 0.72]);
-  const scale = useTransform(scrollProgress, STATE_STOPS, [0.65, 0.78, 0.9, 1.02, 1.1]);
+  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.1, 0.26, 0.52, 0.18]);
+  const scale = useTransform(scrollProgress, STATE_STOPS, [0.4, 0.72, 0.9, 1.02, 0.7]);
 
   return (
     <motion.div
@@ -78,9 +79,9 @@ const CurrentLine = ({
   top: number;
   offset: number;
 }) => {
-  const x = useTransform(scrollProgress, STATE_STOPS, [offset - 20, offset - 8, offset, offset + 10, offset + 18]);
-  const scaleX = useTransform(scrollProgress, STATE_STOPS, [0.08, 0.24, 0.56, 0.86, 1]);
-  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.22, 0.6, 0.72, 0.42]);
+  const x = useTransform(scrollProgress, STATE_STOPS, [offset - 20, offset - 8, offset, offset + 8, offset + 4]);
+  const scaleX = useTransform(scrollProgress, STATE_STOPS, [0, 0.18, 0.6, 0.92, 0.38]);
+  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.18, 0.58, 0.76, 0.14]);
 
   return (
     <motion.div
@@ -91,17 +92,31 @@ const CurrentLine = ({
   );
 };
 
-export const BatteryGraphic = ({ scrollProgress }: BatteryGraphicProps) => {
-  const shellGlow = useTransform(scrollProgress, STATE_STOPS, [0.06, 0.12, 0.18, 0.28, 0.42]);
+export const BatteryGraphic = ({
+  scrollProgress,
+  compact = false,
+}: BatteryGraphicProps) => {
+  const shellGlow = useTransform(scrollProgress, STATE_STOPS, [0.05, 0.12, 0.18, 0.3, 0.42]);
   const energyColor = useTransform(
     scrollProgress,
     STATE_STOPS,
     ['#cc2200', '#f97316', '#facc15', '#22c55e', '#00ff88'],
   );
-  const fillHeight = useTransform(scrollProgress, STATE_STOPS, ['3%', '25%', '50%', '75%', '100%']);
-  const fillOpacity = useTransform(scrollProgress, STATE_STOPS, [0.45, 0.6, 0.72, 0.82, 0.95]);
+  const terminalGlowColor = useTransform(
+    scrollProgress,
+    STATE_STOPS,
+    [
+      'rgba(204,34,0,0.24)',
+      'rgba(249,115,22,0.3)',
+      'rgba(250,204,21,0.34)',
+      'rgba(34,197,94,0.4)',
+      'rgba(0,255,136,0.48)',
+    ],
+  );
+  const fillHeight = useTransform(scrollProgress, STATE_STOPS, ['0.5%', '25%', '50%', '75%', '100%']);
+  const fillOpacity = useTransform(scrollProgress, STATE_STOPS, [0.14, 0.56, 0.72, 0.84, 0.96]);
   const crackOpacity = useTransform(scrollProgress, STATE_STOPS, [0.82, 0.56, 0.28, 0.08, 0]);
-  const chargePulseOpacity = useTransform(scrollProgress, STATE_STOPS, [0.06, 0.24, 0.38, 0.52, 0.7]);
+  const chargePulseOpacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.18, 0.38, 0.28, 0.14]);
   const regenMistOpacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.04, 0.12, 0.28, 0.46]);
   const staticNoiseOpacity = useTransform(scrollProgress, STATE_STOPS, [0.35, 0.22, 0.12, 0.04, 0]);
   const caseRimOpacity = useTransform(scrollProgress, STATE_STOPS, [0.3, 0.4, 0.52, 0.7, 0.9]);
@@ -111,11 +126,15 @@ export const BatteryGraphic = ({ scrollProgress }: BatteryGraphicProps) => {
   const rimGlow = useMotionTemplate`0 0 0 1px rgba(199,255,230, ${caseRimOpacity}), inset 0 0 24px rgba(0,255,136, ${shellGlow})`;
   const energyField = useMotionTemplate`linear-gradient(180deg, rgba(255,255,255,0.34) 0%, ${energyColor} 18%, ${energyColor} 100%)`;
   const innerPulse = useMotionTemplate`radial-gradient(circle at 50% 85%, rgba(255,255,255, ${chargePulseOpacity}), rgba(0,255,136, 0) 62%)`;
-  const terminalGlow = useMotionTemplate`0 0 24px rgba(0,255,136, ${shellGlow})`;
+  const terminalGlow = useMotionTemplate`0 0 24px ${terminalGlowColor}`;
 
   return (
     <motion.div
-      className="relative mx-auto aspect-[0.76] w-full max-w-[min(13.5rem,56vw)] sm:max-w-[15.5rem] lg:max-w-[19rem] xl:max-w-[20.5rem]"
+      className={`relative mx-auto aspect-[0.76] w-full ${
+        compact
+          ? 'max-w-[min(9rem,38vw)] sm:max-w-[10rem]'
+          : 'max-w-[min(13.5rem,56vw)] sm:max-w-[15.5rem] lg:max-w-[19rem] xl:max-w-[20.5rem]'
+      }`}
       aria-hidden="true"
     >
       <motion.div

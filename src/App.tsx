@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { useMotionValueEvent, useScroll } from 'framer-motion';
+import {
+  motion,
+  type MotionValue,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+} from 'framer-motion';
 import { BatteryGraphic } from './components/BatteryGraphic';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -129,6 +135,16 @@ const parseStoredThemeMode = (value: string | null): ThemeMode | null => {
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
+const getActivePanelIndex = (progress: number) => {
+  const normalizedProgress = clamp(progress, 0, 1);
+
+  return PANEL_STOPS.reduce((closestIndex, stop, index) => {
+    const currentDistance = Math.abs(stop - normalizedProgress);
+    const closestDistance = Math.abs(PANEL_STOPS[closestIndex] - normalizedProgress);
+    return currentDistance < closestDistance ? index : closestIndex;
+  }, 0);
+};
+
 const interpolateStops = (progress: number, values: number[]) => {
   if (values.length !== PANEL_STOPS.length) {
     return values[0] ?? 0;
@@ -166,10 +182,12 @@ const getInstrumentReadouts = (progress: number): InstrumentReadouts => ({
 const ReadoutBar = ({
   label,
   value,
+  width,
   toneClass,
 }: {
   label: string;
   value: number;
+  width: MotionValue<string>;
   toneClass: string;
 }) => (
   <div className="space-y-2">
@@ -178,9 +196,9 @@ const ReadoutBar = ({
       <span className="text-slate-100">{value}%</span>
     </div>
     <div className="h-2 overflow-hidden rounded-full bg-white/8">
-      <div
+      <motion.div
+        style={{ width }}
         className={`h-full rounded-full bg-gradient-to-r ${toneClass} transition-[width] duration-150`}
-        style={{ width: `${value}%` }}
       />
     </div>
   </div>
@@ -258,50 +276,19 @@ function App() {
     });
   };
 
-  const scrollytellingRef = useRef<HTMLElement>(null);
   const panelTrackRef = useRef<HTMLDivElement>(null);
-  const panelRefs = useRef<(HTMLElement | null)[]>([]);
-  const visibilityRatiosRef = useRef(new Map<number, number>());
   const pendingReadoutsRef = useRef<InstrumentReadouts>(getInstrumentReadouts(0));
+  const pendingPanelIndexRef = useRef(0);
   const readoutAnimationFrameRef = useRef<number | null>(null);
 
   const { scrollYProgress } = useScroll({
     target: panelTrackRef,
     offset: ['start start', 'end end'],
   });
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const index = Number((entry.target as HTMLElement).dataset.panelIndex);
-          visibilityRatiosRef.current.set(index, entry.isIntersecting ? entry.intersectionRatio : 0);
-        });
-
-        const mostVisible = [...visibilityRatiosRef.current.entries()].sort((left, right) => (
-          right[1] - left[1]
-        ))[0];
-
-        if (mostVisible) {
-          setActivePanelIndex((previousIndex) => (
-            previousIndex === mostVisible[0] ? previousIndex : mostVisible[0]
-          ));
-        }
-      },
-      {
-        threshold: [0.2, 0.35, 0.5, 0.65, 0.8],
-        rootMargin: '-18% 0px -18% 0px',
-      },
-    );
-
-    panelRefs.current.forEach((panel) => {
-      if (panel) {
-        observer.observe(panel);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, []);
+  const chargeWidth = useTransform(scrollYProgress, PANEL_STOPS, ['0%', '25%', '50%', '75%', '100%']);
+  const plateHealthWidth = useTransform(scrollYProgress, PANEL_STOPS, ['12%', '28%', '52%', '79%', '98%']);
+  const sulfationWidth = useTransform(scrollYProgress, PANEL_STOPS, ['94%', '78%', '52%', '21%', '4%']);
+  const savingsWidth = useTransform(scrollYProgress, PANEL_STOPS, ['0%', '6%', '18%', '42%', '70%']);
 
   useEffect(() => {
     return () => {
@@ -312,7 +299,9 @@ function App() {
   }, []);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    pendingReadoutsRef.current = getInstrumentReadouts(clamp(latest, 0, 1));
+    const nextProgress = clamp(latest, 0, 1);
+    pendingReadoutsRef.current = getInstrumentReadouts(nextProgress);
+    pendingPanelIndexRef.current = getActivePanelIndex(nextProgress);
 
     if (readoutAnimationFrameRef.current !== null) {
       return;
@@ -321,6 +310,11 @@ function App() {
     readoutAnimationFrameRef.current = window.requestAnimationFrame(() => {
       readoutAnimationFrameRef.current = null;
       const nextReadouts = pendingReadoutsRef.current;
+      const nextPanelIndex = pendingPanelIndexRef.current;
+
+      setActivePanelIndex((previousIndex) => (
+        previousIndex === nextPanelIndex ? previousIndex : nextPanelIndex
+      ));
 
       setReadouts((previousReadouts) => {
         if (
@@ -336,6 +330,8 @@ function App() {
       });
     });
   });
+
+  const activePanel = STORY_PANELS[activePanelIndex];
 
   return (
     <div className="theme-canvas relative overflow-x-clip bg-ink-950 text-slate-100">
@@ -357,10 +353,7 @@ function App() {
       />
 
       <main className="relative mx-auto w-full max-w-[1480px] px-4 pb-20 pt-28 sm:px-6 md:pt-32 lg:px-10">
-        <section
-          ref={scrollytellingRef}
-          className="relative lg:grid lg:grid-cols-[minmax(18rem,40%)_minmax(0,60%)] lg:gap-10"
-        >
+        <section className="relative lg:grid lg:grid-cols-[minmax(18rem,40%)_minmax(0,60%)] lg:gap-10">
           <aside className="relative z-20 mb-12 border-b border-white/10 pb-8 lg:mb-0 lg:border-b-0 lg:border-r lg:border-white/10 lg:pr-10">
             <div className="sticky top-[calc(var(--header-height)+0.75rem)]">
               <div className="relative overflow-hidden px-1 py-2 lg:grid lg:h-[calc(100vh-var(--header-height)-1.75rem)] lg:grid-rows-[auto_minmax(0,1fr)_auto] lg:py-4">
@@ -374,9 +367,12 @@ function App() {
 
                   <div className="mt-3 flex items-start justify-between gap-4">
                     <div className="max-w-[18rem]">
-                      <p className="text-sm leading-relaxed text-slate-400 sm:text-[15px]">
+                      <p className="hidden text-sm leading-relaxed text-slate-400 sm:block sm:text-[15px]">
                         Scroll the panels on the right. The battery stays fixed here and changes state
                         in place from empty red to restored green.
+                      </p>
+                      <p className="text-xs leading-relaxed text-slate-400 sm:hidden">
+                        Scroll the panels and watch the battery change state in place.
                       </p>
                     </div>
 
@@ -387,39 +383,74 @@ function App() {
                       <p className="mt-2 font-display text-4xl font-semibold leading-none text-white sm:text-5xl">
                         {readouts.charge}%
                       </p>
-                      <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.24em] text-cyan-200">
-                        {STORY_PANELS[activePanelIndex].stageLabel}
+                      <p
+                        className="mt-2 font-mono text-[11px] uppercase tracking-[0.24em]"
+                        style={{ color: activePanel.accentColor }}
+                      >
+                        {activePanel.stageLabel}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="relative z-10 flex min-h-[16rem] items-center justify-center py-5 sm:min-h-[18rem] lg:min-h-0 lg:py-6">
-                  <BatteryGraphic scrollProgress={scrollYProgress} />
+                <div className="relative z-10 flex min-h-[13rem] items-center justify-center py-4 sm:min-h-[15rem] lg:min-h-0 lg:py-6">
+                  <div className="flex w-full justify-center lg:hidden">
+                    <div className="w-[9rem] sm:w-[10rem]">
+                      <BatteryGraphic scrollProgress={scrollYProgress} compact />
+                    </div>
+                  </div>
+                  <div className="hidden w-full justify-center lg:flex">
+                    <div className="w-full max-w-[21rem] xl:max-w-[22rem]">
+                      <BatteryGraphic scrollProgress={scrollYProgress} />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="relative z-10 space-y-4 border-t border-white/8 pt-4 lg:pt-5">
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                  <div className="hidden gap-4 lg:grid lg:grid-cols-1">
                     <ReadoutBar
                       label="Charge"
                       value={readouts.charge}
+                      width={chargeWidth}
                       toneClass="from-[#cc2200] via-[#facc15] to-[#00ff88]"
                     />
                     <ReadoutBar
                       label="Plate Health"
                       value={readouts.plateHealth}
+                      width={plateHealthWidth}
                       toneClass="from-cyan-500 via-cyan-300 to-emerald-300"
                     />
                     <ReadoutBar
                       label="Sulfation"
                       value={readouts.sulfation}
+                      width={sulfationWidth}
                       toneClass="from-[#ff7a59] via-[#f97316] to-[#cc2200]"
                     />
                     <ReadoutBar
                       label="Savings"
                       value={readouts.savings}
+                      width={savingsWidth}
                       toneClass="from-emerald-900 via-emerald-500 to-[#00ff88]"
                     />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 lg:hidden">
+                    <div className="rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-500">
+                        Sulfation
+                      </p>
+                      <p className="mt-1 font-display text-xl font-semibold leading-none text-white">
+                        {readouts.sulfation}%
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-slate-500">
+                        Savings
+                      </p>
+                      <p className="mt-1 font-display text-xl font-semibold leading-none text-white">
+                        {readouts.savings}%
+                      </p>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-5 gap-2 lg:hidden">
@@ -478,10 +509,6 @@ function App() {
                 <section
                   key={panel.id}
                   id={panel.id}
-                  data-panel-index={index}
-                  ref={(node) => {
-                    panelRefs.current[index] = node;
-                  }}
                   className="relative flex min-h-[62vh] scroll-mt-[calc(var(--header-height)+1rem)] items-center border-t border-white/10 py-10 first:border-t-0 sm:min-h-[70vh] sm:py-12 lg:min-h-[100vh] lg:py-16"
                 >
                   <div
