@@ -1,50 +1,123 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react';
-import {
-  motion,
-  useMotionValueEvent,
-  useScroll,
-  useSpring,
-  useTransform,
-} from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { useMotionValueEvent, useScroll } from 'framer-motion';
 import { BatteryGraphic } from './components/BatteryGraphic';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 
-type StoryChapter = {
+type ThemeMode = 'system' | 'lite' | 'dark';
+type ResolvedTheme = 'lite' | 'dark';
+
+type StoryPanel = {
   id: string;
   navLabel: string;
   sequence: string;
   eyebrow: string;
+  stageLabel: string;
   title: string;
-  description: string;
-  highlights: string[];
-  impactLabel: string;
-  impactValue: string;
-  accent: string;
+  copy: string[];
+  metricValue: string;
+  metricLabel: string;
+  accentColor: string;
+  accentGlow: string;
 };
 
-type ScoreSnapshot = {
-  recovery: number;
+type InstrumentReadouts = {
+  charge: number;
+  plateHealth: number;
+  sulfation: number;
   savings: number;
-  uptime: number;
-};
-
-type ThemeMode = 'system' | 'lite' | 'dark';
-type ResolvedTheme = 'lite' | 'dark';
-
-const BATTERY_STAGE_POINTS = [0, 0.2, 0.42, 0.6, 0.78, 1];
-const INITIAL_SCORES: ScoreSnapshot = {
-  recovery: 82,
-  savings: 54,
-  uptime: 90,
 };
 
 const THEME_MODE_STORAGE_KEY = 'artheon-theme-mode';
+const PANEL_STOPS = [0, 0.25, 0.5, 0.75, 1];
+
+const STORY_PANELS: StoryPanel[] = [
+  {
+    id: 'problem',
+    navLabel: 'Problem',
+    sequence: '0%',
+    eyebrow: 'The Problem',
+    stageLabel: 'Depleted',
+    title: 'A tired VRLA battery falls flat long before the job is done.',
+    copy: [
+      'Sulfation locks usable energy away inside the plates, so runtime drops and charge response gets sluggish.',
+      'The battery still looks intact from the outside, but it cannot deliver stable backup under real load.',
+      'That is where avoidable replacements, missed shifts, and downtime usually begin.',
+    ],
+    metricValue: '0-15%',
+    metricLabel: 'usable capacity left',
+    accentColor: '#cc2200',
+    accentGlow: 'rgba(204,34,0,0.22)',
+  },
+  {
+    id: 'diagnosis',
+    navLabel: 'Diagnosis',
+    sequence: '25%',
+    eyebrow: 'Diagnosis',
+    stageLabel: 'Charging',
+    title: 'The system checks how the battery accepts energy before recovery starts.',
+    copy: [
+      'VRLA regeneration reads voltage behavior, internal resistance, and how quickly the cell can take charge.',
+      'That first scan shows whether the battery is still recoverable and how aggressively it should be treated.',
+      'Instead of guessing, the process starts from measured battery health.',
+    ],
+    metricValue: '5',
+    metricLabel: 'health signals checked',
+    accentColor: '#f97316',
+    accentGlow: 'rgba(249,115,22,0.22)',
+  },
+  {
+    id: 'process',
+    navLabel: 'Process',
+    sequence: '50%',
+    eyebrow: 'The Process',
+    stageLabel: 'Mid-Charge',
+    title: 'Controlled desulfation pulses reopen blocked plate area step by step.',
+    copy: [
+      'Targeted current breaks down hardened sulfate so more active material can work again.',
+      'As the blockage loosens, the battery starts holding charge instead of bleeding it away.',
+      'Recovery is gradual, visible, and tied directly to the battery response.',
+    ],
+    metricValue: '3',
+    metricLabel: 'desulfation phases',
+    accentColor: '#facc15',
+    accentGlow: 'rgba(250,204,21,0.18)',
+  },
+  {
+    id: 'recovery',
+    navLabel: 'Recovery',
+    sequence: '75%',
+    eyebrow: 'Recovery',
+    stageLabel: 'Regenerating',
+    title: 'Charge acceptance stabilizes and usable capacity starts coming back online.',
+    copy: [
+      'The cell moves from weak response to reliable delivery as sulfation drops and charge flow clears up.',
+      'At this stage the battery can once again support real operating loads, not just bench numbers.',
+      'The improvement is visible in both stored charge and runtime confidence.',
+    ],
+    metricValue: '+32%',
+    metricLabel: 'capacity regained',
+    accentColor: '#22c55e',
+    accentGlow: 'rgba(34,197,94,0.2)',
+  },
+  {
+    id: 'result',
+    navLabel: 'Result',
+    sequence: '100%',
+    eyebrow: 'Result',
+    stageLabel: 'Restored',
+    title: 'A restored battery goes back to work without the cost of immediate replacement.',
+    copy: [
+      'The battery finishes the cycle bright, stable, and ready for useful service again.',
+      'That means longer battery life, better planning, and fewer surprise failures in the field.',
+      'When recovery works, replacement spend can be pushed back instead of pulled forward.',
+    ],
+    metricValue: '70%',
+    metricLabel: 'saved vs replacement',
+    accentColor: '#00ff88',
+    accentGlow: 'rgba(0,255,136,0.22)',
+  },
+];
 
 const parseStoredThemeMode = (value: string | null): ThemeMode | null => {
   if (value === 'system' || value === 'lite' || value === 'dark') {
@@ -53,203 +126,65 @@ const parseStoredThemeMode = (value: string | null): ThemeMode | null => {
   return null;
 };
 
-const STORY_CHAPTERS: StoryChapter[] = [
-  {
-    id: 'problem',
-    navLabel: 'Problem',
-    sequence: '01',
-    eyebrow: 'What Goes Wrong',
-    title: 'Sulfation Slowly Steals Battery Power',
-    description:
-      'Inside old batteries, a hard layer called sulfation builds up. This blocks smooth power flow, so your battery gives less backup and drains faster.',
-    highlights: [
-      'Your battery runs out faster than before.',
-      'Charging feels normal, but performance keeps dropping.',
-      'You end up replacing batteries sooner than expected.',
-      'Breakdowns interrupt daily work and deliveries.',
-    ],
-    impactLabel: 'Battery strength before checkup',
-    impactValue: '35-55%',
-    accent:
-      'bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.24),transparent_58%)]',
-  },
-  {
-    id: 'diagnostics',
-    navLabel: 'Checkup',
-    sequence: '02',
-    eyebrow: 'Quick Check',
-    title: 'We First Check Battery Health',
-    description:
-      'Before we start, we do a quick health check to see your battery condition. This helps us choose the right level for a safe and useful result.',
-    highlights: [
-      'We test first, then treat.',
-      'Settings are based on your battery condition.',
-      'The process stays consistent across all batteries.',
-      'You get clear before-and-after results.',
-    ],
-    impactLabel: 'Typical check time',
-    impactValue: '8-12 min',
-    accent:
-      'bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.24),transparent_58%)]',
-  },
-  {
-    id: 'regeneration',
-    navLabel: 'Fix',
-    sequence: '03',
-    eyebrow: 'Battery Fix',
-    title: 'Targeted Pulses Break Sulfation Buildup',
-    description:
-      'We use controlled pulses to break the sulfation layer. This helps your battery hold charge better again without replacing it right away.',
-    highlights: [
-      'Sulfation gets reduced step by step.',
-      'The process is controlled and safe.',
-      'Battery backup improves after treatment.',
-      'You can treat the same battery again later if needed.',
-    ],
-    impactLabel: 'Typical fix time',
-    impactValue: '2-4 hrs',
-    accent:
-      'bg-[radial-gradient(circle_at_top_right,rgba(20,184,166,0.24),transparent_58%)]',
-  },
-  {
-    id: 'impact',
-    navLabel: 'Impact',
-    sequence: '04',
-    eyebrow: 'Final Result',
-    title: 'Better Runtime, Lower Cost, Longer Battery Life',
-    description:
-      'After this process, many batteries work much better in daily use. You save money, avoid surprise battery failure, and get more life from each unit.',
-    highlights: [
-      'Recovered batteries can go back to work quickly.',
-      'Replacement spend can drop by up to 70%.',
-      'Operations stay more reliable during busy hours.',
-      'You get clearer planning and less surprise downtime.',
-    ],
-    impactLabel: 'Battery strength after checkup',
-    impactValue: '80-100%',
-    accent:
-      'bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.24),transparent_58%)]',
-  },
-];
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
 
-const FadeInBlock = ({
-  children,
-  delay = 0,
-}: {
-  children: ReactNode;
-  delay?: number;
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 40, filter: 'blur(12px)' }}
-    whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-    viewport={{ once: true, margin: '-16% 0px' }}
-    transition={{ duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] }}
-  >
-    {children}
-  </motion.div>
-);
+const interpolateStops = (progress: number, values: number[]) => {
+  if (values.length !== PANEL_STOPS.length) {
+    return values[0] ?? 0;
+  }
 
-const MetricCard = ({
+  if (progress <= PANEL_STOPS[0]) {
+    return values[0];
+  }
+
+  const lastStopIndex = PANEL_STOPS.length - 1;
+  if (progress >= PANEL_STOPS[lastStopIndex]) {
+    return values[lastStopIndex];
+  }
+
+  for (let index = 0; index < PANEL_STOPS.length - 1; index += 1) {
+    const currentStop = PANEL_STOPS[index];
+    const nextStop = PANEL_STOPS[index + 1];
+
+    if (progress >= currentStop && progress <= nextStop) {
+      const segmentProgress = (progress - currentStop) / (nextStop - currentStop);
+      return values[index] + (values[index + 1] - values[index]) * segmentProgress;
+    }
+  }
+
+  return values[lastStopIndex];
+};
+
+const getInstrumentReadouts = (progress: number): InstrumentReadouts => ({
+  charge: Math.round(interpolateStops(progress, [0, 25, 50, 75, 100])),
+  plateHealth: Math.round(interpolateStops(progress, [12, 28, 52, 79, 98])),
+  sulfation: Math.round(interpolateStops(progress, [94, 78, 52, 21, 4])),
+  savings: Math.round(interpolateStops(progress, [0, 6, 18, 42, 70])),
+});
+
+const ReadoutBar = ({
   label,
   value,
-  compact = false,
+  toneClass,
 }: {
   label: string;
-  value: string;
-  compact?: boolean;
+  value: number;
+  toneClass: string;
 }) => (
-  <div
-    className={`rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl ${
-      compact
-        ? 'min-w-0 p-1.5 shadow-[0_16px_28px_-24px_rgba(8,145,178,0.7)]'
-        : 'p-3 shadow-[0_18px_30px_-24px_rgba(8,145,178,0.7)] sm:p-4'
-    }`}
-  >
-    <p
-      className={`font-semibold text-slate-400 ${
-        compact ? 'truncate text-[8px] tracking-normal' : 'uppercase text-[10px] tracking-[0.2em]'
-      }`}
-      title={label}
-    >
-      {label}
-    </p>
-    <p
-      className={`font-display font-bold text-slate-100 ${
-        compact ? 'mt-0.5 text-[13px] leading-none sm:text-[14px]' : 'mt-1 text-xl sm:text-2xl'
-      }`}
-    >
-      {value}
-    </p>
+  <div className="space-y-2">
+    <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-slate-400">
+      <span>{label}</span>
+      <span className="text-slate-100">{value}%</span>
+    </div>
+    <div className="h-2 overflow-hidden rounded-full bg-white/8">
+      <div
+        className={`h-full rounded-full bg-gradient-to-r ${toneClass} transition-[width] duration-150`}
+        style={{ width: `${value}%` }}
+      />
+    </div>
   </div>
 );
-
-const MetricsRow = ({
-  scores,
-  compact = false,
-}: {
-  scores: ScoreSnapshot;
-  compact?: boolean;
-}) => (
-  <div className={`grid min-w-0 grid-cols-3 ${compact ? 'gap-1.5' : 'gap-3 sm:gap-4'}`}>
-    <MetricCard compact={compact} label="Recovered" value={`${scores.recovery}%`} />
-    <MetricCard compact={compact} label="Savings" value={`${scores.savings}%`} />
-    <MetricCard compact={compact} label="Uptime" value={`${scores.uptime}%`} />
-  </div>
-);
-
-const StoryChapterCard = ({
-  chapter,
-  index,
-}: {
-  chapter: StoryChapter;
-  index: number;
-}) => {
-  return (
-    <section
-      id={chapter.id}
-      className="scroll-mt-[7.2rem] py-1 md:scroll-mt-32 md:py-2"
-    >
-      <FadeInBlock delay={index * 0.05}>
-        <article className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 shadow-[0_26px_60px_-32px_rgba(7,89,133,0.75)] backdrop-blur-md sm:p-7 lg:p-10">
-          <div className={`absolute inset-0 ${chapter.accent}`} />
-          <div className="absolute inset-0 bg-[linear-gradient(150deg,rgba(255,255,255,0.08),transparent_28%,transparent_66%,rgba(255,255,255,0.06))] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-          <div className="relative z-10 space-y-5 sm:space-y-6">
-            <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-cyan-200/90 sm:text-xs sm:tracking-[0.28em]">
-              {chapter.sequence} / {chapter.eyebrow}
-            </p>
-            <h2 className="font-display text-2xl font-bold leading-tight text-white sm:text-4xl lg:text-[2.8rem]">
-              {chapter.title}
-            </h2>
-            <p className="text-base leading-relaxed text-slate-200 sm:text-lg">
-              {chapter.description}
-            </p>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {chapter.highlights.map((item) => (
-                <p
-                  key={item}
-                  className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm leading-relaxed text-slate-200"
-                >
-                  {item}
-                </p>
-              ))}
-            </div>
-
-            <div className="inline-flex items-baseline gap-3 rounded-full border border-cyan-200/30 bg-cyan-200/10 px-4 py-2">
-              <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan-100/90">
-                {chapter.impactLabel}
-              </span>
-              <span className="font-display text-2xl font-bold text-cyan-100">
-                {chapter.impactValue}
-              </span>
-            </div>
-          </div>
-        </article>
-      </FadeInBlock>
-    </section>
-  );
-};
 
 function App() {
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
@@ -268,6 +203,9 @@ function App() {
     }
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
+
+  const [activePanelIndex, setActivePanelIndex] = useState(0);
+  const [readouts, setReadouts] = useState<InstrumentReadouts>(getInstrumentReadouts(0));
 
   const resolvedTheme: ResolvedTheme =
     themeMode === 'system' ? (systemPrefersDark ? 'dark' : 'lite') : themeMode;
@@ -320,230 +258,265 @@ function App() {
     });
   };
 
-  const containerRef = useRef<HTMLElement>(null);
+  const scrollytellingRef = useRef<HTMLElement>(null);
+  const panelRefs = useRef<(HTMLElement | null)[]>([]);
+  const visibilityRatiosRef = useRef(new Map<number, number>());
+  const pendingReadoutsRef = useRef<InstrumentReadouts>(getInstrumentReadouts(0));
+  const readoutAnimationFrameRef = useRef<number | null>(null);
 
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: scrollytellingRef,
     offset: ['start start', 'end end'],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 70,
-    damping: 22,
-    mass: 0.35,
-    restDelta: 0.001,
-  });
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const index = Number((entry.target as HTMLElement).dataset.panelIndex);
+          visibilityRatiosRef.current.set(index, entry.isIntersecting ? entry.intersectionRatio : 0);
+        });
 
-  const orbPrimaryY = useTransform(smoothProgress, [0, 1], ['-10%', '56%']);
-  const orbSecondaryY = useTransform(smoothProgress, [0, 1], ['8%', '-34%']);
-  const stageTilt = useTransform(smoothProgress, [0, 1], [0, 2.5]);
-  const timelineHeight = useTransform(smoothProgress, [0, 1], ['0%', '100%']);
-  const mobileStageLift = useTransform(smoothProgress, [0, 0.92, 1], [0, -6, 34]);
-  const mobileStageOpacity = useTransform(smoothProgress, [0, 0.92, 0.985, 1], [1, 1, 0.22, 0]);
+        const mostVisible = [...visibilityRatiosRef.current.entries()].sort((left, right) => (
+          right[1] - left[1]
+        ))[0];
 
-  const recoveryScoreValue = useTransform(
-    smoothProgress,
-    BATTERY_STAGE_POINTS,
-    [82, 38, 32, 58, 68, 94],
-  );
-  const savingsScoreValue = useTransform(
-    smoothProgress,
-    BATTERY_STAGE_POINTS,
-    [54, 22, 18, 40, 52, 70],
-  );
-  const uptimeScoreValue = useTransform(
-    smoothProgress,
-    BATTERY_STAGE_POINTS,
-    [90, 62, 56, 74, 82, 97],
-  );
+        if (mostVisible) {
+          setActivePanelIndex((previousIndex) => (
+            previousIndex === mostVisible[0] ? previousIndex : mostVisible[0]
+          ));
+        }
+      },
+      {
+        threshold: [0.2, 0.35, 0.5, 0.65, 0.8],
+        rootMargin: '-18% 0px -18% 0px',
+      },
+    );
 
-  const [scores, setScores] = useState<ScoreSnapshot>(INITIAL_SCORES);
-  const pendingScoresRef = useRef<ScoreSnapshot>(INITIAL_SCORES);
-  const scoreAnimationFrameRef = useRef<number | null>(null);
+    panelRefs.current.forEach((panel) => {
+      if (panel) {
+        observer.observe(panel);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     return () => {
-      if (scoreAnimationFrameRef.current !== null) {
-        window.cancelAnimationFrame(scoreAnimationFrameRef.current);
+      if (readoutAnimationFrameRef.current !== null) {
+        window.cancelAnimationFrame(readoutAnimationFrameRef.current);
       }
     };
   }, []);
 
-  const queueScoreFlush = () => {
-    if (scoreAnimationFrameRef.current !== null) {
+  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
+    pendingReadoutsRef.current = getInstrumentReadouts(clamp(latest, 0, 1));
+
+    if (readoutAnimationFrameRef.current !== null) {
       return;
     }
 
-    scoreAnimationFrameRef.current = window.requestAnimationFrame(() => {
-      scoreAnimationFrameRef.current = null;
-      const nextScores = pendingScoresRef.current;
+    readoutAnimationFrameRef.current = window.requestAnimationFrame(() => {
+      readoutAnimationFrameRef.current = null;
+      const nextReadouts = pendingReadoutsRef.current;
 
-      setScores((previousScores) => {
+      setReadouts((previousReadouts) => {
         if (
-          previousScores.recovery === nextScores.recovery &&
-          previousScores.savings === nextScores.savings &&
-          previousScores.uptime === nextScores.uptime
+          previousReadouts.charge === nextReadouts.charge &&
+          previousReadouts.plateHealth === nextReadouts.plateHealth &&
+          previousReadouts.sulfation === nextReadouts.sulfation &&
+          previousReadouts.savings === nextReadouts.savings
         ) {
-          return previousScores;
+          return previousReadouts;
         }
 
-        return nextScores;
+        return nextReadouts;
       });
     });
-  };
-
-  useMotionValueEvent(recoveryScoreValue, 'change', (latest) => {
-    const roundedValue = Math.round(latest);
-    if (pendingScoresRef.current.recovery === roundedValue) {
-      return;
-    }
-
-    pendingScoresRef.current = { ...pendingScoresRef.current, recovery: roundedValue };
-    queueScoreFlush();
-  });
-  useMotionValueEvent(savingsScoreValue, 'change', (latest) => {
-    const roundedValue = Math.round(latest);
-    if (pendingScoresRef.current.savings === roundedValue) {
-      return;
-    }
-
-    pendingScoresRef.current = { ...pendingScoresRef.current, savings: roundedValue };
-    queueScoreFlush();
-  });
-  useMotionValueEvent(uptimeScoreValue, 'change', (latest) => {
-    const roundedValue = Math.round(latest);
-    if (pendingScoresRef.current.uptime === roundedValue) {
-      return;
-    }
-
-    pendingScoresRef.current = { ...pendingScoresRef.current, uptime: roundedValue };
-    queueScoreFlush();
   });
 
   return (
     <div className="theme-canvas relative overflow-x-clip bg-ink-950 text-slate-100">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(20,184,166,0.15),transparent_52%),radial-gradient(circle_at_84%_22%,rgba(56,189,248,0.16),transparent_48%),linear-gradient(145deg,#020712,#040b1a_46%,#030817)]" />
-        <motion.div
-          style={{ y: orbPrimaryY }}
-          className="absolute right-[-16%] top-[-8%] h-[42vw] w-[42vw] max-h-[540px] max-w-[540px] rounded-full bg-cyan-400/14 blur-[96px]"
-        />
-        <motion.div
-          style={{ y: orbSecondaryY }}
-          className="absolute bottom-[4%] left-[-20%] h-[46vw] w-[46vw] max-h-[620px] max-w-[620px] rounded-full bg-emerald-500/14 blur-[104px]"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:44px_44px] opacity-35" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#03060a_0%,#071019_48%,#03060a_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.05)_1px,transparent_1px)] [background-size:32px_32px] opacity-35" />
+        <div className="absolute left-[18%] top-0 h-full w-px bg-gradient-to-b from-transparent via-cyan-300/15 to-transparent" />
+        <div className="absolute right-[24%] top-0 h-full w-px bg-gradient-to-b from-transparent via-emerald-300/12 to-transparent" />
+        <div className="absolute left-[9%] top-[12%] h-40 w-40 rounded-full bg-cyan-400/8 blur-3xl" />
+        <div className="absolute bottom-[14%] right-[12%] h-48 w-48 rounded-full bg-emerald-400/7 blur-3xl" />
       </div>
 
       <Header
-        chapters={STORY_CHAPTERS.map(({ id, navLabel }) => ({ id, label: navLabel }))}
-        progress={smoothProgress}
+        chapters={STORY_PANELS.map(({ id, navLabel }) => ({ id, label: navLabel }))}
+        progress={scrollYProgress}
         themeMode={themeMode}
         resolvedTheme={resolvedTheme}
         onCycleTheme={cycleThemeMode}
       />
 
-      <main
-        ref={containerRef}
-        className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-10 px-4 pb-12 pt-28 sm:px-6 md:pb-14 md:pt-32 lg:flex-row lg:items-start lg:gap-14 lg:px-10"
-      >
-        <section className="lg:hidden">
-          <FadeInBlock>
-            <article className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_30px_70px_-40px_rgba(15,23,42,0.95)] backdrop-blur-md">
-              <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(56,189,248,0.12),transparent_44%,rgba(16,185,129,0.14))]" />
-              <div className="relative z-10 space-y-4">
-                <p className="font-mono text-xs uppercase tracking-[0.22em] text-cyan-200/90">
-                  How It Works
-                </p>
-                <h1 className="font-display text-4xl font-bold leading-[1.05] text-white">
-                  Don&apos;t Replace.
-                  <br />
-                  <span className="hero-recover-text gradient-cyan-text text-transparent bg-gradient-to-r from-emerald-300 via-cyan-200 to-cyan-400 bg-clip-text">
-                    Recover Battery Life.
-                  </span>
-                </h1>
-                <p className="text-sm leading-relaxed text-slate-200">
-                  with just this four simple steps, from sulfation buildup to battery recovery, watch your battery come back to life
-                </p>
-              </div>
-            </article>
-          </FadeInBlock>
-        </section>
+      <main className="relative mx-auto w-full max-w-[1480px] px-4 pb-20 pt-28 sm:px-6 md:pt-32 lg:px-10">
+        <section
+          ref={scrollytellingRef}
+          className="relative lg:grid lg:grid-cols-[minmax(18rem,40%)_minmax(0,60%)] lg:gap-10"
+        >
+          <aside className="relative z-20 mb-12 border-b border-white/10 pb-8 lg:mb-0 lg:border-b-0 lg:border-r lg:border-white/10 lg:pr-10">
+            <div className="sticky top-[calc(var(--header-height)+0.75rem)]">
+              <div className="relative overflow-hidden px-1 py-2 lg:flex lg:h-[calc(100vh-var(--header-height)-1.75rem)] lg:flex-col lg:justify-between lg:py-4">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,255,136,0.08),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(34,211,238,0.08),transparent_32%),linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.06)_1px,transparent_1px)] [background-size:auto,auto,28px_28px,28px_28px] opacity-75" />
+                <div className="pointer-events-none absolute inset-y-6 left-4 w-px bg-gradient-to-b from-transparent via-cyan-300/25 to-transparent" />
 
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+0.85rem)] sm:px-6 lg:hidden">
-          <motion.div
-            style={{ y: mobileStageLift, opacity: mobileStageOpacity }}
-            className="pointer-events-auto relative mx-auto w-full max-w-[1440px] rounded-[1.65rem] border border-white/10 bg-ink-900/82 p-3 shadow-[0_24px_54px_-34px_rgba(8,47,73,0.9)] backdrop-blur-md"
-          >
-            <div className="flex items-center gap-3">
-              <BatteryGraphic scrollProgress={smoothProgress} compact />
-              <div className="min-w-0 flex-1 space-y-2">
-                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-200/90">
-                  Live State
-                </p>
-                <MetricsRow scores={scores} compact />
+                <div className="relative z-10 space-y-5">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-cyan-300/72">
+                    VRLA Regeneration Live
+                  </p>
+
+                  <div className="flex flex-wrap items-end justify-between gap-5">
+                    <div className="max-w-[30rem]">
+                      <h1 className="font-display text-[clamp(2.35rem,6vw,4.6rem)] font-semibold leading-[0.88] text-white">
+                        Battery restoration, mapped directly to scroll.
+                      </h1>
+                      <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-300 sm:text-base">
+                        The battery on the left never moves. Its state changes in place from depleted
+                        red to restored green while the right side walks through the recovery story.
+                      </p>
+                    </div>
+
+                    <div className="min-w-[9rem]">
+                      <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-slate-500">
+                        Current State
+                      </p>
+                      <p className="mt-2 font-display text-5xl font-semibold leading-none text-white">
+                        {readouts.charge}%
+                      </p>
+                      <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.24em] text-cyan-200">
+                        {STORY_PANELS[activePanelIndex].stageLabel}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative z-10 flex min-h-[22rem] items-center justify-center py-8 sm:min-h-[24rem] lg:min-h-0 lg:flex-1 lg:py-10">
+                  <BatteryGraphic scrollProgress={scrollYProgress} />
+                </div>
+
+                <div className="relative z-10 space-y-5">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                    <ReadoutBar
+                      label="Charge"
+                      value={readouts.charge}
+                      toneClass="from-[#cc2200] via-[#facc15] to-[#00ff88]"
+                    />
+                    <ReadoutBar
+                      label="Plate Health"
+                      value={readouts.plateHealth}
+                      toneClass="from-cyan-500 via-cyan-300 to-emerald-300"
+                    />
+                    <ReadoutBar
+                      label="Sulfation"
+                      value={readouts.sulfation}
+                      toneClass="from-[#ff7a59] via-[#f97316] to-[#cc2200]"
+                    />
+                    <ReadoutBar
+                      label="Savings"
+                      value={readouts.savings}
+                      toneClass="from-emerald-900 via-emerald-500 to-[#00ff88]"
+                    />
+                  </div>
+
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                    {STORY_PANELS.map((panel, index) => {
+                      const isActive = index === activePanelIndex;
+                      return (
+                        <div
+                          key={panel.id}
+                          className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 border-t border-white/8 py-2 first:border-t-0 ${
+                            isActive ? 'text-white' : 'text-slate-500'
+                          }`}
+                        >
+                          <span
+                            className="h-2.5 w-2.5 rounded-full border border-white/15"
+                            style={{
+                              backgroundColor: isActive ? panel.accentColor : 'rgba(148,163,184,0.2)',
+                              boxShadow: isActive ? `0 0 18px ${panel.accentGlow}` : 'none',
+                            }}
+                          />
+                          <span className="font-mono text-[10px] uppercase tracking-[0.22em]">
+                            {panel.eyebrow}
+                          </span>
+                          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-slate-500">
+                            {panel.sequence}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
-          </motion.div>
-        </div>
+          </aside>
 
-        <aside className="relative hidden w-full lg:sticky lg:top-28 lg:block lg:h-[calc(100vh-8.25rem)] lg:w-[46%]">
-          <motion.div
-            style={{ rotateX: stageTilt }}
-            className="relative h-full overflow-visible rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_36px_90px_-42px_rgba(15,23,42,0.95)] backdrop-blur-md sm:p-7 lg:p-8"
-          >
-            <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(56,189,248,0.08),transparent_42%,rgba(16,185,129,0.08))]" />
-            <div className="relative z-10 flex h-full flex-col gap-8">
-              <div className="space-y-3">
-                <p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-300/90">
-                  How It Works
-                </p>
-                <h1 className="font-display text-4xl font-bold leading-[1.04] text-white sm:text-5xl lg:text-[3rem]">
-                  Don&apos;t Replace.
-                  <br />
-                  <span className="hero-recover-text gradient-cyan-text text-transparent bg-gradient-to-r from-emerald-300 via-cyan-200 to-cyan-400 bg-clip-text">
-                    Recover Battery Life.
-                  </span>
-                </h1>
-                <p className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-                  with just this four simple steps, from sulfation buildup to battery recovery, watch your battery come back to life
-                </p>
-              </div>
+          <div className="relative lg:pl-10">
+            {STORY_PANELS.map((panel, index) => {
+              const isActive = index === activePanelIndex;
 
-              <div className="grid min-h-0 flex-1 place-items-center pb-1">
-                <BatteryGraphic scrollProgress={smoothProgress} />
-              </div>
-
-              <MetricsRow scores={scores} />
-            </div>
-          </motion.div>
-        </aside>
-
-        <div className="relative flex w-full flex-col gap-6 pb-2 md:gap-8 lg:w-[54%] lg:gap-10">
-          <div className="-mx-4 overflow-x-auto px-4 pb-1 lg:hidden [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
-            <div className="flex w-max gap-2">
-              {STORY_CHAPTERS.map((chapter) => (
-                <a
-                  key={`chip-${chapter.id}`}
-                  href={`#${chapter.id}`}
-                  className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-slate-200"
+              return (
+                <section
+                  key={panel.id}
+                  id={panel.id}
+                  data-panel-index={index}
+                  ref={(node) => {
+                    panelRefs.current[index] = node;
+                  }}
+                  className="relative flex min-h-[72vh] scroll-mt-[calc(var(--header-height)+1rem)] items-center border-t border-white/10 py-12 first:border-t-0 sm:min-h-[78vh] sm:py-14 lg:min-h-[92vh] lg:py-20"
                 >
-                  {chapter.navLabel}
-                </a>
-              ))}
-            </div>
+                  <div
+                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300"
+                    style={{
+                      opacity: isActive ? 1 : 0,
+                      backgroundImage: `radial-gradient(circle at top left, ${panel.accentGlow}, transparent 58%)`,
+                    }}
+                  />
+
+                  <div
+                    className={`relative max-w-[42rem] space-y-6 transition-opacity duration-300 ${
+                      isActive ? 'opacity-100' : 'opacity-65 lg:opacity-45'
+                    }`}
+                  >
+                    <div className="space-y-3">
+                      <p
+                        className="font-mono text-[11px] uppercase tracking-[0.3em]"
+                        style={{ color: panel.accentColor }}
+                      >
+                        {panel.sequence} / {panel.eyebrow}
+                      </p>
+                      <h2 className="max-w-[16ch] font-display text-3xl font-semibold leading-[0.98] text-white sm:text-4xl lg:text-[3.4rem]">
+                        {panel.title}
+                      </h2>
+                    </div>
+
+                    <div className="max-w-[38rem] space-y-3 text-base leading-relaxed text-slate-300 sm:text-lg">
+                      {panel.copy.map((line) => (
+                        <p key={line}>{line}</p>
+                      ))}
+                    </div>
+
+                    <div className="pt-4">
+                      <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500">
+                        {panel.metricLabel}
+                      </p>
+                      <div className="mt-3 flex items-end gap-3">
+                        <p className="font-display text-5xl font-semibold leading-none text-white sm:text-6xl lg:text-7xl">
+                          {panel.metricValue}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              );
+            })}
           </div>
-
-          <div className="pointer-events-none absolute -left-6 top-0 hidden h-full w-px bg-white/10 lg:block" />
-          <motion.div
-            style={{ height: timelineHeight }}
-            className="pointer-events-none absolute -left-6 top-0 hidden w-px bg-gradient-to-b from-cyan-300 via-emerald-400 to-emerald-500 lg:block"
-          />
-
-          {STORY_CHAPTERS.map((chapter, index) => (
-            <StoryChapterCard key={chapter.id} chapter={chapter} index={index} />
-          ))}
-        </div>
+        </section>
       </main>
 
       <Footer />

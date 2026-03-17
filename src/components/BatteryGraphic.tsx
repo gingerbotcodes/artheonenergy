@@ -1,290 +1,257 @@
-import { motion, type MotionValue, useSpring, useTransform } from 'framer-motion';
+import {
+  motion,
+  type MotionValue,
+  useMotionTemplate,
+  useTransform,
+} from 'framer-motion';
 
 interface BatteryGraphicProps {
   scrollProgress: MotionValue<number>;
-  compact?: boolean;
 }
 
+const STATE_STOPS = [0, 0.25, 0.5, 0.75, 1];
 const PLATE_COUNT = 6;
 
-type ElectronBubbleSpec = {
-  id: string;
-  left: number;
-  top: number;
-  travel: number;
-  duration: number;
-  delay: number;
-};
+const FLOW_PARTICLES = [
+  { id: 'p-1', left: 16, baseY: 216, driftX: 6, size: 4 },
+  { id: 'p-2', left: 24, baseY: 202, driftX: -4, size: 3 },
+  { id: 'p-3', left: 35, baseY: 228, driftX: 8, size: 4 },
+  { id: 'p-4', left: 48, baseY: 208, driftX: -6, size: 3 },
+  { id: 'p-5', left: 59, baseY: 224, driftX: 7, size: 4 },
+  { id: 'p-6', left: 71, baseY: 196, driftX: -5, size: 3 },
+  { id: 'p-7', left: 82, baseY: 214, driftX: 5, size: 4 },
+];
 
-const ELECTRON_BUBBLES: ElectronBubbleSpec[] = Array.from({ length: 12 }, (_, index) => ({
-  id: `electron-${index}`,
-  left: 8 + ((index * 17) % 84),
-  top: 14 + ((index * 13) % 64),
-  travel: 3 + (index % 4),
-  duration: 2.2 + (index % 5) * 0.25,
-  delay: (index % 6) * 0.18,
-}));
+const CURRENT_LINES = [
+  { id: 'l-1', top: 29, offset: -22 },
+  { id: 'l-2', top: 43, offset: -10 },
+  { id: 'l-3', top: 58, offset: 2 },
+  { id: 'l-4', top: 72, offset: 12 },
+];
 
-export const BatteryGraphic = ({
+const FlowParticle = ({
   scrollProgress,
-  compact = false,
-}: BatteryGraphicProps) => {
-  const smoothProgress = useSpring(scrollProgress, {
-    stiffness: 90,
-    damping: 28,
-    mass: 0.32,
-    restDelta: 0.001,
-  });
-
-  const fluidScaleY = useTransform(
-    smoothProgress,
-    [0, 0.2, 0.42, 0.6, 0.78, 1],
-    [0.78, 0.2, 0.16, 0.48, 0.58, 0.96],
+  left,
+  baseY,
+  driftX,
+  size,
+}: {
+  scrollProgress: MotionValue<number>;
+  left: number;
+  baseY: number;
+  driftX: number;
+  size: number;
+}) => {
+  const x = useTransform(
+    scrollProgress,
+    STATE_STOPS,
+    [0, driftX * 0.2, driftX * 0.55, driftX * 0.95, driftX * 1.1],
   );
-
-  const fluidColor = useTransform(
-    smoothProgress,
-    [0, 0.25, 0.5, 0.7, 1],
-    ['#10b981', '#ef4444', '#eab308', '#14b8a6', '#10b981'],
+  const y = useTransform(
+    scrollProgress,
+    STATE_STOPS,
+    [baseY + 20, baseY + 8, baseY - 6, baseY - 22, baseY - 36],
   );
-
-  const crystalOpacity = useTransform(
-    smoothProgress,
-    [0, 0.2, 0.3, 0.52, 0.65, 1],
-    [0, 0, 0.86, 0.86, 0.08, 0],
-  );
-
-  const pulseOpacity = useTransform(
-    smoothProgress,
-    [0, 0.48, 0.62, 0.84, 1],
-    [0, 0, 1, 0.62, 0],
-  );
-
-  const electronDriftX = useTransform(
-    smoothProgress,
-    [0, 0.3, 0.42, 0.6, 0.78, 1],
-    [0, 10, 16, 5, -7, -14],
-  );
-
-  const electronOpacity = useTransform(
-    smoothProgress,
-    [0, 0.2, 0.42, 0.75, 1],
-    [0.14, 0.24, 0.34, 0.3, 0.2],
-  );
-
-  const shakeX = useTransform(
-    smoothProgress,
-    [0, 0.54, 0.58, 0.64, 0.7, 1],
-    [0, 0, -0.8, 0.8, 0, 0],
-  );
-
-  const haloOpacity = useTransform(
-    smoothProgress,
-    [0, 0.28, 0.6, 1],
-    [0.22, 0.3, 0.42, 0.36],
-  );
-
-  const badgeScale = useTransform(
-    smoothProgress,
-    [0, 0.84, 0.91, 0.95, 0.99, 1],
-    [0, 0, 1.72, 1.18, 1.05, 1],
-  );
-  const badgeRotate = useTransform(
-    smoothProgress,
-    [0, 0.84, 0.91, 0.95, 0.99, 1],
-    [-108, -108, -4, 8, 11, 10],
-  );
-  const badgeX = useTransform(
-    smoothProgress,
-    [0, 0.84, 0.91, 0.96, 1],
-    [0, 0, compact ? -22 : -86, compact ? -8 : -20, 0],
-  );
-  const badgeY = useTransform(
-    smoothProgress,
-    [0, 0.84, 0.91, 0.96, 1],
-    [0, 0, compact ? 24 : 58, compact ? 6 : 14, 0],
-  );
-  const badgeGlowOpacity = useTransform(
-    smoothProgress,
-    [0, 0.84, 0.91, 0.96, 1],
-    [0, 0, 1, 0.45, 0.3],
-  );
-  const badgeBurstOpacity = useTransform(
-    smoothProgress,
-    [0, 0.84, 0.91, 0.96, 1],
-    [0, 0, 0.9, 0.22, 0],
-  );
-  const badgeBurstScale = useTransform(
-    smoothProgress,
-    [0, 0.84, 0.91, 1],
-    [0.76, 0.76, 1.22, 1.72],
-  );
-
-  const frameWidthClass = compact
-    ? 'max-w-[148px] sm:max-w-[168px]'
-    : 'max-w-[clamp(11.5rem,21vh,19rem)]';
-
-  const terminalWidthClass = compact ? 'w-[62%]' : 'w-[68%]';
-  const terminalSlotClass = compact ? 'h-5 w-8' : 'h-6 w-10';
-  const shellTopClass = compact ? 'top-3' : 'top-4';
-  const shellPaddingClass = compact ? 'p-2' : 'p-3 sm:p-4';
-  const shellRoundClass = compact ? 'rounded-[1.8rem]' : 'rounded-[2.5rem]';
-  const coreRoundClass = compact ? 'rounded-[1.35rem]' : 'rounded-[2rem]';
-  const labelClass = compact
-    ? 'bottom-3 w-[66%] max-w-[110px] rounded-lg px-2 py-1'
-    : 'bottom-5 w-[62%] max-w-[180px] rounded-xl px-3 py-2';
-  const electronBubbles = compact
-    ? ELECTRON_BUBBLES.slice(0, 6)
-    : ELECTRON_BUBBLES;
-  const electronBubbleClass = compact
-    ? 'absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-100/40 bg-cyan-300/18 px-[1px] py-[1px] font-mono text-[5px] font-semibold leading-none text-cyan-100'
-    : 'absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-100/40 bg-cyan-300/18 px-[2px] py-[1px] font-mono text-[6px] font-semibold leading-none text-cyan-100';
+  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.12, 0.24, 0.48, 0.72]);
+  const scale = useTransform(scrollProgress, STATE_STOPS, [0.65, 0.78, 0.9, 1.02, 1.1]);
 
   return (
     <motion.div
-      style={{ x: shakeX }}
-      className={`relative mx-auto aspect-[4/5] w-full transform-gpu will-change-transform ${frameWidthClass}`}
+      style={{ left: `${left}%`, top: 0, x, y, opacity, scale }}
+      className="absolute -translate-x-1/2 rounded-full border border-[#9ef6cf]/35 bg-[#9ef6cf]/30"
+      aria-hidden="true"
+    >
+      <div
+        className="rounded-full bg-[#dfffee]"
+        style={{ height: `${size}px`, width: `${size}px` }}
+      />
+    </motion.div>
+  );
+};
+
+const CurrentLine = ({
+  scrollProgress,
+  top,
+  offset,
+}: {
+  scrollProgress: MotionValue<number>;
+  top: number;
+  offset: number;
+}) => {
+  const x = useTransform(scrollProgress, STATE_STOPS, [offset - 20, offset - 8, offset, offset + 10, offset + 18]);
+  const scaleX = useTransform(scrollProgress, STATE_STOPS, [0.08, 0.24, 0.56, 0.86, 1]);
+  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.22, 0.6, 0.72, 0.42]);
+
+  return (
+    <motion.div
+      style={{ top: `${top}%`, x, scaleX, opacity }}
+      className="absolute left-[9%] h-px w-[82%] origin-left bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(210,255,235,0.88),rgba(255,255,255,0))]"
+      aria-hidden="true"
+    />
+  );
+};
+
+export const BatteryGraphic = ({ scrollProgress }: BatteryGraphicProps) => {
+  const shellGlow = useTransform(scrollProgress, STATE_STOPS, [0.06, 0.12, 0.18, 0.28, 0.42]);
+  const energyColor = useTransform(
+    scrollProgress,
+    STATE_STOPS,
+    ['#cc2200', '#f97316', '#facc15', '#22c55e', '#00ff88'],
+  );
+  const fillHeight = useTransform(scrollProgress, STATE_STOPS, ['3%', '25%', '50%', '75%', '100%']);
+  const fillOpacity = useTransform(scrollProgress, STATE_STOPS, [0.45, 0.6, 0.72, 0.82, 0.95]);
+  const crackOpacity = useTransform(scrollProgress, STATE_STOPS, [0.82, 0.56, 0.28, 0.08, 0]);
+  const chargePulseOpacity = useTransform(scrollProgress, STATE_STOPS, [0.06, 0.24, 0.38, 0.52, 0.7]);
+  const regenMistOpacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.04, 0.12, 0.28, 0.46]);
+  const staticNoiseOpacity = useTransform(scrollProgress, STATE_STOPS, [0.35, 0.22, 0.12, 0.04, 0]);
+  const caseRimOpacity = useTransform(scrollProgress, STATE_STOPS, [0.3, 0.4, 0.52, 0.7, 0.9]);
+
+  const auraBackground = useMotionTemplate`radial-gradient(circle, rgba(0,255,136, ${shellGlow}), rgba(0,255,136, 0) 68%)`;
+  const shellShadow = useMotionTemplate`0 32px 80px -44px rgba(0,255,136, ${shellGlow}), inset 0 0 28px rgba(1,4,9,0.94)`;
+  const rimGlow = useMotionTemplate`0 0 0 1px rgba(199,255,230, ${caseRimOpacity}), inset 0 0 24px rgba(0,255,136, ${shellGlow})`;
+  const energyField = useMotionTemplate`linear-gradient(180deg, rgba(255,255,255,0.34) 0%, ${energyColor} 18%, ${energyColor} 100%)`;
+  const innerPulse = useMotionTemplate`radial-gradient(circle at 50% 85%, rgba(255,255,255, ${chargePulseOpacity}), rgba(0,255,136, 0) 62%)`;
+  const terminalGlow = useMotionTemplate`0 0 24px rgba(0,255,136, ${shellGlow})`;
+
+  return (
+    <motion.div
+      className="relative mx-auto aspect-[0.76] w-full max-w-[min(18rem,78vw)] sm:max-w-[20rem] lg:max-w-[24rem]"
+      aria-hidden="true"
     >
       <motion.div
-        style={{ opacity: haloOpacity }}
-        className="absolute -inset-4 rounded-[2.8rem] bg-[radial-gradient(circle,rgba(34,211,238,0.45),rgba(16,185,129,0.18)_46%,transparent_70%)] blur-xl"
+        style={{ backgroundImage: auraBackground }}
+        className="pointer-events-none absolute -inset-8 rounded-[3rem] blur-2xl"
       />
 
-      <div
-        className={`absolute left-1/2 top-0 z-20 flex -translate-x-1/2 justify-between ${terminalWidthClass}`}
-      >
-        <div className={`relative ${terminalSlotClass} rounded-t-xl border border-slate-500 bg-gradient-to-b from-slate-400 to-slate-600`}>
-          <span className="absolute inset-0 grid place-items-center text-sm font-bold text-slate-900">-</span>
-        </div>
-        <div className={`relative ${terminalSlotClass} rounded-t-xl border border-rose-400/80 bg-gradient-to-b from-rose-400 to-rose-600`}>
+      <div className="absolute left-1/2 top-0 z-20 flex w-[70%] -translate-x-1/2 justify-between">
+        <motion.div
+          style={{ boxShadow: terminalGlow }}
+          className="relative h-7 w-10 rounded-t-xl border border-slate-500 bg-gradient-to-b from-slate-400 to-slate-700"
+        >
+          <span className="absolute inset-0 grid place-items-center text-sm font-bold text-slate-950">-</span>
+        </motion.div>
+        <motion.div
+          style={{ boxShadow: terminalGlow }}
+          className="relative h-7 w-10 rounded-t-xl border border-rose-300/80 bg-gradient-to-b from-rose-400 to-rose-700"
+        >
           <span className="absolute inset-0 grid place-items-center text-sm font-bold text-white">+</span>
-        </div>
+        </motion.div>
       </div>
 
-      <div
-        className={`absolute inset-x-0 bottom-0 ${shellTopClass} overflow-hidden border border-white/15 bg-slate-900/70 shadow-[inset_0_0_24px_rgba(2,6,23,0.92)] ${shellPaddingClass} ${shellRoundClass}`}
+      <motion.div
+        style={{ boxShadow: shellShadow }}
+        className="absolute inset-x-0 bottom-0 top-5 overflow-hidden rounded-[2.8rem] border border-white/12 bg-[#0a0f15] p-4"
       >
-        <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.08),transparent_22%,transparent_68%,rgba(56,189,248,0.12))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(140deg,rgba(255,255,255,0.08),transparent_26%,transparent_68%,rgba(0,255,136,0.08))]" />
+        <motion.div
+          style={{ boxShadow: rimGlow }}
+          className="absolute inset-[0.9rem] overflow-hidden rounded-[2.15rem] border border-white/10 bg-[#05080d]"
+        >
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_18%,transparent_82%,rgba(255,255,255,0.03))]" />
 
-        <div className={`relative h-full overflow-hidden border border-white/10 bg-[#020712] ${coreRoundClass}`}>
-          <div className="absolute inset-0 grid grid-cols-6 gap-[2px] p-2">
+          <div className="absolute inset-0 grid grid-cols-6 gap-[3px] p-3">
             {Array.from({ length: PLATE_COUNT }).map((_, index) => (
               <div
                 key={`plate-${index}`}
-                className="relative overflow-hidden rounded-md border border-white/10 bg-gradient-to-b from-slate-300/30 via-slate-600/35 to-slate-900/60"
+                className="relative overflow-hidden rounded-md border border-white/8 bg-[linear-gradient(180deg,rgba(226,232,240,0.2),rgba(71,85,105,0.22)_28%,rgba(15,23,42,0.78))]"
               >
-                <div className="absolute inset-0 bg-[linear-gradient(transparent_74%,rgba(2,6,23,0.4)_74%)] [background-size:100%_8px]" />
+                <div className="absolute inset-0 bg-[linear-gradient(transparent_74%,rgba(2,6,23,0.55)_74%)] [background-size:100%_9px]" />
               </div>
             ))}
           </div>
 
           <motion.div
-            style={{ opacity: crystalOpacity }}
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_24%,rgba(251,191,36,0.44),transparent_34%),radial-gradient(circle_at_72%_72%,rgba(254,242,153,0.35),transparent_34%)] mix-blend-hard-light"
-          />
-
-          <motion.div
-            style={{ opacity: pulseOpacity }}
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(6,182,212,0),rgba(34,211,238,0.44),rgba(6,182,212,0))]"
-          />
-
-          <motion.div
-            style={{ x: electronDriftX, opacity: electronOpacity }}
-            className="pointer-events-none absolute inset-0 transform-gpu will-change-transform"
+            style={{ height: fillHeight, opacity: fillOpacity, background: energyField }}
+            className="absolute inset-x-0 bottom-0 overflow-hidden border-t border-white/12"
           >
-            {electronBubbles.map((bubble) => (
-              <motion.div
-                key={bubble.id}
-                style={{ left: `${bubble.left}%`, top: `${bubble.top}%` }}
-                className={electronBubbleClass}
-                animate={{ y: [0, -bubble.travel, 0, bubble.travel, 0] }}
-                transition={{
-                  duration: bubble.duration,
-                  delay: bubble.delay,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: 'easeInOut',
-                }}
-              >
-                e-
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            style={{ scaleY: fluidScaleY, backgroundColor: fluidColor, originY: 1 }}
-            className="absolute inset-x-0 bottom-0 h-full overflow-hidden border-t border-white/20 transform-gpu will-change-transform"
-          >
-            <div className="absolute inset-x-0 top-0 h-3 bg-gradient-to-b from-white/55 to-transparent" />
+            <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-white/40 to-transparent" />
             <motion.div
-              style={{ opacity: pulseOpacity }}
-              className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(165,243,252,0.38),transparent_60%)]"
+              style={{ backgroundImage: innerPulse }}
+              className="absolute inset-0"
             />
           </motion.div>
 
+          {CURRENT_LINES.map((line) => (
+            <CurrentLine
+              key={line.id}
+              scrollProgress={scrollProgress}
+              top={line.top}
+              offset={line.offset}
+            />
+          ))}
+
+          {FLOW_PARTICLES.map((particle) => (
+            <FlowParticle
+              key={particle.id}
+              scrollProgress={scrollProgress}
+              left={particle.left}
+              baseY={particle.baseY}
+              driftX={particle.driftX}
+              size={particle.size}
+            />
+          ))}
+
           <motion.div
-            style={{ opacity: pulseOpacity }}
-            className="pointer-events-none absolute inset-0"
-          >
-            <div className="absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-cyan-200/50 animate-[ping_1.6s_cubic-bezier(0,0,0.2,1)_infinite]" />
-            {!compact && (
-              <div className="absolute left-1/2 top-1/2 h-[8.5rem] w-[8.5rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/32 animate-[ping_1.9s_cubic-bezier(0,0,0.2,1)_infinite]" />
-            )}
-          </motion.div>
-        </div>
+            style={{ opacity: regenMistOpacity }}
+            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_82%,rgba(175,255,219,0.44),transparent_58%),radial-gradient(circle_at_48%_28%,rgba(0,255,136,0.14),transparent_46%)]"
+          />
 
-        <div
-          className={`absolute left-1/2 z-30 -translate-x-1/2 border border-white/20 bg-slate-900/78 text-center shadow-[0_20px_40px_-20px_rgba(6,182,212,0.7)] ${labelClass}`}
-        >
-          <p
-            className={`battery-brand-text font-mono uppercase ${
-              compact ? 'text-[8px] tracking-[0.16em]' : 'text-[10px] tracking-[0.2em]'
-            }`}
-          >
-            Artheon Energy
-          </p>
-        </div>
-      </div>
+          <motion.div
+            style={{ opacity: staticNoiseOpacity }}
+            className="absolute inset-0 bg-[linear-gradient(0deg,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:7px_7px,7px_7px] mix-blend-screen"
+          />
 
-      <motion.div
-        style={{ opacity: badgeGlowOpacity, x: badgeX, y: badgeY }}
-        className={`pointer-events-none absolute z-30 rounded-full bg-[radial-gradient(circle,rgba(251,191,36,0.82),rgba(245,158,11,0.25)_52%,transparent_72%)] blur-xl ${
-          compact ? '-right-4 -top-2 h-20 w-20' : '-right-10 -top-2 h-36 w-36'
-        }`}
-      />
-
-      <motion.div
-        style={{ opacity: badgeBurstOpacity, scale: badgeBurstScale, x: badgeX, y: badgeY }}
-        className={`pointer-events-none absolute z-[35] rounded-full border border-amber-100/90 ${
-          compact ? '-right-3 -top-1 h-16 w-16' : '-right-8 top-0 h-28 w-28'
-        }`}
-      />
-
-      <motion.div
-        style={{ scale: badgeScale, rotate: badgeRotate, x: badgeX, y: badgeY }}
-        className={`absolute z-40 grid place-items-center rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-amber-600 text-center shadow-[0_26px_80px_-26px_rgba(245,158,11,0.95)] ${
-          compact
-            ? '-right-3 -top-1 h-16 w-16 border-2 border-amber-100/90'
-            : '-right-8 top-0 h-28 w-28 border-4 border-amber-100/90'
-        }`}
-      >
-        <div>
-          <p className={`font-display font-black leading-none text-amber-950 ${compact ? 'text-lg' : 'text-3xl'}`}>
-            1-2
-          </p>
-          <p
-            className={`font-semibold uppercase text-amber-900/95 ${
-              compact ? 'mt-0.5 text-[8px] tracking-[0.14em]' : 'mt-0.5 text-[11px] tracking-[0.2em]'
-            }`}
+          <motion.svg
+            viewBox="0 0 240 320"
+            style={{ opacity: crackOpacity }}
+            className="absolute inset-0 h-full w-full"
           >
-            Years
-          </p>
-          <p
-            className={`font-bold uppercase text-white/90 ${
-              compact ? 'text-[7px] tracking-[0.12em]' : 'text-[9px] tracking-[0.2em]'
-            }`}
-          >
-            Warranty
-          </p>
+            <path
+              d="M48 86 75 124 68 153 89 192 78 234"
+              stroke="rgba(255,245,240,0.42)"
+              strokeWidth="3"
+              fill="none"
+              strokeLinecap="round"
+            />
+            <path
+              d="M126 66 112 108 135 134 120 186 146 226"
+              stroke="rgba(255,245,240,0.36)"
+              strokeWidth="3"
+              fill="none"
+              strokeLinecap="round"
+            />
+            <path
+              d="M184 92 168 138 186 166 172 212 188 246"
+              stroke="rgba(255,245,240,0.38)"
+              strokeWidth="3"
+              fill="none"
+              strokeLinecap="round"
+            />
+            <path
+              d="M92 140 58 162"
+              stroke="rgba(255,245,240,0.28)"
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinecap="round"
+            />
+            <path
+              d="M141 170 170 186"
+              stroke="rgba(255,245,240,0.26)"
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinecap="round"
+            />
+          </motion.svg>
+
+          <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-white/10 to-transparent" />
+        </motion.div>
+
+        <div className="absolute inset-x-0 bottom-4 flex items-center justify-center">
+          <div className="rounded-full border border-white/12 bg-black/40 px-4 py-2 shadow-[inset_0_0_12px_rgba(0,0,0,0.5)] backdrop-blur-sm">
+            <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-slate-300">
+              VRLA Cell Monitor
+            </p>
+          </div>
         </div>
       </motion.div>
     </motion.div>
