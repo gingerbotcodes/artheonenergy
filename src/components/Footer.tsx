@@ -1,5 +1,7 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { Factory, Mail, Phone, ShieldCheck } from 'lucide-react';
+import { useMotionValue } from 'framer-motion';
+import { BatteryGraphic } from './BatteryGraphic';
 
 const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
 const ENV_WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY as
@@ -12,6 +14,7 @@ export const Footer = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const restoredBatteryProgress = useMotionValue(1);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,6 +65,61 @@ export const Footer = () => {
 
   return (
     <>
+      <section className="relative z-30 px-4 pb-6 sm:px-6 lg:px-10">
+        <div className="mx-auto w-full max-w-[1320px] overflow-hidden rounded-[2.25rem] border border-white/10 bg-white/[0.04] shadow-[0_40px_100px_-52px_rgba(15,23,42,0.95)] backdrop-blur-xl">
+          <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="relative overflow-hidden px-6 py-10 sm:px-10 lg:px-12 lg:py-12">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,136,0.14),transparent_46%),linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.06)_1px,transparent_1px)] [background-size:auto,26px_26px,26px_26px]" />
+              <div className="pointer-events-none absolute inset-y-10 left-8 w-px bg-gradient-to-b from-transparent via-cyan-300/20 to-transparent" />
+              <div className="relative flex items-center justify-center">
+                <div className="w-full max-w-[14rem] sm:max-w-[16rem] lg:max-w-[18rem]">
+                  <BatteryGraphic scrollProgress={restoredBatteryProgress} />
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-8 sm:px-10 lg:px-12 lg:py-12">
+              <p className="font-mono text-xs uppercase tracking-[0.28em] text-emerald-200/85">
+                Fully Regenerated
+              </p>
+              <h3 className="mt-4 max-w-[14ch] font-display text-3xl font-bold leading-[0.98] text-white sm:text-4xl lg:text-5xl">
+                Your battery is back in action.
+              </h3>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-200 sm:text-lg">
+                Before the checkup form, this is the end result you are aiming for:
+                a battery brought back to strong working condition with warranty-backed confidence.
+              </p>
+
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-[1.6rem] border border-emerald-300/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.03))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-emerald-200/80">
+                    Battery Health
+                  </p>
+                  <p className="mt-3 font-display text-5xl font-semibold leading-none text-white sm:text-6xl">
+                    95%
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                    Healthy usable condition after regeneration.
+                  </p>
+                </div>
+
+                <div className="rounded-[1.6rem] border border-cyan-300/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0.03))] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cyan-200/80">
+                    Warranty
+                  </p>
+                  <p className="mt-3 font-display text-5xl font-semibold leading-none text-white sm:text-6xl">
+                    2 Years
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                    Coverage support on the regenerated battery.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section
         id="contact"
         className="relative z-30 border-t border-white/10 bg-ink-950/40 px-4 py-14 sm:px-6 md:py-16 lg:px-10"
