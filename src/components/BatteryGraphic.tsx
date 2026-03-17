@@ -268,7 +268,7 @@ export const BatteryGraphic = ({
         <div className="absolute inset-x-0 bottom-4 flex items-center justify-center">
           <div className="rounded-full border border-white/12 bg-black/40 px-4 py-2 shadow-[inset_0_0_12px_rgba(0,0,0,0.5)] backdrop-blur-sm">
             <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-slate-300">
-              VRLA Cell Monitor
+              Artheon Energy
             </p>
           </div>
         </div>
