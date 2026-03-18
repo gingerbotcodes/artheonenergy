@@ -135,14 +135,15 @@ export const BatteryGraphic = ({
   const energyField = useMotionTemplate`linear-gradient(180deg, rgba(255,255,255,0.36) 0%, ${energyColor} 16%, ${energyColor} 100%)`;
   const pulseField = useMotionTemplate`radial-gradient(circle at 50% 86%, rgba(255,255,255, ${pulseOpacity}), rgba(0,255,136, 0) 62%)`;
   const capGlow = useMotionTemplate`0 0 16px rgba(255,255,255, ${capGlowOpacity})`;
+  const brandLabel = compact ? 'Artheon' : 'Artheon Energy';
 
   const wrapperWidthClass = compact
-    ? 'max-w-[min(10.5rem,44vw)] sm:max-w-[11.5rem]'
+    ? 'max-w-[min(11.5rem,48vw)] sm:max-w-[12.5rem]'
     : 'max-w-[min(18rem,72vw)] sm:max-w-[20rem] lg:max-w-[23rem] xl:max-w-[25rem]';
 
-  const windowInsetClass = compact ? 'inset-x-[0.9rem] bottom-[1.3rem] top-[3rem]' : 'inset-x-[1.2rem] bottom-[1.6rem] top-[3.35rem]';
+  const windowInsetClass = compact ? 'inset-x-[0.9rem] bottom-[1.25rem] top-[3rem]' : 'inset-x-[1.2rem] bottom-[1.6rem] top-[3.35rem]';
   const labelClass = compact
-    ? 'bottom-3 rounded-lg px-3 py-1.5 text-[8px] tracking-[0.2em]'
+    ? 'bottom-3 rounded-lg px-3 py-1.5 text-[8.5px] tracking-[0.24em]'
     : 'bottom-4 rounded-xl px-4 py-2 text-[9px] tracking-[0.28em]';
 
   return (
@@ -300,7 +301,7 @@ export const BatteryGraphic = ({
 
         <div className={`absolute left-1/2 -translate-x-1/2 border border-white/12 bg-black/35 backdrop-blur-sm ${labelClass}`}>
           <p className="battery-brand-text font-mono uppercase text-slate-300">
-            Artheon Energy
+            {brandLabel}
           </p>
         </div>
       </motion.div>

@@ -215,6 +215,11 @@ function App() {
   const batteryBackgroundOpacity = useTransform(scrollYProgress, [0, 0.4, 1], [0.72, 0.86, 0.94]);
   const mobileHeroOpacity = useTransform(scrollYProgress, [0, 0.1, 0.22], [1, 0.78, 0]);
   const mobileHeroY = useTransform(scrollYProgress, [0, 0.22], [0, -18]);
+  const mobileHeroScale = useTransform(scrollYProgress, [0, 0.22], [1, 0.94]);
+  const mobileTrayHeight = useTransform(scrollYProgress, [0, 0.14, 0.3, 0.5], [356, 328, 276, 228]);
+  const mobileBatteryScale = useTransform(scrollYProgress, [0, 0.18, 0.48], [1.08, 0.98, 0.84]);
+  const mobileBatteryY = useTransform(scrollYProgress, [0, 0.18, 0.48], [0, -8, -16]);
+  const mobileStageOpacity = useTransform(scrollYProgress, [0, 0.08, 0.2], [0.35, 0.72, 1]);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
     const nextPanelIndex = getActivePanelIndex(clamp(latest, 0, 1));
@@ -331,16 +336,20 @@ function App() {
           </div>
 
           <div className="relative lg:ml-[40%] lg:w-[60%] lg:pl-10">
-            <div className="pointer-events-none sticky top-[calc(var(--header-height)+0.55rem)] z-0 mb-5 h-[21rem] sm:h-[22rem] lg:hidden">
+            <motion.div
+              style={{ height: mobileTrayHeight }}
+              className="pointer-events-none sticky top-[calc(var(--header-height)+0.55rem)] z-0 mb-5 lg:hidden"
+            >
               <motion.div
                 style={{ y: mobileBatteryLift, opacity: batteryBackgroundOpacity }}
                 className="relative flex h-full flex-col items-center overflow-hidden rounded-[2.2rem]"
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,136,0.12),transparent_48%),linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.06)_1px,transparent_1px)] [background-size:auto,24px_24px,24px_24px]" />
                 <div className="absolute inset-0 border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.015))]" />
+                <div className="absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(180deg,rgba(2,7,18,0)_0%,rgba(2,7,18,0.18)_48%,rgba(2,7,18,0.34)_100%)]" />
 
                 <motion.div
-                  style={{ opacity: mobileHeroOpacity, y: mobileHeroY }}
+                  style={{ opacity: mobileHeroOpacity, y: mobileHeroY, scale: mobileHeroScale }}
                   className="relative z-10 mx-auto max-w-[19rem] px-4 pt-4 text-center"
                 >
                   <p className="font-mono text-[10px] uppercase tracking-[0.42em] text-cyan-300/88">
@@ -355,7 +364,7 @@ function App() {
                   </h1>
                   <p
                     className="mt-2 text-[0.86rem] font-semibold uppercase tracking-[0.18em] sm:text-[0.95rem]"
-                    style={{ color: activePanel.accentColor }}
+                    style={{ color: '#00ff88' }}
                   >
                     Regenerate. Save Earth.
                   </p>
@@ -368,24 +377,30 @@ function App() {
                   </p>
                 </motion.div>
 
-                <div className="relative z-10 mt-4 flex justify-center">
+                <motion.div
+                  style={{ opacity: mobileStageOpacity }}
+                  className="relative z-10 mt-4 flex justify-center"
+                >
                   <p
                     className="rounded-full border border-white/10 bg-black/35 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.24em] backdrop-blur-sm"
                     style={{ color: activePanel.accentColor }}
                   >
                     {activePanel.stageLabel}
                   </p>
-                </div>
+                </motion.div>
 
-                <div className="relative z-10 mt-auto flex w-full items-end justify-center px-4 pb-4">
+                <motion.div
+                  style={{ scale: mobileBatteryScale, y: mobileBatteryY }}
+                  className="relative z-10 mt-auto flex w-full items-end justify-center px-4 pb-4"
+                >
                   <div className="w-[11.75rem] sm:w-[13rem]">
                     <BatteryGraphic scrollProgress={scrollYProgress} compact />
                   </div>
-                </div>
+                </motion.div>
               </motion.div>
-            </div>
+            </motion.div>
 
-            <div ref={panelTrackRef} className="relative z-10 pt-16 sm:pt-20 lg:pt-0 snap-y snap-proximity">
+            <div ref={panelTrackRef} className="relative z-10 pt-8 sm:pt-10 lg:pt-0 snap-y snap-proximity">
               {STORY_PANELS.map((panel, index) => {
                 const isActive = index === activePanelIndex;
                 const isLeadPanel = index === 0;
