@@ -34,6 +34,30 @@
       opacity: 1;
     }
   }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  .gpu-accelerated {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+
+  .scroll-animate {
+    will-change: transform, opacity;
+  }
 }
 
 :root {
@@ -80,6 +104,8 @@ body {
   background-color: #ffffff;
 }
 
+/* Prefer explicit transition-property (e.g. opacity, box-shadow, transform)
+   over `transition: all` to avoid layout thrash and unexpected interpolations. */
 .theme-canvas {
   transition: background-color 220ms ease, color 220ms ease;
 }
@@ -167,6 +193,15 @@ select,
 textarea,
 button {
   font: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 ::selection {

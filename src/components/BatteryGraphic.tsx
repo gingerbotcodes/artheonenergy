@@ -10,7 +10,7 @@ interface BatteryGraphicProps {
   compact?: boolean;
 }
 
-const STATE_STOPS = [0, 0.25, 0.5, 0.75, 1];
+const STATE_STOPS = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
 const CELL_COUNT = 6;
 
 const FLOW_PARTICLES = [
@@ -21,6 +21,9 @@ const FLOW_PARTICLES = [
   { id: 'p-5', left: 55, top: 70, driftX: 6, rise: 8, size: 3 },
   { id: 'p-6', left: 68, top: 63, driftX: -4, rise: 7, size: 2 },
   { id: 'p-7', left: 80, top: 71, driftX: 5, rise: 8, size: 3 },
+  { id: 'p-8', left: 36, top: 68, driftX: -3, rise: 6, size: 2 },
+  { id: 'p-9', left: 62, top: 76, driftX: 4, rise: 10, size: 3 },
+  { id: 'p-10', left: 48, top: 60, driftX: -6, rise: 8, size: 2 },
 ];
 
 const CURRENT_LINES = [
@@ -48,15 +51,15 @@ const CellParticle = ({
   const x = useTransform(
     scrollProgress,
     STATE_STOPS,
-    [0, driftX * 0.15, driftX * 0.48, driftX * 0.9, driftX * 0.36],
+    [0, driftX * 0.075, driftX * 0.15, driftX * 0.315, driftX * 0.48, driftX * 0.69, driftX * 0.9, driftX * 0.63, driftX * 0.36],
   );
   const y = useTransform(
     scrollProgress,
     STATE_STOPS,
-    ['10%', `${-rise * 0.15}%`, `${-rise * 0.5}%`, `${-rise}%`, `${-rise * 0.38}%`],
+    ['10%', `${-rise * 0.075}%`, `${-rise * 0.15}%`, `${-rise * 0.325}%`, `${-rise * 0.5}%`, `${-rise * 0.75}%`, `${-rise}%`, `${-rise * 0.69}%`, `${-rise * 0.38}%`],
   );
-  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.08, 0.22, 0.5, 0.18]);
-  const scale = useTransform(scrollProgress, STATE_STOPS, [0.5, 0.72, 0.92, 1.04, 0.72]);
+  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.04, 0.08, 0.15, 0.22, 0.36, 0.5, 0.34, 0.18]);
+  const scale = useTransform(scrollProgress, STATE_STOPS, [0.5, 0.61, 0.72, 0.82, 0.92, 0.98, 1.04, 0.88, 0.72]);
 
   return (
     <motion.div
@@ -84,10 +87,10 @@ const CurrentLine = ({
   const x = useTransform(
     scrollProgress,
     STATE_STOPS,
-    [`${offset - 8}%`, `${offset - 3}%`, `${offset}%`, `${offset + 3}%`, `${offset + 1}%`],
+    [`${offset - 8}%`, `${offset - 5.5}%`, `${offset - 3}%`, `${offset - 1.5}%`, `${offset}%`, `${offset + 1.5}%`, `${offset + 3}%`, `${offset + 2}%`, `${offset + 1}%`],
   );
-  const scaleX = useTransform(scrollProgress, STATE_STOPS, [0, 0.18, 0.62, 0.96, 0.4]);
-  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.18, 0.58, 0.78, 0.16]);
+  const scaleX = useTransform(scrollProgress, STATE_STOPS, [0, 0.09, 0.18, 0.4, 0.62, 0.79, 0.96, 0.68, 0.4]);
+  const opacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.09, 0.18, 0.38, 0.58, 0.68, 0.78, 0.47, 0.16]);
 
   return (
     <motion.div
@@ -102,31 +105,42 @@ export const BatteryGraphic = ({
   scrollProgress,
   compact = false,
 }: BatteryGraphicProps) => {
-  const shellGlow = useTransform(scrollProgress, STATE_STOPS, [0.04, 0.1, 0.16, 0.28, 0.42]);
+  const shellGlow = useTransform(scrollProgress, STATE_STOPS, [0.04, 0.07, 0.1, 0.13, 0.16, 0.22, 0.28, 0.35, 0.42]);
   const energyColor = useTransform(
     scrollProgress,
     STATE_STOPS,
-    ['#cc2200', '#f97316', '#facc15', '#22c55e', '#00ff88'],
+    ['#cc2200', '#e54a0b', '#f97316', '#f9a016', '#facc15', '#8ec838', '#22c55e', '#11e271', '#00ff88'],
   );
   const terminalGlowColor = useTransform(
     scrollProgress,
     STATE_STOPS,
     [
       'rgba(204,34,0,0.24)',
+      'rgba(226,74,11,0.26)',
       'rgba(249,115,22,0.28)',
+      'rgba(249,159,21,0.31)',
       'rgba(250,204,21,0.34)',
+      'rgba(142,200,56,0.38)',
       'rgba(34,197,94,0.42)',
+      'rgba(17,226,113,0.46)',
       'rgba(0,255,136,0.5)',
     ],
   );
-  const fillHeight = useTransform(scrollProgress, STATE_STOPS, ['1%', '25%', '50%', '75%', '100%']);
-  const fillOpacity = useTransform(scrollProgress, STATE_STOPS, [0.12, 0.5, 0.68, 0.84, 0.96]);
-  const crackOpacity = useTransform(scrollProgress, STATE_STOPS, [0.82, 0.56, 0.26, 0.08, 0]);
-  const pulseOpacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.16, 0.34, 0.24, 0.12]);
-  const mistOpacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.04, 0.12, 0.3, 0.48]);
-  const staticNoiseOpacity = useTransform(scrollProgress, STATE_STOPS, [0.3, 0.2, 0.1, 0.03, 0]);
-  const rimOpacity = useTransform(scrollProgress, STATE_STOPS, [0.28, 0.36, 0.48, 0.7, 0.9]);
-  const capGlowOpacity = useTransform(scrollProgress, STATE_STOPS, [0.08, 0.14, 0.22, 0.34, 0.48]);
+  const fillHeight = useTransform(scrollProgress, STATE_STOPS, ['1%', '13%', '25%', '37.5%', '50%', '62.5%', '75%', '87.5%', '100%']);
+  const fillOpacity = useTransform(scrollProgress, STATE_STOPS, [0.12, 0.31, 0.5, 0.59, 0.68, 0.76, 0.84, 0.9, 0.96]);
+  const crackOpacity = useTransform(scrollProgress, STATE_STOPS, [0.82, 0.69, 0.56, 0.41, 0.26, 0.17, 0.08, 0.04, 0]);
+  const pulseOpacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.08, 0.16, 0.25, 0.34, 0.29, 0.24, 0.18, 0.12]);
+  const mistOpacity = useTransform(scrollProgress, STATE_STOPS, [0, 0.02, 0.04, 0.08, 0.12, 0.21, 0.3, 0.39, 0.48]);
+  const staticNoiseOpacity = useTransform(scrollProgress, STATE_STOPS, [0.3, 0.25, 0.2, 0.15, 0.1, 0.065, 0.03, 0.015, 0]);
+  const rimOpacity = useTransform(scrollProgress, STATE_STOPS, [0.28, 0.32, 0.36, 0.42, 0.48, 0.59, 0.7, 0.8, 0.9]);
+  const capGlowOpacity = useTransform(scrollProgress, STATE_STOPS, [0.08, 0.11, 0.14, 0.18, 0.22, 0.28, 0.34, 0.41, 0.48]);
+
+  const crackDashProgress = useTransform(scrollProgress, STATE_STOPS, [0, 0.06, 0.12, 0.22, 0.35, 0.52, 0.72, 0.88, 1]);
+  const crackOffset1 = useTransform(crackDashProgress, [0, 1], [0, 120]);
+  const crackOffset2 = useTransform(crackDashProgress, [0, 1], [0, 132]);
+  const crackOffset3 = useTransform(crackDashProgress, [0, 1], [0, 132]);
+  const crackOffset4 = useTransform(crackDashProgress, [0, 1], [0, 30]);
+  const crackOffset5 = useTransform(crackDashProgress, [0, 1], [0, 29]);
 
   const auraBackground = useMotionTemplate`radial-gradient(circle, rgba(0,255,136, ${shellGlow}), rgba(0,255,136, 0) 70%)`;
   const shellShadow = useMotionTemplate`0 34px 90px -48px rgba(0,255,136, ${shellGlow}), inset 0 0 28px rgba(2,5,10,0.96)`;
@@ -159,12 +173,16 @@ export const BatteryGraphic = ({
       <div className="absolute left-[8%] right-[8%] top-0 z-20 flex items-end justify-between">
         <motion.div
           style={{ boxShadow: terminalGlow }}
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
           className="relative h-8 w-9 rounded-t-lg border border-slate-500 bg-gradient-to-b from-slate-300 to-slate-700"
         >
           <span className="absolute inset-0 grid place-items-center text-sm font-black text-slate-950">-</span>
         </motion.div>
         <motion.div
           style={{ boxShadow: terminalGlow }}
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
           className="relative h-8 w-9 rounded-t-lg border border-rose-300/80 bg-gradient-to-b from-rose-400 to-rose-700"
         >
           <span className="absolute inset-0 grid place-items-center text-sm font-black text-white">+</span>
@@ -221,6 +239,11 @@ export const BatteryGraphic = ({
               style={{ backgroundImage: pulseField }}
               className="absolute inset-0"
             />
+            <motion.div
+              animate={{ opacity: [0.96, 1, 0.96] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute inset-0 bg-white/[0.04]"
+            />
           </motion.div>
 
           {CURRENT_LINES.map((line) => (
@@ -259,40 +282,50 @@ export const BatteryGraphic = ({
             style={{ opacity: crackOpacity }}
             className="absolute inset-0 h-full w-full"
           >
-            <path
+            <motion.path
               d="M42 26 58 54 49 77 65 102 58 134"
               stroke="rgba(255,245,240,0.38)"
               strokeWidth="3"
               fill="none"
               strokeLinecap="round"
+              strokeDasharray="120"
+              style={{ strokeDashoffset: crackOffset1 }}
             />
-            <path
+            <motion.path
               d="M121 18 111 49 128 70 116 104 136 134"
               stroke="rgba(255,245,240,0.32)"
               strokeWidth="3"
               fill="none"
               strokeLinecap="round"
+              strokeDasharray="132"
+              style={{ strokeDashoffset: crackOffset2 }}
             />
-            <path
+            <motion.path
               d="M205 24 191 56 206 82 193 116 209 142"
               stroke="rgba(255,245,240,0.34)"
               strokeWidth="3"
               fill="none"
               strokeLinecap="round"
+              strokeDasharray="132"
+              style={{ strokeDashoffset: crackOffset3 }}
             />
-            <path
+            <motion.path
               d="M77 76 52 92"
               stroke="rgba(255,245,240,0.24)"
               strokeWidth="2.5"
               fill="none"
               strokeLinecap="round"
+              strokeDasharray="30"
+              style={{ strokeDashoffset: crackOffset4 }}
             />
-            <path
+            <motion.path
               d="M150 90 175 104"
               stroke="rgba(255,245,240,0.22)"
               strokeWidth="2.5"
               fill="none"
               strokeLinecap="round"
+              strokeDasharray="29"
+              style={{ strokeDashoffset: crackOffset5 }}
             />
           </motion.svg>
 

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion, useMotionValueEvent, useScroll, useTransform } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from 'framer-motion';
 import { BatteryGraphic } from './components/BatteryGraphic';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { StoryCard } from './components/StoryCard';
 
 type ThemeMode = 'system' | 'lite' | 'dark';
 type ResolvedTheme = 'lite' | 'dark';
@@ -211,15 +212,22 @@ function App() {
   });
 
   const desktopStageProgress = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
-  const mobileBatteryLift = useTransform(scrollYProgress, [0, 1], [0, -10]);
-  const batteryBackgroundOpacity = useTransform(scrollYProgress, [0, 0.4, 1], [0.72, 0.86, 0.94]);
-  const mobileHeroOpacity = useTransform(scrollYProgress, [0, 0.1, 0.22], [1, 0.78, 0]);
-  const mobileHeroY = useTransform(scrollYProgress, [0, 0.22], [0, -18]);
-  const mobileHeroScale = useTransform(scrollYProgress, [0, 0.22], [1, 0.94]);
-  const mobileTrayHeight = useTransform(scrollYProgress, [0, 0.14, 0.3, 0.5], [356, 328, 276, 228]);
-  const mobileBatteryScale = useTransform(scrollYProgress, [0, 0.18, 0.48], [1.08, 0.98, 0.84]);
-  const mobileBatteryY = useTransform(scrollYProgress, [0, 0.18, 0.48], [0, -8, -16]);
-  const mobileStageOpacity = useTransform(scrollYProgress, [0, 0.08, 0.2], [0.35, 0.72, 1]);
+  const mobileBatteryLift = useTransform(scrollYProgress, [0, 0.5, 1], [0, -5, -10]);
+  const batteryBackgroundOpacity = useTransform(scrollYProgress, [0, 0.2, 0.4, 0.6, 0.8, 1], [0.72, 0.78, 0.86, 0.9, 0.92, 0.94]);
+  const mobileHeroOpacity = useTransform(scrollYProgress, [0, 0.06, 0.12, 0.18, 0.24], [1, 0.92, 0.7, 0.35, 0]);
+  const mobileHeroY = useTransform(scrollYProgress, [0, 0.08, 0.16, 0.24], [0, -4, -10, -18]);
+  const mobileHeroScale = useTransform(scrollYProgress, [0, 0.08, 0.16, 0.24], [1, 0.985, 0.965, 0.94]);
+  const mobileTrayHeight = useTransform(scrollYProgress, [0, 0.08, 0.16, 0.24, 0.34, 0.44, 0.56], [356, 348, 336, 320, 296, 260, 228]);
+  const mobileBatteryScale = useTransform(scrollYProgress, [0, 0.08, 0.18, 0.3, 0.48], [1.0, 0.99, 0.96, 0.92, 0.84]);
+  const mobileBatteryY = useTransform(scrollYProgress, [0, 0.1, 0.24, 0.48], [0, -3, -8, -16]);
+  const mobileStageOpacity = useTransform(scrollYProgress, [0, 0.05, 0.12, 0.2], [0.35, 0.52, 0.82, 1]);
+
+  /* ---- Parallax background transforms ---- */
+  const bgGridY = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const bgOrbLeftY = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const bgOrbRightY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  const bgLineCyanOpacity = useTransform(scrollYProgress, [0, 0.3, 0.6, 1], [0.15, 0.28, 0.18, 0.25]);
+  const bgLineEmeraldOpacity = useTransform(scrollYProgress, [0, 0.4, 0.7, 1], [0.12, 0.22, 0.14, 0.2]);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
     const nextPanelIndex = getActivePanelIndex(clamp(latest, 0, 1));
@@ -266,11 +274,26 @@ function App() {
     <div className="theme-canvas relative overflow-x-clip bg-ink-950 text-slate-100">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#03060a_0%,#071019_48%,#03060a_100%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.05)_1px,transparent_1px)] [background-size:32px_32px] opacity-35" />
-        <div className="absolute left-[18%] top-0 h-full w-px bg-gradient-to-b from-transparent via-cyan-300/15 to-transparent" />
-        <div className="absolute right-[24%] top-0 h-full w-px bg-gradient-to-b from-transparent via-emerald-300/12 to-transparent" />
-        <div className="absolute left-[9%] top-[12%] h-40 w-40 rounded-full bg-cyan-400/8 blur-3xl" />
-        <div className="absolute bottom-[14%] right-[12%] h-48 w-48 rounded-full bg-emerald-400/7 blur-3xl" />
+        <motion.div
+          style={{ y: bgGridY }}
+          className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.05)_1px,transparent_1px)] [background-size:32px_32px] opacity-35 scroll-animate"
+        />
+        <motion.div
+          style={{ opacity: bgLineCyanOpacity }}
+          className="absolute left-[18%] top-0 h-full w-px bg-gradient-to-b from-transparent via-cyan-300 to-transparent scroll-animate"
+        />
+        <motion.div
+          style={{ opacity: bgLineEmeraldOpacity }}
+          className="absolute right-[24%] top-0 h-full w-px bg-gradient-to-b from-transparent via-emerald-300 to-transparent scroll-animate"
+        />
+        <motion.div
+          style={{ y: bgOrbLeftY }}
+          className="absolute left-[9%] top-[12%] h-40 w-40 rounded-full bg-cyan-400/8 blur-3xl scroll-animate"
+        />
+        <motion.div
+          style={{ y: bgOrbRightY }}
+          className="absolute bottom-[14%] right-[12%] h-48 w-48 rounded-full bg-emerald-400/7 blur-3xl scroll-animate"
+        />
       </div>
 
       <Header
@@ -306,8 +329,29 @@ function App() {
 
                 <div className="absolute bottom-8 left-6 right-8 space-y-3">
                   <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-slate-400">
-                    <span>{activePanel.eyebrow}</span>
-                    <span style={{ color: activePanel.accentColor }}>{activePanel.sequence}</span>
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={activePanel.eyebrow}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        {activePanel.eyebrow}
+                      </motion.span>
+                    </AnimatePresence>
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={activePanel.sequence}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                        style={{ color: activePanel.accentColor }}
+                      >
+                        {activePanel.sequence}
+                      </motion.span>
+                    </AnimatePresence>
                   </div>
                   <div className="h-px overflow-hidden bg-white/10">
                     <motion.div
@@ -319,13 +363,14 @@ function App() {
                     {STORY_PANELS.map((panel, index) => {
                       const isActive = index === activePanelIndex;
                       return (
-                        <span
+                        <motion.span
                           key={`desktop-dot-${panel.id}`}
                           className="h-1.5 rounded-full"
-                          style={{
+                          animate={{
                             backgroundColor: isActive ? panel.accentColor : 'rgba(148,163,184,0.18)',
-                            boxShadow: isActive ? `0 0 14px ${panel.accentGlow}` : 'none',
+                            boxShadow: isActive ? `0 0 14px ${panel.accentGlow}` : '0 0 0px rgba(0,0,0,0)',
                           }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                         />
                       );
                     })}
@@ -381,12 +426,19 @@ function App() {
                   style={{ opacity: mobileStageOpacity }}
                   className="relative z-10 mt-4 flex justify-center"
                 >
-                  <p
-                    className="rounded-full border border-white/10 bg-black/35 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.24em] backdrop-blur-sm"
-                    style={{ color: activePanel.accentColor }}
-                  >
-                    {activePanel.stageLabel}
-                  </p>
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={activePanel.stageLabel}
+                      initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      className="rounded-full border border-white/10 bg-black/35 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.24em] backdrop-blur-sm"
+                      style={{ color: activePanel.accentColor }}
+                    >
+                      {activePanel.stageLabel}
+                    </motion.p>
+                  </AnimatePresence>
                 </motion.div>
 
                 <motion.div
@@ -400,99 +452,16 @@ function App() {
               </motion.div>
             </motion.div>
 
-            <div ref={panelTrackRef} className="relative z-10 pt-8 sm:pt-10 lg:pt-0 snap-y snap-proximity">
-              {STORY_PANELS.map((panel, index) => {
-                const isActive = index === activePanelIndex;
-                const isLeadPanel = index === 0;
-                const cardBackground = isLeadPanel
-                  ? `linear-gradient(180deg, ${panelPalette.heroSurfaceTop}, ${panelPalette.heroSurfaceBottom})`
-                  : `linear-gradient(180deg, ${panelPalette.surfaceTop}, ${panelPalette.surfaceBottom})`;
-                const cardShadow = isActive
-                  ? `${panelPalette.shadow}, 0 0 0 1px ${panelPalette.activeRing}, 0 24px 54px -42px ${panel.accentGlow}`
-                  : panelPalette.shadow;
-
-                return (
-                  <section
-                    key={panel.id}
-                    id={panel.id}
-                    className="relative flex min-h-[72vh] snap-start items-start py-10 first:pt-0 sm:min-h-[82vh] sm:py-12 lg:min-h-[100vh] lg:items-center lg:py-16"
-                  >
-                    <article
-                      className={`relative max-w-[42rem] overflow-hidden rounded-[2rem] border border-white/14 p-6 backdrop-blur-[28px] transition-all duration-300 sm:p-8 lg:p-10 ${
-                        isActive ? 'opacity-100' : 'opacity-80'
-                      }`}
-                      style={{
-                        background: cardBackground,
-                        boxShadow: cardShadow,
-                      }}
-                    >
-                      <div
-                        className="pointer-events-none absolute inset-0"
-                        style={{
-                          backgroundImage: `linear-gradient(140deg, ${panelPalette.sheen}, transparent 24%, transparent 72%, ${panelPalette.edgeGlow})`,
-                        }}
-                      />
-                      <div
-                        className="pointer-events-none absolute inset-0"
-                        style={{
-                          backgroundImage: `radial-gradient(circle at top left, ${panelPalette.cornerGlow}, transparent 34%), radial-gradient(circle at bottom right, ${panelPalette.edgeGlow}, transparent 38%)`,
-                        }}
-                      />
-                      <div className="pointer-events-none absolute inset-[1px] rounded-[calc(2rem-1px)] border border-white/10" />
-                      <div
-                        className="absolute inset-x-0 top-0 h-px"
-                        style={{
-                          background: `linear-gradient(90deg, transparent, ${panel.accentColor}, transparent)`,
-                          opacity: isActive ? 0.78 : 0,
-                        }}
-                      />
-
-                      <div className="relative z-10 space-y-6">
-                        <div className="space-y-3">
-                          <p
-                            className="font-mono text-[11px] uppercase tracking-[0.3em]"
-                            style={{ color: panel.accentColor }}
-                          >
-                            {panel.sequence} / {panel.eyebrow}
-                          </p>
-                          <h2
-                            className="max-w-[16ch] font-display text-3xl font-semibold leading-[0.98] sm:text-4xl lg:text-[3.4rem]"
-                            style={{ color: panelPalette.title }}
-                          >
-                            {panel.title}
-                          </h2>
-                        </div>
-
-                        <div
-                          className="max-w-[38rem] space-y-3 text-base leading-relaxed sm:text-lg"
-                          style={{ color: panelPalette.body }}
-                        >
-                          {panel.copy.map((line) => (
-                            <p key={line}>{line}</p>
-                          ))}
-                        </div>
-
-                        <div className="pt-2">
-                          <p
-                            className="font-mono text-[10px] uppercase tracking-[0.28em]"
-                            style={{ color: panelPalette.meta }}
-                          >
-                            {panel.metricLabel}
-                          </p>
-                          <div className="mt-3 flex items-end gap-3">
-                            <p
-                              className="font-display text-5xl font-semibold leading-none sm:text-6xl lg:text-7xl"
-                              style={{ color: panelPalette.metric }}
-                            >
-                              {panel.metricValue}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </article>
-                  </section>
-                );
-              })}
+            <div ref={panelTrackRef} className="relative z-10 pt-8 sm:pt-10 lg:pt-0">
+              {STORY_PANELS.map((panel, index) => (
+                <StoryCard
+                  key={panel.id}
+                  panel={panel}
+                  panelPalette={panelPalette}
+                  isLeadPanel={index === 0}
+                  isGloballyActive={index === activePanelIndex}
+                />
+              ))}
             </div>
           </div>
         </section>

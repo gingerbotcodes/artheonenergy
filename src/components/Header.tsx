@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatePresence, motion, type MotionValue } from 'framer-motion';
+import { AnimatePresence, motion, type MotionValue, useTransform, useMotionTemplate } from 'framer-motion';
 import {
   ArrowUpRight,
   LaptopMinimal,
@@ -30,6 +30,14 @@ export const Header = ({
   onCycleTheme,
 }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const progressGlowColor = useTransform(
+    progress,
+    [0, 0.5, 1],
+    ['rgba(103,232,249,0.45)', 'rgba(52,211,153,0.5)', 'rgba(16,185,129,0.55)'],
+  );
+  const progressGlow = useMotionTemplate`0 2px 12px ${progressGlowColor}`;
+  const progressPercent = useTransform(progress, [0, 1], [0, 100]);
+  const progressDotLeft = useMotionTemplate`${progressPercent}%`;
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -173,8 +181,12 @@ export const Header = ({
 
       <div className="relative h-[2px] w-full bg-white/10">
         <motion.div
-          style={{ scaleX: progress }}
+          style={{ scaleX: progress, boxShadow: progressGlow }}
           className="h-full origin-left bg-gradient-to-r from-cyan-300 via-emerald-400 to-emerald-300"
+        />
+        <motion.div
+          style={{ left: progressDotLeft }}
+          className="pointer-events-none absolute -top-[2px] h-[6px] w-[6px] -translate-x-1/2 rounded-full bg-white shadow-[0_0_6px_rgba(52,211,153,0.7),0_0_12px_rgba(103,232,249,0.4)]"
         />
       </div>
 

@@ -8,7 +8,7 @@ const ENV_WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY as
   | string
   | undefined;
 const WEB3FORMS_ACCESS_KEY =
-  ENV_WEB3FORMS_ACCESS_KEY?.trim() || 'd562401f-b04b-458d-b550-b9f5622c836a';
+  ENV_WEB3FORMS_ACCESS_KEY?.trim() || '';
 
 export const Footer = () => {
   const formRef = useRef<HTMLFormElement>(null);
