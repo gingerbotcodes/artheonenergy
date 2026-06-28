@@ -376,6 +376,19 @@ p {
   transform: translateZ(34px) scale(1.06);
 }
 
+.stage-testing .sequence-battery-image {
+  border-radius: 22px;
+  box-shadow:
+    0 22px 70px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(0, 255, 136, 0.18);
+}
+
+.stage-testing .sequence-halo {
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 58%),
+    radial-gradient(circle at 50% 46%, rgba(0, 255, 136, 0.14), transparent 54%);
+}
+
 .battery-shell {
   position: absolute;
   inset: 7% 13% 4%;

@@ -43,6 +43,14 @@ const BATTERY_STAGES = [
     detail: 'Over time, white sulphate deposits build up on the lead plates and reduce useful battery capacity.',
   },
   {
+    key: 'testing',
+    label: 'Expert Testing',
+    status: 'Diagnostics',
+    image: '/battery-sequence/stage-3-testing.png',
+    alt: 'Trained expert running voltage, life, resistance, and load tests on a battery',
+    detail: 'Before regeneration, trained experts check voltage, life, resistance, and load response so the battery condition is clear.',
+  },
+  {
     key: 'pulse',
     label: 'Pulse Desulphation',
     status: 'Pulse active',
