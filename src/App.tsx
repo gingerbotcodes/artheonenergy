@@ -21,9 +21,39 @@ type BlogPost = {
   }>;
 };
 
-const UPI_ID = 'bballery@ybl';
 const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
 const WEB3FORMS_ACCESS_KEY = 'd562401f-b04b-458d-b550-b9f5622c836a';
+
+const BATTERY_STAGES = [
+  {
+    key: 'new',
+    label: 'New Battery',
+    charge: 100,
+    status: 'Full power',
+    detail: 'Clean plates, strong charge bars, and a fresh green glow.',
+  },
+  {
+    key: 'aging',
+    label: 'Aging & Sulfation',
+    charge: 22,
+    status: 'Sulfated',
+    detail: 'White sulfate deposits block the plates and energy drops hard.',
+  },
+  {
+    key: 'pulse',
+    label: 'Pulse Regeneration',
+    charge: 58,
+    status: 'Pulsing',
+    detail: 'A regeneration unit sends pulses that break down sulfate buildup.',
+  },
+  {
+    key: 'restored',
+    label: 'Restored Power',
+    charge: 96,
+    status: 'Recovered',
+    detail: 'The plates look clean again and charge returns near full strength.',
+  },
+] as const;
 
 const BLOG_POSTS: BlogPost[] = [
   {
@@ -235,7 +265,6 @@ const SiteHeader = ({ navigate }: { navigate: (href: string) => void }) => {
       <nav className="site-nav" aria-label="Primary navigation">
         <a href="/" onClick={(event) => onLinkClick(event, '/')}>Home</a>
         <a href="/blog" onClick={(event) => onLinkClick(event, '/blog')}>Blog</a>
-        <a href="/#pay" onClick={(event) => onLinkClick(event, '/#pay')}>Pay</a>
         <a href="/terms" onClick={(event) => onLinkClick(event, '/terms')}>Terms</a>
       </nav>
 
@@ -251,7 +280,6 @@ const HomePage = ({ navigate }: { navigate: (href: string) => void }) => (
     <HeroSection navigate={navigate} />
     <ProcessSection />
     <ValueSection />
-    <PaySection />
     <ContactSection />
   </main>
 );
@@ -283,47 +311,44 @@ const HeroSection = ({ navigate }: { navigate: (href: string) => void }) => (
 );
 
 const InteractiveBattery = () => {
-  const [charge, setCharge] = useState(62);
-  const [targetCharge, setTargetCharge] = useState(94);
+  const [activeStageIndex, setActiveStageIndex] = useState(0);
+  const activeStage = BATTERY_STAGES[activeStageIndex];
+  const charge = activeStage.charge;
 
   useEffect(() => {
-    let frameId = 0;
+    const intervalId = window.setInterval(() => {
+      setActiveStageIndex((currentIndex) => (currentIndex + 1) % BATTERY_STAGES.length);
+    }, 10000);
 
-    const tick = () => {
-      setCharge((currentCharge) => {
-        const distance = targetCharge - currentCharge;
-        if (Math.abs(distance) < 0.12) return targetCharge;
-        return currentCharge + distance * 0.035;
-      });
-      frameId = window.requestAnimationFrame(tick);
-    };
+    return () => window.clearInterval(intervalId);
+  }, []);
 
-    frameId = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(frameId);
-  }, [targetCharge]);
-
-  const isCharging = targetCharge > charge;
   const roundedCharge = Math.round(charge);
   const batteryStyle = {
     '--charge': `${charge}%`,
     '--charge-ratio': charge / 100,
   } as CSSProperties;
 
-  const toggleCharge = () => {
-    setTargetCharge((currentTarget) => (currentTarget > 70 ? 18 : 96));
-  };
+  const advanceStage = () =>
+    setActiveStageIndex((currentIndex) => (currentIndex + 1) % BATTERY_STAGES.length);
 
   return (
-    <section className="battery-stage" aria-label="Interactive battery animation">
+    <section className="battery-stage" aria-label="Battery regeneration animation">
       <button
-        className={`battery-device ${isCharging ? 'is-charging' : 'is-discharging'}`}
+        className={`battery-device stage-${activeStage.key}`}
         type="button"
         style={batteryStyle}
-        onClick={toggleCharge}
-        aria-label={`Battery is at ${roundedCharge} percent. Click to toggle charge state.`}
+        onClick={advanceStage}
+        aria-label={`${activeStage.label}. Battery is at ${roundedCharge} percent. Click to advance the regeneration stage.`}
       >
         <span className="terminal terminal-negative">-</span>
         <span className="terminal terminal-positive">+</span>
+        <span className="pulse-machine" aria-hidden="true">
+          <span className="pulse-screen" />
+          <span className="pulse-wave" />
+        </span>
+        <span className="pulse-cable pulse-cable-left" aria-hidden="true" />
+        <span className="pulse-cable pulse-cable-right" aria-hidden="true" />
         <span className="battery-shell">
           <span className="battery-cap-row">
             {Array.from({ length: 6 }).map((_, index) => (
@@ -338,6 +363,16 @@ const InteractiveBattery = () => {
                 <span key={index} />
               ))}
             </span>
+            <span className="sulfate-layer">
+              {Array.from({ length: 14 }).map((_, index) => (
+                <span key={index} />
+              ))}
+            </span>
+            <span className="pulse-sparks">
+              {Array.from({ length: 9 }).map((_, index) => (
+                <span key={index} />
+              ))}
+            </span>
             <span className="battery-scan" />
           </span>
           <span className="battery-brand">Artheon</span>
@@ -346,7 +381,23 @@ const InteractiveBattery = () => {
 
       <div className="battery-readout">
         <span>{roundedCharge}%</span>
-        <small>{isCharging ? 'Charging' : 'Discharging'}</small>
+        <small>{activeStage.status}</small>
+      </div>
+      <div className="stage-caption">
+        <strong>{activeStage.label}</strong>
+        <p>{activeStage.detail}</p>
+      </div>
+      <div className="stage-track" aria-label="Battery animation stages">
+        {BATTERY_STAGES.map((stage, index) => (
+          <button
+            key={stage.key}
+            type="button"
+            className={index === activeStageIndex ? 'is-active' : ''}
+            onClick={() => setActiveStageIndex(index)}
+          >
+            {stage.label}
+          </button>
+        ))}
       </div>
     </section>
   );
@@ -409,36 +460,6 @@ const ValueSection = () => (
     </div>
   </section>
 );
-
-const PaySection = () => {
-  const [copied, setCopied] = useState(false);
-
-  const copyUpi = async () => {
-    await navigator.clipboard?.writeText(UPI_ID);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
-  };
-
-  return (
-    <section className="pay-section" id="pay">
-      <div className="pay-copy">
-        <p className="eyebrow">Pay</p>
-        <h2>Use UPI for quick payments.</h2>
-        <p>
-          Share the payment screenshot with our team after transfer so we can match it to
-          your checkup or service request.
-        </p>
-      </div>
-      <div className="upi-panel">
-        <span>UPI ID</span>
-        <strong>{UPI_ID}</strong>
-        <button type="button" onClick={copyUpi}>
-          {copied ? 'Copied' : 'Copy UPI ID'}
-        </button>
-      </div>
-    </section>
-  );
-};
 
 const ContactSection = () => {
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -672,7 +693,6 @@ const SiteFooter = ({ navigate }: { navigate: (href: string) => void }) => (
     <nav aria-label="Footer navigation">
       <button type="button" onClick={() => navigate('/blog')}>Blog</button>
       <button type="button" onClick={() => navigate('/terms')}>Terms</button>
-      <button type="button" onClick={() => navigate('/#pay')}>Pay</button>
     </nav>
   </footer>
 );
