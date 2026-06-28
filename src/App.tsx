@@ -29,30 +29,34 @@ const BATTERY_STAGES = [
   {
     key: 'new',
     label: 'New Battery',
-    charge: 100,
-    status: 'Full power',
-    detail: 'Clean plates, strong charge bars, and a fresh green glow.',
+    status: 'Fresh start',
+    image: '/battery-sequence/stage-1-new.png',
+    alt: 'New closed inverter battery before internal inspection',
+    detail: 'A fresh battery starts with a clean structure and stable power delivery.',
   },
   {
     key: 'aging',
-    label: 'Aging & Sulfation',
-    charge: 22,
-    status: 'Sulfated',
-    detail: 'White sulfate deposits block the plates and energy drops hard.',
+    label: 'Sulphated Battery',
+    status: 'Blocked plates',
+    image: '/battery-sequence/stage-2-sulphated.png',
+    alt: 'Battery with sulphated internal plates',
+    detail: 'Over time, white sulphate deposits build up on the lead plates and reduce useful battery capacity.',
   },
   {
     key: 'pulse',
-    label: 'Pulse Regeneration',
-    charge: 58,
-    status: 'Pulsing',
-    detail: 'A regeneration unit sends pulses that break down sulfate buildup.',
+    label: 'Pulse Desulphation',
+    status: 'Pulse active',
+    image: '/battery-sequence/stage-3-pulse-desulphation.png',
+    alt: 'Battery connected to pulse regeneration machine during desulphation',
+    detail: 'Advanced pulse wave modulation sends controlled energy waves that help break down sulphate buildup.',
   },
   {
     key: 'restored',
-    label: 'Restored Power',
-    charge: 96,
+    label: 'Fresh Lead Cells',
     status: 'Recovered',
-    detail: 'The plates look clean again and charge returns near full strength.',
+    image: '/battery-sequence/stage-4-restored.png',
+    alt: 'Desulphated battery with clean fresh-looking lead cells',
+    detail: 'As the buildup clears, the lead cells look cleaner and the battery can return to stronger working condition.',
   },
 ] as const;
 
@@ -314,7 +318,6 @@ const HeroSection = ({ navigate }: { navigate: (href: string) => void }) => (
 const InteractiveBattery = () => {
   const [activeStageIndex, setActiveStageIndex] = useState(0);
   const activeStage = BATTERY_STAGES[activeStageIndex];
-  const charge = activeStage.charge;
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -324,69 +327,29 @@ const InteractiveBattery = () => {
     return () => window.clearInterval(intervalId);
   }, []);
 
-  const roundedCharge = Math.round(charge);
   const batteryStyle = {
-    '--charge': `${charge}%`,
-    '--charge-ratio': charge / 100,
     '--stage-duration': `${STAGE_DURATION_MS}ms`,
   } as CSSProperties;
 
   return (
     <section className="battery-stage" aria-label="Battery regeneration animation">
       <div
-        className={`battery-device stage-${activeStage.key}`}
+        className={`battery-device image-sequence-stage stage-${activeStage.key}`}
         style={batteryStyle}
         role="img"
-        aria-label={`${activeStage.label}. Battery is at ${roundedCharge} percent.`}
+        aria-label={activeStage.alt}
       >
         <span className="cinema-sweep" aria-hidden="true" />
-        <span className="terminal terminal-negative">-</span>
-        <span className="terminal terminal-positive">+</span>
-        <span className="pulse-machine" aria-hidden="true">
-          <span className="pulse-screen" />
-          <span className="pulse-wave" />
-        </span>
-        <span className="pulse-cable pulse-cable-left" aria-hidden="true" />
-        <span className="pulse-cable pulse-cable-right" aria-hidden="true" />
-        <span className="battery-shell">
-          <span className="battery-cap-row">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <span key={index} />
-            ))}
-          </span>
-          <span className="battery-window">
-            <span className="battery-liquid" />
-            <span className="battery-wave" />
-            <span className="battery-cells">
-              {Array.from({ length: 12 }).map((_, index) => (
-                <span key={index} />
-              ))}
-            </span>
-            <span className="sulfate-layer">
-              {Array.from({ length: 20 }).map((_, index) => (
-                <span key={index} />
-              ))}
-            </span>
-            <span className="pulse-sparks">
-              {Array.from({ length: 9 }).map((_, index) => (
-                <span key={index} />
-              ))}
-            </span>
-            <span className="battery-scan" />
-          </span>
-          <span className="battery-brand">Artheon</span>
-        </span>
+        <span className="sequence-halo" aria-hidden="true" />
+        <img className="sequence-battery-image" src={activeStage.image} alt="" />
       </div>
 
-      <div className="battery-readout">
-        <span>{roundedCharge}%</span>
-        <small>{activeStage.status}</small>
-      </div>
-      <div className="stage-caption">
-        <strong>{activeStage.label}</strong>
+      <div className="stage-caption battery-story-copy">
+        <span>Stage {activeStageIndex + 1} / {BATTERY_STAGES.length} · {activeStage.status}</span>
+        <h3>{activeStage.label}</h3>
         <p>{activeStage.detail}</p>
       </div>
-      <div className="degradation-timeline" aria-hidden="true">
+      <div className="degradation-timeline" key={activeStage.key} aria-hidden="true">
         <span />
       </div>
     </section>
