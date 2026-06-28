@@ -34,7 +34,7 @@ export const Footer = () => {
 
     const formData = new FormData(formRef.current);
     formData.append('access_key', WEB3FORMS_ACCESS_KEY);
-    formData.append('subject', 'New Free Battery Checkup Request');
+    formData.append('subject', 'New Battery Checkup Request');
     formData.append('from_name', 'Artheon Energy Website');
 
     try {
@@ -50,7 +50,7 @@ export const Footer = () => {
 
       if (response.ok && result.success) {
         setSubmitState('success');
-        setFeedbackMessage('Request sent. Our team will call you shortly to schedule your free checkup.');
+        setFeedbackMessage('Request sent. Our team will call you shortly to schedule your battery checkup.');
         formRef.current.reset();
         return;
       }
@@ -127,10 +127,10 @@ export const Footer = () => {
         <div className="mx-auto grid w-full max-w-[1320px] gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] p-7 shadow-[0_35px_80px_-42px_rgba(15,23,42,0.95)] backdrop-blur-md sm:p-9">
             <p className="font-mono text-xs uppercase tracking-[0.28em] text-cyan-200/85">
-              Free Checkup
+              Book Checkup
             </p>
             <h3 className="mt-4 font-display text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
-              Book a Free
+              Book a
               <span className="gradient-cyan-text text-transparent bg-gradient-to-r from-cyan-200 via-emerald-300 to-emerald-400 bg-clip-text">
                 {' '}
                 Battery Checkup.
@@ -284,7 +284,7 @@ export const Footer = () => {
               disabled={submitState === 'submitting'}
               className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-300/90 px-5 py-3.5 font-semibold text-ink-950 transition hover:bg-emerald-200"
             >
-              {submitState === 'submitting' ? 'Sending...' : 'Book My Free Checkup'}
+              {submitState === 'submitting' ? 'Sending...' : 'Book My Checkup'}
             </button>
 
             <p

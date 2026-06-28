@@ -269,7 +269,7 @@ const SiteHeader = ({ navigate }: { navigate: (href: string) => void }) => {
       </nav>
 
       <a className="header-cta" href="/#contact" onClick={(event) => onLinkClick(event, '/#contact')}>
-        Free Checkup
+        Book Checkup
       </a>
     </header>
   );
@@ -297,7 +297,7 @@ const HeroSection = ({ navigate }: { navigate: (href: string) => void }) => (
         </p>
         <div className="hero-actions">
           <button className="primary-action" type="button" onClick={() => navigate('/#contact')}>
-            Book Free Checkup
+            Book Checkup
           </button>
           <button className="ghost-action" type="button" onClick={() => navigate('/blog')}>
             Read Articles
@@ -341,6 +341,7 @@ const InteractiveBattery = () => {
         onClick={advanceStage}
         aria-label={`${activeStage.label}. Battery is at ${roundedCharge} percent. Click to advance the regeneration stage.`}
       >
+        <span className="cinema-sweep" aria-hidden="true" />
         <span className="terminal terminal-negative">-</span>
         <span className="terminal terminal-positive">+</span>
         <span className="pulse-machine" aria-hidden="true">
@@ -471,7 +472,7 @@ const ContactSection = () => {
     const formData = new FormData(form);
 
     formData.append('access_key', WEB3FORMS_ACCESS_KEY);
-    formData.append('subject', 'New Free Battery Checkup Request');
+    formData.append('subject', 'New Battery Checkup Request');
     formData.append('from_name', 'Artheon Energy Website');
 
     setSubmitState('submitting');
@@ -503,7 +504,7 @@ const ContactSection = () => {
   return (
     <section className="section-block contact-section" id="contact">
       <div>
-        <p className="eyebrow">Free Checkup</p>
+        <p className="eyebrow">Book Checkup</p>
         <h2>Tell us about your batteries.</h2>
         <p>
           Send your basic details and we will help you understand whether regeneration is worth checking.

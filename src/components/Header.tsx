@@ -162,7 +162,7 @@ export const Header = ({
               href="#contact"
               className="inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-300/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100 transition-all hover:border-emerald-200 hover:bg-emerald-300/20"
             >
-              Book Free Checkup
+              Book Checkup
               <ArrowUpRight className="h-4 w-4" />
             </a>
           </div>
@@ -215,7 +215,7 @@ export const Header = ({
                 onClick={closeMenu}
                 className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300/40 bg-emerald-300/14 px-4 py-3 text-sm font-semibold text-emerald-100"
               >
-                Book Free Checkup
+                Book Checkup
                 <ArrowUpRight className="h-4 w-4" />
               </a>
             </div>
