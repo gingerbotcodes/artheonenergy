@@ -340,7 +340,10 @@ const InteractiveBattery = () => {
   } as CSSProperties;
 
   return (
-    <section className="battery-stage" aria-label="Battery regeneration animation">
+    <section
+      className={`battery-stage stage-shell-${activeStage.key}`}
+      aria-label="Battery regeneration animation"
+    >
       <div
         className={`battery-device image-sequence-stage stage-${activeStage.key}`}
         style={batteryStyle}
@@ -349,10 +352,15 @@ const InteractiveBattery = () => {
       >
         <span className="cinema-sweep" aria-hidden="true" />
         <span className="sequence-halo" aria-hidden="true" />
-        <img className="sequence-battery-image" src={activeStage.image} alt="" />
+        <img
+          key={activeStage.key}
+          className="sequence-battery-image"
+          src={activeStage.image}
+          alt=""
+        />
       </div>
 
-      <div className="stage-caption battery-story-copy">
+      <div key={`copy-${activeStage.key}`} className="stage-caption battery-story-copy">
         <span>Stage {activeStageIndex + 1} / {BATTERY_STAGES.length} · {activeStage.status}</span>
         <h3>{activeStage.label}</h3>
         <p>{activeStage.detail}</p>
