@@ -275,25 +275,25 @@ p {
   isolation: isolate;
   display: grid;
   justify-items: center;
-  gap: 18px;
-  width: min(100%, 440px);
+  gap: 12px;
+  width: min(100%, 420px);
   margin: 0 auto;
   text-align: center;
-  perspective: 1100px;
+  perspective: 1200px;
 }
 
 .battery-device {
   --charge: 62%;
   --charge-ratio: 0.62;
+  --stage-duration: 4000ms;
   position: relative;
   isolation: isolate;
   display: block;
-  width: min(82vw, 390px);
-  aspect-ratio: 1.3;
-  border: 0;
-  background: transparent;
-  filter: drop-shadow(0 34px 50px rgba(0, 0, 0, 0.38));
-  transform: rotateX(7deg) rotateY(-8deg) translate3d(0, 0, 0);
+  width: min(54vw, 230px);
+  aspect-ratio: 0.52;
+  background: radial-gradient(circle at 50% 48%, rgba(0, 212, 255, 0.08), transparent 56%);
+  filter: drop-shadow(0 36px 54px rgba(0, 0, 0, 0.42));
+  transform: rotateX(6deg) rotateY(-13deg) translate3d(0, 0, 0);
   transform-style: preserve-3d;
   animation: battery-camera 8s ease-in-out infinite;
   will-change: transform, filter;
@@ -302,13 +302,13 @@ p {
 .battery-device::before {
   content: "";
   position: absolute;
-  inset: 6% 5%;
+  inset: -5% -34%;
   z-index: -1;
-  border-radius: 34px;
+  border-radius: 999px;
   background: radial-gradient(circle, rgba(0, 212, 255, 0.18), transparent 64%);
   opacity: calc(0.2 + var(--charge-ratio));
-  filter: blur(18px);
-  transform: translateZ(-42px);
+  filter: blur(20px);
+  transform: translateZ(-64px);
   animation: glow-pulse 2.4s ease-in-out infinite;
   transition: background 700ms ease, opacity 700ms ease;
 }
@@ -317,10 +317,10 @@ p {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -4%;
+  bottom: -6%;
   z-index: -2;
-  width: 88%;
-  height: 26%;
+  width: 132%;
+  height: 16%;
   border-radius: 50%;
   background:
     radial-gradient(ellipse, rgba(0, 212, 255, 0.22) 0%, rgba(0, 255, 136, 0.08) 34%, transparent 70%),
@@ -332,11 +332,11 @@ p {
 
 .cinema-sweep {
   position: absolute;
-  top: 10%;
-  left: -24%;
+  top: 4%;
+  left: -36%;
   z-index: 8;
-  width: 34%;
-  height: 72%;
+  width: 50%;
+  height: 92%;
   border-radius: 999px;
   pointer-events: none;
   background: linear-gradient(115deg, transparent 18%, rgba(255, 255, 255, 0.2) 48%, transparent 78%);
@@ -349,23 +349,24 @@ p {
 
 .battery-shell {
   position: absolute;
-  inset: 14% 5% 2%;
+  inset: 7% 13% 4%;
   z-index: 2;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 28px;
+  border-radius: 42px 42px 34px 34px / 76px 76px 34px 34px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.22), transparent 16%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 30%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 22%, rgba(0, 0, 0, 0.32) 84%),
-    #09111b;
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.24), transparent 19%),
+    linear-gradient(92deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.035) 22%, rgba(2, 9, 17, 0.42) 74%),
+    linear-gradient(180deg, rgba(8, 20, 31, 0.46), rgba(4, 8, 15, 0.8)),
+    rgba(7, 18, 29, 0.72);
   box-shadow:
-    14px 16px 24px rgba(0, 0, 0, 0.28),
+    18px 20px 28px rgba(0, 0, 0, 0.32),
     inset 0 0 0 1px rgba(255, 255, 255, 0.055),
-    inset 18px 0 36px rgba(255, 255, 255, 0.045),
-    inset -24px 0 52px rgba(0, 0, 0, 0.45),
-    inset 0 -22px 42px rgba(0, 0, 0, 0.45),
+    inset 20px 0 38px rgba(255, 255, 255, 0.07),
+    inset -28px 0 58px rgba(0, 0, 0, 0.48),
+    inset 0 -26px 46px rgba(0, 0, 0, 0.5),
     0 0 44px rgba(0, 212, 255, calc(var(--charge-ratio) * 0.28));
+  backdrop-filter: blur(5px);
   transform: translateZ(24px) rotateX(1deg);
   transform-style: preserve-3d;
   transition:
@@ -387,29 +388,32 @@ p {
 .battery-shell::before {
   z-index: 4;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 18%),
-    linear-gradient(95deg, rgba(255, 255, 255, 0.16), transparent 24%, transparent 74%, rgba(0, 0, 0, 0.34));
+    radial-gradient(ellipse at 50% 3%, rgba(255, 255, 255, 0.28), transparent 14%),
+    linear-gradient(96deg, rgba(255, 255, 255, 0.2), transparent 23%, transparent 72%, rgba(0, 0, 0, 0.32)),
+    linear-gradient(180deg, transparent 0 78%, rgba(255, 255, 255, 0.08));
   mix-blend-mode: screen;
 }
 
 .battery-shell::after {
   z-index: 1;
-  inset: 3% 2% 4%;
+  inset: 2.5% 4% 3.5%;
   border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 36px 36px 30px 30px / 70px 70px 30px 30px;
   box-shadow:
     inset 0 12px 20px rgba(255, 255, 255, 0.04),
-    inset 0 -16px 28px rgba(0, 0, 0, 0.38);
+    inset 0 -16px 28px rgba(0, 0, 0, 0.38),
+    inset -18px 0 26px rgba(0, 0, 0, 0.26);
 }
 
 .terminal {
   position: absolute;
   z-index: 6;
-  top: 5%;
+  top: 2%;
   display: grid;
   place-items: center;
-  width: 18%;
-  height: 16%;
-  border-radius: 14px 14px 6px 6px;
+  width: 24%;
+  height: 8%;
+  border-radius: 16px 16px 7px 7px;
   color: #061019;
   font-weight: 900;
   box-shadow:
@@ -420,27 +424,27 @@ p {
 }
 
 .terminal-negative {
-  left: 18%;
+  left: 20%;
   background: linear-gradient(180deg, #dbe8ef, #6e7c89);
 }
 
 .terminal-positive {
-  right: 18%;
+  right: 20%;
   background: linear-gradient(180deg, #ff7992, #d82158);
 }
 
 .battery-cap-row {
   position: absolute;
-  inset: 15% 12% auto;
+  inset: 14% 22% auto;
   z-index: 3;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 9px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
   transform: translateZ(44px);
 }
 
 .battery-cap-row span {
-  height: 13px;
+  height: 8px;
   border-radius: 999px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.04)),
@@ -452,65 +456,108 @@ p {
 
 .battery-window {
   position: absolute;
-  inset: 34% 10% 20%;
+  inset: 18% 18% 13%;
   z-index: 3;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 18px;
+  border: 1px solid rgba(0, 212, 255, 0.22);
+  border-radius: 30px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 32%),
-    #050b12;
+    linear-gradient(115deg, rgba(255, 255, 255, 0.12), transparent 28%),
+    radial-gradient(circle at 50% 20%, rgba(0, 212, 255, 0.14), transparent 42%),
+    rgba(3, 10, 17, 0.76);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    inset 0 18px 28px rgba(255, 255, 255, 0.045),
-    inset 0 -24px 28px rgba(0, 0, 0, 0.45),
+    inset 0 18px 28px rgba(255, 255, 255, 0.05),
+    inset 0 -24px 28px rgba(0, 0, 0, 0.48),
     0 12px 22px rgba(0, 0, 0, 0.25);
   transform: translateZ(46px);
 }
 
+.battery-window::before,
+.battery-window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.battery-window::before {
+  z-index: 4;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.2), transparent 20%, transparent 78%, rgba(0, 0, 0, 0.24)),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 18px);
+  mix-blend-mode: screen;
+}
+
+.battery-window::after {
+  z-index: 5;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 28px rgba(0, 212, 255, 0.18),
+    inset 0 0 70px rgba(0, 255, 136, calc(var(--charge-ratio) * 0.15));
+}
+
 .battery-liquid {
   position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--charge);
-  background: linear-gradient(90deg, #00ff88, #00d4ff);
+  inset: auto 0 0;
+  width: 100%;
+  height: var(--charge);
+  background: linear-gradient(0deg, rgba(0, 255, 136, 0.76), rgba(0, 212, 255, 0.68));
   box-shadow: 0 0 28px rgba(0, 212, 255, 0.58);
-  transition: width 1400ms ease, background 700ms ease, box-shadow 700ms ease;
+  transition: height 1100ms ease, background 700ms ease, box-shadow 700ms ease;
 }
 
 .battery-wave {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(110deg, transparent 0 28%, rgba(255, 255, 255, 0.24) 34%, transparent 42%),
-    radial-gradient(circle at 34% 20%, rgba(255, 255, 255, 0.25), transparent 24%);
-  transform: translateX(-18%);
+    linear-gradient(180deg, transparent 0 24%, rgba(255, 255, 255, 0.2) 34%, transparent 44%),
+    radial-gradient(circle at 45% 76%, rgba(255, 255, 255, 0.26), transparent 18%);
+  transform: translateY(18%);
   animation: charge-flow 2.8s linear infinite;
   mix-blend-mode: screen;
 }
 
 .battery-cells {
   position: absolute;
-  inset: 0;
+  inset: 7px;
+  z-index: 2;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  gap: 5px;
 }
 
 .battery-cells span {
-  border-right: 1px solid rgba(3, 16, 22, 0.38);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(151, 228, 255, 0.18);
+  border-radius: 9px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 36%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.12), transparent 28%, rgba(0, 0, 0, 0.18));
-  box-shadow: inset -8px 0 18px rgba(0, 0, 0, 0.16);
-  transition: background 700ms ease, opacity 700ms ease;
+    linear-gradient(180deg, rgba(218, 255, 245, 0.28), rgba(0, 212, 255, 0.08)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.14), transparent 34%, rgba(0, 0, 0, 0.18));
+  box-shadow:
+    inset 0 8px 10px rgba(255, 255, 255, 0.08),
+    inset -8px 0 18px rgba(0, 0, 0, 0.16);
+  transition: background 700ms ease, border-color 700ms ease, opacity 700ms ease;
+}
+
+.battery-cells span::after {
+  content: "";
+  position: absolute;
+  inset: 16% 24%;
+  border-radius: 999px;
+  background: rgba(218, 255, 245, 0.24);
+  filter: blur(3px);
 }
 
 .pulse-machine {
   position: absolute;
-  left: 50%;
-  top: -11%;
+  left: 84%;
+  top: 38%;
   z-index: 7;
-  width: 34%;
-  height: 22%;
+  width: 58%;
+  height: 16%;
   border: 1px solid rgba(0, 212, 255, 0.38);
   border-radius: 16px;
   background:
@@ -523,7 +570,7 @@ p {
     0 0 34px rgba(0, 212, 255, 0.32),
     0 20px 28px rgba(0, 0, 0, 0.28);
   opacity: 0;
-  transform: translateX(-50%) translateY(8px) translateZ(86px) scale(0.92);
+  transform: translateY(8px) translateZ(86px) scale(0.9);
   transition: opacity 650ms ease, transform 650ms ease;
 }
 
@@ -545,9 +592,9 @@ p {
 .pulse-cable {
   position: absolute;
   z-index: 5;
-  top: 8%;
+  top: 45%;
   height: 2px;
-  width: 22%;
+  width: 46%;
   background: linear-gradient(90deg, transparent, var(--accent), var(--accent-green));
   opacity: 0;
   transform: translateZ(54px);
@@ -556,13 +603,14 @@ p {
 }
 
 .pulse-cable-left {
-  left: 26%;
-  rotate: 22deg;
+  left: 54%;
+  rotate: 8deg;
 }
 
 .pulse-cable-right {
-  right: 26%;
-  rotate: -22deg;
+  left: 54%;
+  top: 53%;
+  rotate: -8deg;
 }
 
 .sulfate-layer,
@@ -575,30 +623,36 @@ p {
 
 .sulfate-layer span {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 7px;
+  height: 7px;
   border-radius: 35% 65% 42% 58%;
-  background: linear-gradient(135deg, #eef2f7, #8c98a5);
-  box-shadow: 0 0 8px rgba(238, 242, 247, 0.28);
+  background: linear-gradient(135deg, #f8fbff, #9aa6b3);
+  box-shadow: 0 0 9px rgba(238, 242, 247, 0.32);
   opacity: 0;
   transform: scale(0.5);
-  transition: opacity 650ms ease, transform 650ms ease;
+  transition: opacity 650ms ease, transform 650ms ease, filter 650ms ease;
 }
 
-.sulfate-layer span:nth-child(1) { left: 12%; top: 22%; }
-.sulfate-layer span:nth-child(2) { left: 18%; top: 52%; }
-.sulfate-layer span:nth-child(3) { left: 28%; top: 34%; }
-.sulfate-layer span:nth-child(4) { left: 36%; top: 64%; }
-.sulfate-layer span:nth-child(5) { left: 46%; top: 24%; }
-.sulfate-layer span:nth-child(6) { left: 56%; top: 48%; }
-.sulfate-layer span:nth-child(7) { left: 68%; top: 30%; }
-.sulfate-layer span:nth-child(8) { left: 78%; top: 58%; }
-.sulfate-layer span:nth-child(9) { left: 23%; top: 72%; }
-.sulfate-layer span:nth-child(10) { left: 62%; top: 72%; }
-.sulfate-layer span:nth-child(11) { left: 82%; top: 18%; }
-.sulfate-layer span:nth-child(12) { left: 42%; top: 42%; }
-.sulfate-layer span:nth-child(13) { left: 11%; top: 74%; }
-.sulfate-layer span:nth-child(14) { left: 72%; top: 76%; }
+.sulfate-layer span:nth-child(1) { left: 18%; top: 13%; animation-delay: 0.05s; }
+.sulfate-layer span:nth-child(2) { left: 55%; top: 16%; animation-delay: 0.16s; }
+.sulfate-layer span:nth-child(3) { left: 32%; top: 24%; animation-delay: 0.28s; }
+.sulfate-layer span:nth-child(4) { left: 72%; top: 28%; animation-delay: 0.38s; }
+.sulfate-layer span:nth-child(5) { left: 22%; top: 34%; animation-delay: 0.48s; }
+.sulfate-layer span:nth-child(6) { left: 58%; top: 38%; animation-delay: 0.58s; }
+.sulfate-layer span:nth-child(7) { left: 36%; top: 45%; animation-delay: 0.68s; }
+.sulfate-layer span:nth-child(8) { left: 75%; top: 49%; animation-delay: 0.78s; }
+.sulfate-layer span:nth-child(9) { left: 18%; top: 56%; animation-delay: 0.88s; }
+.sulfate-layer span:nth-child(10) { left: 53%; top: 60%; animation-delay: 0.98s; }
+.sulfate-layer span:nth-child(11) { left: 33%; top: 68%; animation-delay: 1.08s; }
+.sulfate-layer span:nth-child(12) { left: 73%; top: 70%; animation-delay: 1.18s; }
+.sulfate-layer span:nth-child(13) { left: 18%; top: 78%; animation-delay: 1.28s; }
+.sulfate-layer span:nth-child(14) { left: 52%; top: 82%; animation-delay: 1.38s; }
+.sulfate-layer span:nth-child(15) { left: 40%; top: 18%; animation-delay: 1.48s; }
+.sulfate-layer span:nth-child(16) { left: 80%; top: 40%; animation-delay: 1.58s; }
+.sulfate-layer span:nth-child(17) { left: 25%; top: 88%; animation-delay: 1.68s; }
+.sulfate-layer span:nth-child(18) { left: 66%; top: 88%; animation-delay: 1.78s; }
+.sulfate-layer span:nth-child(19) { left: 44%; top: 52%; animation-delay: 1.88s; }
+.sulfate-layer span:nth-child(20) { left: 65%; top: 22%; animation-delay: 1.98s; }
 
 .pulse-sparks span {
   position: absolute;
@@ -623,15 +677,19 @@ p {
 .battery-scan {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  background: linear-gradient(transparent 68%, rgba(5, 7, 13, 0.28) 68%);
-  background-size: 100% 10px;
+  z-index: 6;
+  background:
+    linear-gradient(transparent 68%, rgba(5, 7, 13, 0.2) 68%),
+    linear-gradient(180deg, transparent, rgba(0, 212, 255, 0.18), transparent);
+  background-size: 100% 10px, 100% 44%;
+  background-position: 0 0, 0 -80%;
+  animation: xray-scan 3.6s linear infinite;
 }
 
 .battery-brand {
   position: absolute;
   left: 50%;
-  bottom: 7%;
+  bottom: 6%;
   z-index: 5;
   transform: translate3d(-50%, 0, 52px);
   color: var(--text);
@@ -646,6 +704,7 @@ p {
   display: flex;
   align-items: baseline;
   gap: 12px;
+  justify-content: center;
 }
 
 .battery-readout span {
@@ -664,7 +723,7 @@ p {
 .stage-caption {
   display: grid;
   gap: 6px;
-  max-width: 380px;
+  max-width: 340px;
 }
 
 .stage-caption strong {
@@ -677,39 +736,35 @@ p {
   line-height: 1.5;
 }
 
-.stage-track {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  width: min(100%, 440px);
+.degradation-timeline {
+  width: min(100%, 320px);
+  height: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.stage-track button {
-  min-height: 42px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--muted-strong);
-  padding: 8px;
-  font-size: 0.72rem;
-  font-weight: 800;
-}
-
-.stage-track button.is-active {
-  border-color: rgba(0, 212, 255, 0.5);
-  background: rgba(0, 212, 255, 0.14);
-  color: var(--text);
+.degradation-timeline span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent), #ffb14a);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: timeline-fill var(--stage-duration) linear infinite;
 }
 
 .stage-new .battery-shell,
 .stage-restored .battery-shell {
   border-color: rgba(0, 255, 136, 0.28);
   box-shadow:
-    14px 16px 24px rgba(0, 0, 0, 0.28),
+    18px 20px 28px rgba(0, 0, 0, 0.32),
     inset 0 0 0 1px rgba(255, 255, 255, 0.055),
-    inset 18px 0 36px rgba(255, 255, 255, 0.045),
-    inset -24px 0 52px rgba(0, 0, 0, 0.45),
-    inset 0 -22px 42px rgba(0, 0, 0, 0.45),
+    inset 20px 0 38px rgba(255, 255, 255, 0.07),
+    inset -28px 0 58px rgba(0, 0, 0, 0.48),
+    inset 0 -26px 46px rgba(0, 0, 0, 0.5),
     0 0 52px rgba(0, 255, 136, calc(var(--charge-ratio) * 0.32));
 }
 
@@ -727,26 +782,28 @@ p {
   border-color: rgba(255, 154, 145, 0.22);
   filter: saturate(0.72) brightness(0.78);
   box-shadow:
-    14px 16px 24px rgba(0, 0, 0, 0.34),
+    18px 20px 28px rgba(0, 0, 0, 0.38),
     inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-    inset 18px 0 36px rgba(255, 255, 255, 0.035),
-    inset -24px 0 52px rgba(0, 0, 0, 0.56),
-    inset 0 -24px 46px rgba(0, 0, 0, 0.62),
+    inset 20px 0 38px rgba(255, 255, 255, 0.035),
+    inset -28px 0 58px rgba(0, 0, 0, 0.58),
+    inset 0 -26px 48px rgba(0, 0, 0, 0.64),
     0 0 42px rgba(255, 74, 61, 0.18);
 }
 
 .stage-aging .battery-liquid {
-  background: linear-gradient(90deg, #ff4a3d, #ffb14a);
+  background: linear-gradient(0deg, rgba(255, 74, 61, 0.72), rgba(255, 177, 74, 0.6));
   box-shadow: 0 0 22px rgba(255, 74, 61, 0.36);
 }
 
 .stage-aging .battery-cells span {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(89, 94, 105, 0.24));
+  border-color: rgba(255, 177, 74, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(89, 94, 105, 0.24)),
+    linear-gradient(90deg, rgba(255, 177, 74, 0.08), transparent 38%, rgba(0, 0, 0, 0.24));
 }
 
 .stage-aging .sulfate-layer span {
-  opacity: 0.92;
-  transform: scale(1);
+  animation: sulfate-grow var(--stage-duration) ease-in forwards;
 }
 
 .stage-pulse .pulse-machine,
@@ -755,7 +812,7 @@ p {
 }
 
 .stage-pulse .pulse-machine {
-  transform: translateX(-50%) translateY(0) translateZ(86px) scale(1);
+  transform: translateY(0) translateZ(86px) scale(1);
 }
 
 .stage-pulse .pulse-cable {
@@ -764,7 +821,7 @@ p {
 }
 
 .stage-pulse .battery-liquid {
-  background: linear-gradient(90deg, #22ff95, #00d4ff);
+  background: linear-gradient(0deg, rgba(34, 255, 149, 0.78), rgba(0, 212, 255, 0.68));
 }
 
 .stage-pulse .sulfate-layer span {
@@ -1062,13 +1119,13 @@ p {
 @keyframes battery-camera {
   0%,
   100% {
-    transform: rotateX(7deg) rotateY(-8deg) translate3d(0, 0, 0);
+    transform: rotateX(6deg) rotateY(-13deg) translate3d(0, 0, 0);
   }
   45% {
-    transform: rotateX(5deg) rotateY(7deg) translate3d(0, -4px, 12px);
+    transform: rotateX(4deg) rotateY(8deg) translate3d(0, -5px, 14px);
   }
   70% {
-    transform: rotateX(9deg) rotateY(-4deg) translate3d(0, 2px, 4px);
+    transform: rotateX(8deg) rotateY(-6deg) translate3d(0, 2px, 5px);
   }
 }
 
@@ -1099,10 +1156,44 @@ p {
 
 @keyframes charge-flow {
   from {
-    transform: translateX(-34%);
+    transform: translateY(30%);
   }
   to {
-    transform: translateX(34%);
+    transform: translateY(-30%);
+  }
+}
+
+@keyframes xray-scan {
+  from {
+    background-position: 0 0, 0 -80%;
+  }
+  to {
+    background-position: 0 0, 0 180%;
+  }
+}
+
+@keyframes timeline-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes sulfate-grow {
+  0% {
+    opacity: 0;
+    filter: blur(2px);
+    transform: scale(0.25) rotate(0deg);
+  }
+  55% {
+    opacity: 0.58;
+  }
+  100% {
+    opacity: 0.94;
+    filter: blur(0);
+    transform: scale(1) rotate(24deg);
   }
 }
 
@@ -1278,15 +1369,11 @@ p {
   }
 
   .battery-device {
-    width: min(74vw, 292px);
+    width: min(52vw, 198px);
   }
 
   .battery-readout span {
     font-size: clamp(3rem, 18vw, 4.4rem);
-  }
-
-  .stage-track {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

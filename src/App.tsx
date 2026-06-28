@@ -23,6 +23,7 @@ type BlogPost = {
 
 const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
 const WEB3FORMS_ACCESS_KEY = 'd562401f-b04b-458d-b550-b9f5622c836a';
+const STAGE_DURATION_MS = 4000;
 
 const BATTERY_STAGES = [
   {
@@ -318,7 +319,7 @@ const InteractiveBattery = () => {
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       setActiveStageIndex((currentIndex) => (currentIndex + 1) % BATTERY_STAGES.length);
-    }, 10000);
+    }, STAGE_DURATION_MS);
 
     return () => window.clearInterval(intervalId);
   }, []);
@@ -327,19 +328,16 @@ const InteractiveBattery = () => {
   const batteryStyle = {
     '--charge': `${charge}%`,
     '--charge-ratio': charge / 100,
+    '--stage-duration': `${STAGE_DURATION_MS}ms`,
   } as CSSProperties;
-
-  const advanceStage = () =>
-    setActiveStageIndex((currentIndex) => (currentIndex + 1) % BATTERY_STAGES.length);
 
   return (
     <section className="battery-stage" aria-label="Battery regeneration animation">
-      <button
+      <div
         className={`battery-device stage-${activeStage.key}`}
-        type="button"
         style={batteryStyle}
-        onClick={advanceStage}
-        aria-label={`${activeStage.label}. Battery is at ${roundedCharge} percent. Click to advance the regeneration stage.`}
+        role="img"
+        aria-label={`${activeStage.label}. Battery is at ${roundedCharge} percent.`}
       >
         <span className="cinema-sweep" aria-hidden="true" />
         <span className="terminal terminal-negative">-</span>
@@ -360,12 +358,12 @@ const InteractiveBattery = () => {
             <span className="battery-liquid" />
             <span className="battery-wave" />
             <span className="battery-cells">
-              {Array.from({ length: 5 }).map((_, index) => (
+              {Array.from({ length: 12 }).map((_, index) => (
                 <span key={index} />
               ))}
             </span>
             <span className="sulfate-layer">
-              {Array.from({ length: 14 }).map((_, index) => (
+              {Array.from({ length: 20 }).map((_, index) => (
                 <span key={index} />
               ))}
             </span>
@@ -378,7 +376,7 @@ const InteractiveBattery = () => {
           </span>
           <span className="battery-brand">Artheon</span>
         </span>
-      </button>
+      </div>
 
       <div className="battery-readout">
         <span>{roundedCharge}%</span>
@@ -388,17 +386,8 @@ const InteractiveBattery = () => {
         <strong>{activeStage.label}</strong>
         <p>{activeStage.detail}</p>
       </div>
-      <div className="stage-track" aria-label="Battery animation stages">
-        {BATTERY_STAGES.map((stage, index) => (
-          <button
-            key={stage.key}
-            type="button"
-            className={index === activeStageIndex ? 'is-active' : ''}
-            onClick={() => setActiveStageIndex(index)}
-          >
-            {stage.label}
-          </button>
-        ))}
+      <div className="degradation-timeline" aria-hidden="true">
+        <span />
       </div>
     </section>
   );
