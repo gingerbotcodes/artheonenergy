@@ -1,475 +1,680 @@
-import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from 'framer-motion';
-import { BatteryGraphic } from './components/BatteryGraphic';
-import { Header } from './components/Header';
-import { Footer } from './components/Footer';
-import { StoryCard } from './components/StoryCard';
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type MouseEvent,
+} from 'react';
 
-type ThemeMode = 'system' | 'lite' | 'dark';
-type ResolvedTheme = 'lite' | 'dark';
-
-type StoryPanel = {
-  id: string;
-  navLabel: string;
-  sequence: string;
-  eyebrow: string;
-  stageLabel: string;
+type BlogPost = {
+  slug: string;
   title: string;
-  copy: string[];
-  metricValue: string;
-  metricLabel: string;
-  accentColor: string;
-  accentGlow: string;
+  excerpt: string;
+  date: string;
+  category: string;
+  readTime: string;
+  sections: Array<{
+    heading: string;
+    paragraphs: string[];
+    bullets?: string[];
+  }>;
 };
 
-const THEME_MODE_STORAGE_KEY = 'artheon-theme-mode';
-const PANEL_STOPS = [0, 0.25, 0.5, 0.75, 1];
+const UPI_ID = 'bballery@ybl';
+const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
+const WEB3FORMS_ACCESS_KEY = 'd562401f-b04b-458d-b550-b9f5622c836a';
 
-const STORY_PANELS: StoryPanel[] = [
+const BLOG_POSTS: BlogPost[] = [
   {
-    id: 'problem',
-    navLabel: 'Problem',
-    sequence: '0%',
-    eyebrow: 'The Problem',
-    stageLabel: 'Depleted',
-    title: 'A tired battery starts the day almost empty.',
-    copy: [
-      'Sulfation blocks active plate area, so the battery cannot store or deliver energy the way it used to.',
-      'What looks like a normal battery from outside is already losing useful runtime and backup strength.',
-      'That slow drop is what pushes fleets and backup systems toward early replacement.',
+    slug: 'how-battery-regeneration-works',
+    title: 'How battery regeneration brings weak batteries back into service',
+    excerpt:
+      'A simple explanation of sulfation, desulfation, and what recovery looks like without the heavy lab language.',
+    date: '2026-06-18',
+    category: 'Regeneration',
+    readTime: '4 min read',
+    sections: [
+      {
+        heading: 'The short version',
+        paragraphs: [
+          'Lead-acid batteries often lose useful capacity because sulfate builds up on the plates. That buildup blocks the battery from storing and releasing energy properly.',
+          'Regeneration uses controlled electrical pulses and charging cycles to help reduce that buildup. The goal is simple: recover useful battery life before replacement becomes the only option.',
+        ],
+      },
+      {
+        heading: 'What changes during recovery',
+        paragraphs: [
+          'A healthy battery accepts charge more cleanly, holds it longer, and delivers steadier power under load. A regenerated battery should be tested before and after treatment so the improvement is visible.',
+        ],
+        bullets: [
+          'Improved charge acceptance',
+          'Better usable runtime',
+          'Lower replacement pressure',
+        ],
+      },
     ],
-    metricValue: '0-15%',
-    metricLabel: 'usable capacity left',
-    accentColor: '#cc2200',
-    accentGlow: 'rgba(204,34,0,0.2)',
   },
   {
-    id: 'diagnosis',
-    navLabel: 'Diagnosis',
-    sequence: '25%',
-    eyebrow: 'Diagnosis',
-    stageLabel: 'Charging',
-    title: 'The recovery cycle first checks how the cell accepts charge.',
-    copy: [
-      'The system reads how the battery responds under load and while taking energy back in.',
-      'That gives a clear picture of how severe the sulfation is and how recoverable the battery still looks.',
-      'The process starts from measured condition, not guesswork.',
+    slug: 'when-to-check-vrla-batteries',
+    title: 'When should you check a VRLA battery bank?',
+    excerpt:
+      'Early warning signs that a backup or fleet battery needs testing before it becomes a costly surprise.',
+    date: '2026-06-12',
+    category: 'Maintenance',
+    readTime: '3 min read',
+    sections: [
+      {
+        heading: 'Do not wait for complete failure',
+        paragraphs: [
+          'A battery bank usually gives hints before it fails. Shorter backup time, slower charging, heating, or uneven voltage readings are all signs worth checking.',
+          'A quick inspection can help decide whether the battery can be regenerated or should be replaced.',
+        ],
+      },
+      {
+        heading: 'Simple checkup rhythm',
+        paragraphs: [
+          'For active business use, a quarterly check is a practical baseline. For high-load sites, monthly condition tracking gives better protection.',
+        ],
+        bullets: [
+          'Check runtime trends',
+          'Compare batteries in the same bank',
+          'Record charging behavior after every service cycle',
+        ],
+      },
     ],
-    metricValue: '5',
-    metricLabel: 'health signals checked',
-    accentColor: '#f97316',
-    accentGlow: 'rgba(249,115,22,0.22)',
   },
   {
-    id: 'process',
-    navLabel: 'Process',
-    sequence: '50%',
-    eyebrow: 'The Process',
-    stageLabel: 'Mid-Charge',
-    title: 'Controlled desulfation pulses reopen blocked plate area.',
-    copy: [
-      'As the pulses work through the cell, hardened sulfate begins to loosen and charge flow becomes cleaner.',
-      'The battery does not move anywhere on screen because the change is happening inside the same unit.',
-      'Mid-cycle is where the regeneration becomes visibly active.',
+    slug: 'regeneration-vs-replacement-cost',
+    title: 'Regeneration vs replacement: where the savings come from',
+    excerpt:
+      'A practical look at how battery recovery can reduce waste, downtime, and capital cost.',
+    date: '2026-06-05',
+    category: 'Savings',
+    readTime: '5 min read',
+    sections: [
+      {
+        heading: 'Replacement is not always the first move',
+        paragraphs: [
+          'If a battery is physically damaged, replacement is usually the right call. But if the main issue is capacity loss from sulfation, regeneration may recover enough performance to extend service life.',
+        ],
+      },
+      {
+        heading: 'Where value appears',
+        paragraphs: [
+          'The savings are not only from buying fewer batteries. You also reduce disposal frequency, downtime, and the operational friction of changing batteries too early.',
+        ],
+        bullets: [
+          'Lower replacement spend',
+          'Less battery waste',
+          'More predictable uptime',
+        ],
+      },
     ],
-    metricValue: '3',
-    metricLabel: 'desulfation phases',
-    accentColor: '#facc15',
-    accentGlow: 'rgba(250,204,21,0.18)',
-  },
-  {
-    id: 'recovery',
-    navLabel: 'Recovery',
-    sequence: '75%',
-    eyebrow: 'Recovery',
-    stageLabel: 'Regenerating',
-    title: 'Capacity and charge acceptance come back into a usable range.',
-    copy: [
-      'The battery begins holding more energy, responding more cleanly, and delivering steadier output.',
-      'This is the point where the battery starts feeling dependable again in real use, not just on paper.',
-      'The improvement is visible in the fill, glow, and reduced internal damage.',
-    ],
-    metricValue: '+32%',
-    metricLabel: 'capacity regained',
-    accentColor: '#22c55e',
-    accentGlow: 'rgba(34,197,94,0.2)',
-  },
-  {
-    id: 'result',
-    navLabel: 'Result',
-    sequence: '100%',
-    eyebrow: 'Result',
-    stageLabel: 'Restored',
-    title: 'A restored battery goes back to work instead of straight to replacement.',
-    copy: [
-      'At full recovery the battery is stable, bright, and ready for useful service again.',
-      'That means lower replacement pressure, fewer surprise failures, and better value from each battery.',
-      'The whole story finishes with the same battery regenerated in place.',
-    ],
-    metricValue: '70%',
-    metricLabel: 'saved vs replacement',
-    accentColor: '#00ff88',
-    accentGlow: 'rgba(0,255,136,0.22)',
   },
 ];
 
-const parseStoredThemeMode = (value: string | null): ThemeMode | null => {
-  if (value === 'system' || value === 'lite' || value === 'dark') {
-    return value;
+const TERMS_SECTIONS = [
+  {
+    title: 'Acceptance of Terms',
+    body:
+      'By using this website or requesting an Artheon Energy service, you agree to these terms and any service-specific conditions shared with you before work begins.',
+  },
+  {
+    title: 'User Responsibilities',
+    body:
+      'You agree to provide accurate contact details, battery information, site access details, and any safety information needed to evaluate or service your batteries.',
+  },
+  {
+    title: 'Intellectual Property',
+    body:
+      'The website content, visuals, brand assets, and technical presentation belong to Artheon Energy or its licensors and may not be copied or reused without written permission.',
+  },
+  {
+    title: 'Disclaimers',
+    body:
+      'Battery regeneration results depend on battery age, condition, damage, chemistry, and usage history. We do not guarantee recovery for every battery submitted for inspection.',
+  },
+  {
+    title: 'Limitations of Liability',
+    body:
+      'To the maximum extent permitted by law, Artheon Energy is not liable for indirect, incidental, or consequential losses related to website use or service decisions.',
+  },
+  {
+    title: 'Governing Law',
+    body:
+      'These terms are governed by the laws of India, and any disputes will be handled under the jurisdiction agreed in the final service documentation.',
+  },
+];
+
+const formatDate = (value: string) =>
+  new Intl.DateTimeFormat('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(value));
+
+const getPath = () => window.location.pathname;
+
+const scrollToHash = (hash: string) => {
+  if (!hash) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
   }
-  return null;
+
+  const target = document.querySelector(hash);
+  target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, value));
-
-const getActivePanelIndex = (progress: number) => {
-  const normalizedProgress = clamp(progress, 0, 1);
-
-  return PANEL_STOPS.reduce((closestIndex, stop, index) => {
-    const currentDistance = Math.abs(stop - normalizedProgress);
-    const closestDistance = Math.abs(PANEL_STOPS[closestIndex] - normalizedProgress);
-    return currentDistance < closestDistance ? index : closestIndex;
-  }, 0);
-};
-
-function App() {
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    if (typeof window === 'undefined') {
-      return 'system';
-    }
-    const storedThemeMode = parseStoredThemeMode(
-      window.localStorage.getItem(THEME_MODE_STORAGE_KEY),
-    );
-    return storedThemeMode ?? 'system';
-  });
-
-  const [systemPrefersDark, setSystemPrefersDark] = useState<boolean>(() => {
-    if (typeof window === 'undefined') {
-      return true;
-    }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
-  const [activePanelIndex, setActivePanelIndex] = useState(0);
-
-  const resolvedTheme: ResolvedTheme =
-    themeMode === 'system' ? (systemPrefersDark ? 'dark' : 'lite') : themeMode;
+const useRoute = () => {
+  const [path, setPath] = useState(() => getPath());
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleMediaChange = (event: MediaQueryListEvent) => {
-      setSystemPrefersDark(event.matches);
-    };
-
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', handleMediaChange);
-      return () => mediaQuery.removeEventListener('change', handleMediaChange);
-    }
-
-    mediaQuery.addListener(handleMediaChange);
-    return () => mediaQuery.removeListener(handleMediaChange);
+    const syncPath = () => setPath(getPath());
+    window.addEventListener('popstate', syncPath);
+    return () => window.removeEventListener('popstate', syncPath);
   }, []);
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', resolvedTheme);
-  }, [resolvedTheme]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    if (themeMode === 'system') {
-      window.localStorage.removeItem(THEME_MODE_STORAGE_KEY);
-      return;
-    }
-
-    window.localStorage.setItem(THEME_MODE_STORAGE_KEY, themeMode);
-  }, [themeMode]);
-
-  const cycleThemeMode = () => {
-    setThemeMode((currentMode) => {
-      if (currentMode === 'system') {
-        return 'lite';
-      }
-      if (currentMode === 'lite') {
-        return 'dark';
-      }
-      return 'system';
-    });
+  const navigate = (href: string) => {
+    const url = new URL(href, window.location.origin);
+    window.history.pushState(null, '', `${url.pathname}${url.hash}`);
+    setPath(url.pathname);
+    requestAnimationFrame(() => scrollToHash(url.hash));
   };
 
-  const panelTrackRef = useRef<HTMLDivElement>(null);
+  return { path, navigate };
+};
 
-  const { scrollYProgress } = useScroll({
-    target: panelTrackRef,
-    offset: ['start start', 'end end'],
-  });
+const App = () => {
+  const { path, navigate } = useRoute();
 
-  const desktopStageProgress = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
-  const mobileBatteryLift = useTransform(scrollYProgress, [0, 0.5, 1], [0, -5, -10]);
-  const batteryBackgroundOpacity = useTransform(scrollYProgress, [0, 0.2, 0.4, 0.6, 0.8, 1], [0.72, 0.78, 0.86, 0.9, 0.92, 0.94]);
-  const mobileHeroOpacity = useTransform(scrollYProgress, [0, 0.06, 0.12, 0.18, 0.24], [1, 0.92, 0.7, 0.35, 0]);
-  const mobileHeroY = useTransform(scrollYProgress, [0, 0.08, 0.16, 0.24], [0, -4, -10, -18]);
-  const mobileHeroScale = useTransform(scrollYProgress, [0, 0.08, 0.16, 0.24], [1, 0.985, 0.965, 0.94]);
-  const mobileTrayHeight = useTransform(scrollYProgress, [0, 0.08, 0.16, 0.24, 0.34, 0.44, 0.56], [356, 348, 336, 320, 296, 260, 228]);
-  const mobileBatteryScale = useTransform(scrollYProgress, [0, 0.08, 0.18, 0.3, 0.48], [1.0, 0.99, 0.96, 0.92, 0.84]);
-  const mobileBatteryY = useTransform(scrollYProgress, [0, 0.1, 0.24, 0.48], [0, -3, -8, -16]);
-  const mobileStageOpacity = useTransform(scrollYProgress, [0, 0.05, 0.12, 0.2], [0.35, 0.52, 0.82, 1]);
+  useEffect(() => {
+    const pageTitle =
+      path === '/blog'
+        ? 'Blog | Artheon Energy'
+        : path === '/terms'
+          ? 'Terms & Conditions | Artheon Energy'
+          : path.startsWith('/blog/')
+            ? 'Article | Artheon Energy'
+            : 'Artheon Energy | Battery Regeneration';
+    document.title = pageTitle;
+  }, [path]);
 
-  /* ---- Parallax background transforms ---- */
-  const bgGridY = useTransform(scrollYProgress, [0, 1], [0, -40]);
-  const bgOrbLeftY = useTransform(scrollYProgress, [0, 1], [0, -60]);
-  const bgOrbRightY = useTransform(scrollYProgress, [0, 1], [0, 50]);
-  const bgLineCyanOpacity = useTransform(scrollYProgress, [0, 0.3, 0.6, 1], [0.15, 0.28, 0.18, 0.25]);
-  const bgLineEmeraldOpacity = useTransform(scrollYProgress, [0, 0.4, 0.7, 1], [0.12, 0.22, 0.14, 0.2]);
-
-  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    const nextPanelIndex = getActivePanelIndex(clamp(latest, 0, 1));
-    setActivePanelIndex((previousIndex) => (
-      previousIndex === nextPanelIndex ? previousIndex : nextPanelIndex
-    ));
-  });
-
-  const activePanel = STORY_PANELS[activePanelIndex];
-  const panelPalette =
-    resolvedTheme === 'dark'
-      ? {
-          surfaceTop: 'rgba(6,12,20,0.46)',
-          surfaceBottom: 'rgba(6,12,20,0.16)',
-          heroSurfaceTop: 'rgba(6,12,20,0.32)',
-          heroSurfaceBottom: 'rgba(6,12,20,0.1)',
-          sheen: 'rgba(255,255,255,0.16)',
-          cornerGlow: 'rgba(255,255,255,0.12)',
-          edgeGlow: 'rgba(255,255,255,0.04)',
-          title: '#f8fafc',
-          body: '#cbd5e1',
-          meta: '#94a3b8',
-          metric: '#f8fafc',
-          shadow: '0 34px 100px -52px rgba(2,8,20,0.84)',
-          activeRing: 'rgba(255,255,255,0.06)',
-        }
-      : {
-          surfaceTop: 'rgba(255,255,255,0.52)',
-          surfaceBottom: 'rgba(255,255,255,0.16)',
-          heroSurfaceTop: 'rgba(255,255,255,0.4)',
-          heroSurfaceBottom: 'rgba(255,255,255,0.12)',
-          sheen: 'rgba(255,255,255,0.4)',
-          cornerGlow: 'rgba(255,255,255,0.3)',
-          edgeGlow: 'rgba(255,255,255,0.12)',
-          title: '#0f172a',
-          body: '#334155',
-          meta: '#475569',
-          metric: '#0f172a',
-          shadow: '0 30px 84px -58px rgba(15,23,42,0.22)',
-          activeRing: 'rgba(15,23,42,0.06)',
-        };
+  const page = (() => {
+    if (path === '/blog') return <BlogPage navigate={navigate} />;
+    if (path.startsWith('/blog/')) {
+      const slug = path.replace('/blog/', '');
+      return <BlogPostPage slug={slug} navigate={navigate} />;
+    }
+    if (path === '/terms') return <TermsPage navigate={navigate} />;
+    return <HomePage navigate={navigate} />;
+  })();
 
   return (
-    <div className="theme-canvas relative overflow-x-clip bg-ink-950 text-slate-100">
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#03060a_0%,#071019_48%,#03060a_100%)]" />
-        <motion.div
-          style={{ y: bgGridY }}
-          className="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.05)_1px,transparent_1px)] [background-size:32px_32px] opacity-35 scroll-animate"
-        />
-        <motion.div
-          style={{ opacity: bgLineCyanOpacity }}
-          className="absolute left-[18%] top-0 h-full w-px bg-gradient-to-b from-transparent via-cyan-300 to-transparent scroll-animate"
-        />
-        <motion.div
-          style={{ opacity: bgLineEmeraldOpacity }}
-          className="absolute right-[24%] top-0 h-full w-px bg-gradient-to-b from-transparent via-emerald-300 to-transparent scroll-animate"
-        />
-        <motion.div
-          style={{ y: bgOrbLeftY }}
-          className="absolute left-[9%] top-[12%] h-40 w-40 rounded-full bg-cyan-400/8 blur-3xl scroll-animate"
-        />
-        <motion.div
-          style={{ y: bgOrbRightY }}
-          className="absolute bottom-[14%] right-[12%] h-48 w-48 rounded-full bg-emerald-400/7 blur-3xl scroll-animate"
-        />
-      </div>
-
-      <Header
-        chapters={STORY_PANELS.map(({ id, navLabel }) => ({ id, label: navLabel }))}
-        progress={scrollYProgress}
-        themeMode={themeMode}
-        resolvedTheme={resolvedTheme}
-        onCycleTheme={cycleThemeMode}
-      />
-
-      <main className="relative mx-auto w-full max-w-[1480px] px-4 pb-20 pt-28 sm:px-6 md:pt-32 lg:px-10">
-        <section className="relative">
-          <div className="hidden lg:block">
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-[40%]">
-              <div className="sticky top-[calc(var(--header-height)+0.8rem)] h-[calc(100vh-var(--header-height)-1.6rem)]">
-                <motion.div
-                  style={{ opacity: batteryBackgroundOpacity }}
-                  className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,136,0.12),transparent_48%),linear-gradient(rgba(148,163,184,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.07)_1px,transparent_1px)] [background-size:auto,30px_30px,30px_30px]"
-                />
-                <div className="absolute left-0 top-[9%] h-[82%] w-px bg-gradient-to-b from-transparent via-cyan-300/25 to-transparent" />
-
-                <div className="relative flex h-full items-center justify-center">
-                  <div className="w-full max-w-[24rem] px-6 xl:max-w-[26rem]">
-                    <BatteryGraphic scrollProgress={scrollYProgress} />
-                  </div>
-                </div>
-
-                <div className="absolute left-6 right-8 top-6">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-cyan-300/72">
-                    Background Regeneration
-                  </p>
-                </div>
-
-                <div className="absolute bottom-8 left-6 right-8 space-y-3">
-                  <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-slate-400">
-                    <AnimatePresence mode="wait">
-                      <motion.span
-                        key={activePanel.eyebrow}
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -6 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      >
-                        {activePanel.eyebrow}
-                      </motion.span>
-                    </AnimatePresence>
-                    <AnimatePresence mode="wait">
-                      <motion.span
-                        key={activePanel.sequence}
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -6 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        style={{ color: activePanel.accentColor }}
-                      >
-                        {activePanel.sequence}
-                      </motion.span>
-                    </AnimatePresence>
-                  </div>
-                  <div className="h-px overflow-hidden bg-white/10">
-                    <motion.div
-                      style={{ width: desktopStageProgress }}
-                      className="h-full bg-gradient-to-r from-[#cc2200] via-[#facc15] to-[#00ff88]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-5 gap-2">
-                    {STORY_PANELS.map((panel, index) => {
-                      const isActive = index === activePanelIndex;
-                      return (
-                        <motion.span
-                          key={`desktop-dot-${panel.id}`}
-                          className="h-1.5 rounded-full"
-                          animate={{
-                            backgroundColor: isActive ? panel.accentColor : 'rgba(148,163,184,0.18)',
-                            boxShadow: isActive ? `0 0 14px ${panel.accentGlow}` : '0 0 0px rgba(0,0,0,0)',
-                          }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative lg:ml-[40%] lg:w-[60%] lg:pl-10">
-            <motion.div
-              style={{ height: mobileTrayHeight }}
-              className="pointer-events-none sticky top-[calc(var(--header-height)+0.55rem)] z-0 mb-5 lg:hidden"
-            >
-              <motion.div
-                style={{ y: mobileBatteryLift, opacity: batteryBackgroundOpacity }}
-                className="relative flex h-full flex-col items-center overflow-hidden rounded-[2.2rem]"
-              >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,136,0.12),transparent_48%),linear-gradient(rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.06)_1px,transparent_1px)] [background-size:auto,24px_24px,24px_24px]" />
-                <div className="absolute inset-0 border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.015))]" />
-                <div className="absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(180deg,rgba(2,7,18,0)_0%,rgba(2,7,18,0.18)_48%,rgba(2,7,18,0.34)_100%)]" />
-
-                <motion.div
-                  style={{ opacity: mobileHeroOpacity, y: mobileHeroY, scale: mobileHeroScale }}
-                  className="relative z-10 mx-auto max-w-[19rem] px-4 pt-4 text-center"
-                >
-                  <p className="font-mono text-[10px] uppercase tracking-[0.42em] text-cyan-300/88">
-                    Artheon Energy
-                  </p>
-                  <h1
-                    className="mt-2 font-display text-[1.55rem] font-semibold leading-[0.94] drop-shadow-[0_2px_14px_rgba(2,8,20,0.35)] sm:text-[1.8rem]"
-                    style={{ color: panelPalette.title, textShadow: '0 1px 14px rgba(2,8,20,0.22)' }}
-                  >
-                    <span className="block">Don&apos;t replace</span>
-                    <span className="block">your old battery.</span>
-                  </h1>
-                  <p
-                    className="mt-2 text-[0.86rem] font-semibold uppercase tracking-[0.18em] sm:text-[0.95rem]"
-                    style={{ color: '#00ff88' }}
-                  >
-                    Regenerate. Save Earth.
-                  </p>
-                  <p
-                    className="mx-auto mt-3 max-w-[17.5rem] text-[0.88rem] leading-relaxed sm:text-[0.95rem]"
-                    style={{ color: panelPalette.body }}
-                  >
-                    with just this four simple steps, from sulfation buildup to battery recovery,
-                    watch your battery come back to life
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  style={{ opacity: mobileStageOpacity }}
-                  className="relative z-10 mt-4 flex justify-center"
-                >
-                  <AnimatePresence mode="wait">
-                    <motion.p
-                      key={activePanel.stageLabel}
-                      initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                      exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                      className="rounded-full border border-white/10 bg-black/35 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.24em] backdrop-blur-sm"
-                      style={{ color: activePanel.accentColor }}
-                    >
-                      {activePanel.stageLabel}
-                    </motion.p>
-                  </AnimatePresence>
-                </motion.div>
-
-                <motion.div
-                  style={{ scale: mobileBatteryScale, y: mobileBatteryY }}
-                  className="relative z-10 mt-auto flex w-full items-end justify-center px-4 pb-4"
-                >
-                  <div className="w-[11.75rem] sm:w-[13rem]">
-                    <BatteryGraphic scrollProgress={scrollYProgress} compact />
-                  </div>
-                </motion.div>
-              </motion.div>
-            </motion.div>
-
-            <div ref={panelTrackRef} className="relative z-10 pt-8 sm:pt-10 lg:pt-0">
-              {STORY_PANELS.map((panel, index) => (
-                <StoryCard
-                  key={panel.id}
-                  panel={panel}
-                  panelPalette={panelPalette}
-                  isLeadPanel={index === 0}
-                  isGloballyActive={index === activePanelIndex}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <Footer />
+    <div className="site-shell">
+      <SiteHeader navigate={navigate} />
+      {page}
+      <SiteFooter navigate={navigate} />
     </div>
   );
-}
+};
+
+const SiteHeader = ({ navigate }: { navigate: (href: string) => void }) => {
+  const onLinkClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    navigate(href);
+  };
+
+  return (
+    <header className="site-header">
+      <a className="brand-mark" href="/" onClick={(event) => onLinkClick(event, '/')}>
+        <img src="/logo.svg" alt="Artheon Energy" />
+        <span>Artheon Energy</span>
+      </a>
+
+      <nav className="site-nav" aria-label="Primary navigation">
+        <a href="/" onClick={(event) => onLinkClick(event, '/')}>Home</a>
+        <a href="/blog" onClick={(event) => onLinkClick(event, '/blog')}>Blog</a>
+        <a href="/#pay" onClick={(event) => onLinkClick(event, '/#pay')}>Pay</a>
+        <a href="/terms" onClick={(event) => onLinkClick(event, '/terms')}>Terms</a>
+      </nav>
+
+      <a className="header-cta" href="/#contact" onClick={(event) => onLinkClick(event, '/#contact')}>
+        Free Checkup
+      </a>
+    </header>
+  );
+};
+
+const HomePage = ({ navigate }: { navigate: (href: string) => void }) => (
+  <main>
+    <HeroSection navigate={navigate} />
+    <ProcessSection />
+    <ValueSection />
+    <PaySection />
+    <ContactSection />
+  </main>
+);
+
+const HeroSection = ({ navigate }: { navigate: (href: string) => void }) => (
+  <section className="hero-section">
+    <div className="hero-grid" aria-hidden="true" />
+    <div className="hero-content">
+      <div className="hero-copy">
+        <p className="eyebrow">Battery regeneration specialists</p>
+        <h1>Artheon Energy</h1>
+        <p className="hero-lede">
+          Recover battery life, reduce waste, and keep your backup or fleet systems moving
+          with a cleaner regeneration process.
+        </p>
+        <div className="hero-actions">
+          <button className="primary-action" type="button" onClick={() => navigate('/#contact')}>
+            Book Free Checkup
+          </button>
+          <button className="ghost-action" type="button" onClick={() => navigate('/blog')}>
+            Read Articles
+          </button>
+        </div>
+      </div>
+
+      <InteractiveBattery />
+    </div>
+  </section>
+);
+
+const InteractiveBattery = () => {
+  const [charge, setCharge] = useState(62);
+  const [targetCharge, setTargetCharge] = useState(94);
+
+  useEffect(() => {
+    let frameId = 0;
+
+    const tick = () => {
+      setCharge((currentCharge) => {
+        const distance = targetCharge - currentCharge;
+        if (Math.abs(distance) < 0.12) return targetCharge;
+        return currentCharge + distance * 0.035;
+      });
+      frameId = window.requestAnimationFrame(tick);
+    };
+
+    frameId = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [targetCharge]);
+
+  const isCharging = targetCharge > charge;
+  const roundedCharge = Math.round(charge);
+  const batteryStyle = {
+    '--charge': `${charge}%`,
+    '--charge-ratio': charge / 100,
+  } as CSSProperties;
+
+  const toggleCharge = () => {
+    setTargetCharge((currentTarget) => (currentTarget > 70 ? 18 : 96));
+  };
+
+  return (
+    <section className="battery-stage" aria-label="Interactive battery animation">
+      <button
+        className={`battery-device ${isCharging ? 'is-charging' : 'is-discharging'}`}
+        type="button"
+        style={batteryStyle}
+        onClick={toggleCharge}
+        aria-label={`Battery is at ${roundedCharge} percent. Click to toggle charge state.`}
+      >
+        <span className="terminal terminal-negative">-</span>
+        <span className="terminal terminal-positive">+</span>
+        <span className="battery-shell">
+          <span className="battery-cap-row">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <span key={index} />
+            ))}
+          </span>
+          <span className="battery-window">
+            <span className="battery-liquid" />
+            <span className="battery-wave" />
+            <span className="battery-cells">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <span key={index} />
+              ))}
+            </span>
+            <span className="battery-scan" />
+          </span>
+          <span className="battery-brand">Artheon</span>
+        </span>
+      </button>
+
+      <div className="battery-readout">
+        <span>{roundedCharge}%</span>
+        <small>{isCharging ? 'Charging' : 'Discharging'}</small>
+      </div>
+    </section>
+  );
+};
+
+const ProcessSection = () => {
+  const steps = [
+    {
+      title: 'Check',
+      text: 'We test how the battery accepts and delivers charge before recommending work.',
+    },
+    {
+      title: 'Regenerate',
+      text: 'Controlled desulfation pulses help reopen blocked plate area inside the battery.',
+    },
+    {
+      title: 'Verify',
+      text: 'The recovered battery is checked again so performance gains are easy to understand.',
+    },
+  ];
+
+  return (
+    <section className="section-block" id="process">
+      <div className="section-heading">
+        <p className="eyebrow">Simple process</p>
+        <h2>Three steps from weak battery to useful battery.</h2>
+      </div>
+      <div className="process-list">
+        {steps.map((step, index) => (
+          <article className="process-item" key={step.title}>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const ValueSection = () => (
+  <section className="section-block value-section">
+    <div>
+      <p className="eyebrow">Cleaner economics</p>
+      <h2>Regenerate when it makes sense. Replace only when needed.</h2>
+    </div>
+    <div className="metric-strip" aria-label="Service highlights">
+      <div>
+        <strong>95%</strong>
+        <span>target health after recovery checks</span>
+      </div>
+      <div>
+        <strong>2 yrs</strong>
+        <span>warranty support on treated batteries</span>
+      </div>
+      <div>
+        <strong>70%</strong>
+        <span>potential savings versus replacement</span>
+      </div>
+    </div>
+  </section>
+);
+
+const PaySection = () => {
+  const [copied, setCopied] = useState(false);
+
+  const copyUpi = async () => {
+    await navigator.clipboard?.writeText(UPI_ID);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  };
+
+  return (
+    <section className="pay-section" id="pay">
+      <div className="pay-copy">
+        <p className="eyebrow">Pay</p>
+        <h2>Use UPI for quick payments.</h2>
+        <p>
+          Share the payment screenshot with our team after transfer so we can match it to
+          your checkup or service request.
+        </p>
+      </div>
+      <div className="upi-panel">
+        <span>UPI ID</span>
+        <strong>{UPI_ID}</strong>
+        <button type="button" onClick={copyUpi}>
+          {copied ? 'Copied' : 'Copy UPI ID'}
+        </button>
+      </div>
+    </section>
+  );
+};
+
+const ContactSection = () => {
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+    formData.append('subject', 'New Free Battery Checkup Request');
+    formData.append('from_name', 'Artheon Energy Website');
+
+    setSubmitState('submitting');
+    setMessage('');
+
+    try {
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: formData,
+      });
+      const result = (await response.json()) as { success?: boolean; message?: string };
+
+      if (response.ok && result.success) {
+        setSubmitState('success');
+        setMessage('Request sent. Our team will call you shortly.');
+        form.reset();
+        return;
+      }
+
+      setSubmitState('error');
+      setMessage(result.message ?? 'Could not send request. Please try again.');
+    } catch {
+      setSubmitState('error');
+      setMessage('Network issue while sending request. Please try again.');
+    }
+  };
+
+  return (
+    <section className="section-block contact-section" id="contact">
+      <div>
+        <p className="eyebrow">Free Checkup</p>
+        <h2>Tell us about your batteries.</h2>
+        <p>
+          Send your basic details and we will help you understand whether regeneration is worth checking.
+        </p>
+      </div>
+
+      <form className="contact-form" onSubmit={handleSubmit}>
+        <label>
+          Name or Company
+          <input name="name" type="text" required />
+        </label>
+        <label>
+          Phone Number
+          <input name="phone" type="tel" inputMode="tel" required />
+        </label>
+        <label>
+          Setup Type
+          <select name="setup" defaultValue="" required>
+            <option value="" disabled>Select setup</option>
+            <option value="backup">UPS / Backup Power</option>
+            <option value="fleet">Fleet Battery</option>
+            <option value="solar">Solar Storage</option>
+            <option value="industrial">Industrial Battery Bank</option>
+          </select>
+        </label>
+        <button type="submit" disabled={submitState === 'submitting'}>
+          {submitState === 'submitting' ? 'Sending...' : 'Request Checkup'}
+        </button>
+        <p className={`form-message ${submitState}`} aria-live="polite">
+          {message}
+        </p>
+      </form>
+    </section>
+  );
+};
+
+const BlogPage = ({ navigate }: { navigate: (href: string) => void }) => {
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('All');
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(BLOG_POSTS.map((post) => post.category)))],
+    [],
+  );
+
+  const filteredPosts = BLOG_POSTS.filter((post) => {
+    const matchesCategory = category === 'All' || post.category === category;
+    const searchableText = `${post.title} ${post.excerpt} ${post.category}`.toLowerCase();
+    return matchesCategory && searchableText.includes(query.trim().toLowerCase());
+  });
+
+  return (
+    <main className="page-main">
+      <section className="page-hero">
+        <p className="eyebrow">Blog</p>
+        <h1>Battery regeneration notes, minus the jargon.</h1>
+        <p>Useful articles for shops, fleets, backup sites, and anyone trying to avoid early battery replacement.</p>
+      </section>
+
+      <section className="blog-controls" aria-label="Blog filters">
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          aria-label="Search blog articles"
+          placeholder="Search articles"
+        />
+        <div className="category-filter">
+          {categories.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={item === category ? 'is-active' : ''}
+              onClick={() => setCategory(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="blog-grid" aria-label="Article list">
+        {filteredPosts.map((post) => (
+          <article className="blog-card" key={post.slug}>
+            <span>{post.category}</span>
+            <h2>{post.title}</h2>
+            <p>{post.excerpt}</p>
+            <div className="blog-meta">
+              <time dateTime={post.date}>{formatDate(post.date)}</time>
+              <small>{post.readTime}</small>
+            </div>
+            <button type="button" onClick={() => navigate(`/blog/${post.slug}`)}>
+              Read more
+            </button>
+          </article>
+        ))}
+      </section>
+    </main>
+  );
+};
+
+const BlogPostPage = ({
+  slug,
+  navigate,
+}: {
+  slug: string;
+  navigate: (href: string) => void;
+}) => {
+  const post = BLOG_POSTS.find((item) => item.slug === slug);
+
+  if (!post) {
+    return (
+      <main className="page-main">
+        <section className="page-hero">
+          <p className="eyebrow">Article not found</p>
+          <h1>This post is not available.</h1>
+          <button className="primary-action" type="button" onClick={() => navigate('/blog')}>
+            Back to Blog
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="page-main">
+      <article className="article-page">
+        <button className="text-link" type="button" onClick={() => navigate('/blog')}>
+          Back to Blog
+        </button>
+        <p className="eyebrow">{post.category}</p>
+        <h1>{post.title}</h1>
+        <div className="article-meta">
+          <time dateTime={post.date}>{formatDate(post.date)}</time>
+          <span>{post.readTime}</span>
+        </div>
+
+        <div className="article-body">
+          {post.sections.map((section) => (
+            <section key={section.heading}>
+              <h2>{section.heading}</h2>
+              {section.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+              {section.bullets && (
+                <ul>
+                  {section.bullets.map((bullet) => (
+                    <li key={bullet}>{bullet}</li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))}
+        </div>
+      </article>
+    </main>
+  );
+};
+
+const TermsPage = ({ navigate }: { navigate: (href: string) => void }) => (
+  <main className="page-main">
+    <article className="legal-page">
+      <p className="eyebrow">Terms & Conditions</p>
+      <h1>Clear terms for using Artheon Energy services.</h1>
+      <p className="legal-intro">
+        This template is written for readability and should be reviewed by a qualified legal professional before production use.
+      </p>
+
+      <ol>
+        {TERMS_SECTIONS.map((section) => (
+          <li key={section.title}>
+            <h2>{section.title}</h2>
+            <p>{section.body}</p>
+          </li>
+        ))}
+      </ol>
+
+      <button className="primary-action" type="button" onClick={() => navigate('/')}>
+        Return Home
+      </button>
+    </article>
+  </main>
+);
+
+const SiteFooter = ({ navigate }: { navigate: (href: string) => void }) => (
+  <footer className="site-footer">
+    <p>© {new Date().getFullYear()} Artheon Energy. Battery Regeneration Systems.</p>
+    <nav aria-label="Footer navigation">
+      <button type="button" onClick={() => navigate('/blog')}>Blog</button>
+      <button type="button" onClick={() => navigate('/terms')}>Terms</button>
+      <button type="button" onClick={() => navigate('/#pay')}>Pay</button>
+    </nav>
+  </footer>
+);
 
 export default App;
