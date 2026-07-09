@@ -230,43 +230,56 @@ const useRoute = () => {
 
 const App = () => {
   const { path, navigate } = useRoute();
+  const routePath = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
 
   useEffect(() => {
     const pageTitle =
-      path === '/blog'
+      routePath === '/blog'
         ? 'Blog | Artheon Energy'
-        : path === '/terms'
+        : routePath === '/terms'
           ? 'Terms & Conditions | Artheon Energy'
-          : path.startsWith('/blog/')
+          : routePath === '/regeneration'
+            ? 'Battery Regeneration | Artheon Energy'
+            : routePath.startsWith('/blog/')
             ? 'Article | Artheon Energy'
-            : 'Artheon Energy | Battery Regeneration';
+            : 'Artheon Energy | Solar Installations & EV Charging';
     document.title = pageTitle;
-  }, [path]);
+  }, [routePath]);
 
   const page = (() => {
-    if (path === '/blog') return <BlogPage navigate={navigate} />;
-    if (path.startsWith('/blog/')) {
-      const slug = path.replace('/blog/', '');
+    if (routePath === '/blog') return <BlogPage navigate={navigate} />;
+    if (routePath.startsWith('/blog/')) {
+      const slug = routePath.replace('/blog/', '');
       return <BlogPostPage slug={slug} navigate={navigate} />;
     }
-    if (path === '/terms') return <TermsPage navigate={navigate} />;
-    return <HomePage navigate={navigate} />;
+    if (routePath === '/terms') return <TermsPage navigate={navigate} />;
+    if (routePath === '/regeneration') return <RegenerationPage navigate={navigate} />;
+    return <SolarHomePage navigate={navigate} />;
   })();
 
   return (
     <div className="site-shell">
-      <SiteHeader navigate={navigate} />
+      <SiteHeader navigate={navigate} path={routePath} />
       {page}
-      <SiteFooter navigate={navigate} />
+      <SiteFooter navigate={navigate} path={routePath} />
     </div>
   );
 };
 
-const SiteHeader = ({ navigate }: { navigate: (href: string) => void }) => {
+const SiteHeader = ({
+  navigate,
+  path,
+}: {
+  navigate: (href: string) => void;
+  path: string;
+}) => {
   const onLinkClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
     event.preventDefault();
     navigate(href);
   };
+  const isRegeneration = path === '/regeneration';
+  const headerCtaHref = isRegeneration ? '/regeneration#contact' : '/#contact';
+  const headerCtaLabel = isRegeneration ? 'Book Checkup' : 'Solar Consultation';
 
   return (
     <header className="site-header">
@@ -276,19 +289,285 @@ const SiteHeader = ({ navigate }: { navigate: (href: string) => void }) => {
       </a>
 
       <nav className="site-nav" aria-label="Primary navigation">
-        <a href="/" onClick={(event) => onLinkClick(event, '/')}>Home</a>
-        <a href="/blog" onClick={(event) => onLinkClick(event, '/blog')}>Blog</a>
-        <a href="/terms" onClick={(event) => onLinkClick(event, '/terms')}>Terms</a>
+        <a href="/" aria-current={path === '/' ? 'page' : undefined} onClick={(event) => onLinkClick(event, '/')}>Solar</a>
+        <a href="/regeneration" aria-current={isRegeneration ? 'page' : undefined} onClick={(event) => onLinkClick(event, '/regeneration')}>Regeneration</a>
+        <a href="/blog" aria-current={path === '/blog' ? 'page' : undefined} onClick={(event) => onLinkClick(event, '/blog')}>Blog</a>
+        <a href="/terms" aria-current={path === '/terms' ? 'page' : undefined} onClick={(event) => onLinkClick(event, '/terms')}>Terms</a>
       </nav>
 
-      <a className="header-cta" href="/#contact" onClick={(event) => onLinkClick(event, '/#contact')}>
-        Book Checkup
+      <a className="header-cta" href={headerCtaHref} onClick={(event) => onLinkClick(event, headerCtaHref)}>
+        {headerCtaLabel}
       </a>
     </header>
   );
 };
 
-const HomePage = ({ navigate }: { navigate: (href: string) => void }) => (
+const SolarHomePage = ({ navigate }: { navigate: (href: string) => void }) => (
+  <main>
+    <SolarHeroSection navigate={navigate} />
+    <SolarAudienceSection />
+    <FactoryEnergySection navigate={navigate} />
+    <SolarDeliverySection />
+    <SolarContactSection />
+  </main>
+);
+
+const SolarHeroSection = ({ navigate }: { navigate: (href: string) => void }) => (
+  <section className="solar-hero-section">
+    <div className="solar-ambient-grid" aria-hidden="true" />
+    <div className="solar-hero-content">
+      <div className="solar-hero-copy">
+        <p className="eyebrow">Solar EPC + EV charging infrastructure</p>
+        <h1>Premium solar power for homes, farms, and factories.</h1>
+        <p className="hero-lede">
+          Artheon Energy designs, installs, and operates clean energy systems for
+          residential rooftops, agricultural lands, commercial buildings, and industrial EV charging.
+        </p>
+        <div className="hero-actions">
+          <button className="primary-action" type="button" onClick={() => navigate('/#contact')}>
+            Plan Solar Project
+          </button>
+          <button className="ghost-action" type="button" onClick={() => navigate('/#factory-model')}>
+            View Factory Model
+          </button>
+        </div>
+      </div>
+
+      <div className="solar-command-panel" aria-label="Solar infrastructure command panel">
+        <div className="solar-panel-header">
+          <span>Artheon Grid Desk</span>
+          <strong>Live Project Model</strong>
+        </div>
+        <div className="solar-kpi-grid">
+          <div>
+            <span>Solar EPC</span>
+            <strong>Turnkey</strong>
+          </div>
+          <div>
+            <span>EV charging</span>
+            <strong>Factory-ready</strong>
+          </div>
+          <div>
+            <span>Operating term</span>
+            <strong>5 years</strong>
+          </div>
+        </div>
+        <div className="solar-flow-map" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+        <div className="solar-status-list">
+          <p><span /> Rooftop and land survey</p>
+          <p><span /> Engineering, approvals, procurement</p>
+          <p><span /> Installation, monitoring, maintenance</p>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const SolarAudienceSection = () => {
+  const audiences = [
+    {
+      title: 'Residential Homes',
+      metric: 'Lower bills',
+      text: 'Rooftop systems planned around your monthly usage, roof layout, and long-term savings.',
+    },
+    {
+      title: 'Agricultural Lands',
+      metric: 'Field ready',
+      text: 'Solar for farms, pumps, sheds, cold storage, and open land with durable outdoor execution.',
+    },
+    {
+      title: 'Commercial Buildings',
+      metric: 'Business power',
+      text: 'High-usage buildings get structured generation, clean monitoring, and professional handover.',
+    },
+    {
+      title: 'Factories + EV',
+      metric: 'EV enabled',
+      text: 'Solar-backed charging stations for factory fleets, staff vehicles, logistics, and visitors.',
+    },
+  ];
+
+  return (
+    <section className="section-block solar-audience-section">
+      <div className="section-heading">
+        <p className="eyebrow">Built for serious sites</p>
+        <h2>One energy partner for rooftops, land, commercial power, and EV charging.</h2>
+      </div>
+      <div className="solar-audience-grid">
+        {audiences.map((item) => (
+          <article className="solar-audience-card" key={item.title}>
+            <span>{item.metric}</span>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const FactoryEnergySection = ({ navigate }: { navigate: (href: string) => void }) => (
+  <section className="section-block factory-model-section" id="factory-model">
+    <div className="factory-model-copy">
+      <p className="eyebrow">Factory power offer</p>
+      <h2>We install the system. You pay through your electricity bill for 5 years.</h2>
+      <p>
+        For qualified industrial projects, Artheon can design, finance, install, operate,
+        and maintain the solar and EV charging infrastructure. Your site pays Artheon for
+        electricity during the agreement term; after 5 years, the project benefit moves to
+        you under the final contract terms.
+      </p>
+      <button className="primary-action" type="button" onClick={() => navigate('/#contact')}>
+        Discuss Factory Project
+      </button>
+    </div>
+
+    <div className="factory-model-card" aria-label="Five year factory installation model">
+      <div className="model-step">
+        <span>01</span>
+        <strong>No heavy upfront install burden</strong>
+        <p>We handle design, procurement, installation, commissioning, and monitoring.</p>
+      </div>
+      <div className="model-step">
+        <span>02</span>
+        <strong>5-year electricity billing model</strong>
+        <p>Your factory pays Artheon for consumed power through a structured agreement.</p>
+      </div>
+      <div className="model-step">
+        <span>03</span>
+        <strong>Long-term power advantage</strong>
+        <p>After the term, your site keeps the solar benefit with maintenance as agreed.</p>
+      </div>
+    </div>
+  </section>
+);
+
+const SolarDeliverySection = () => {
+  const steps = [
+    'Site survey and energy bill study',
+    'Solar, EV, and savings model',
+    'Engineering and approval planning',
+    'Installation and commissioning',
+    'Monitoring, maintenance, and support',
+  ];
+
+  return (
+    <section className="section-block solar-delivery-section">
+      <div className="section-heading">
+        <p className="eyebrow">Premium delivery</p>
+        <h2>A clean process vendors, families, and factory teams can trust.</h2>
+      </div>
+      <div className="delivery-rail">
+        {steps.map((step, index) => (
+          <article className="delivery-step" key={step}>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <p>{step}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const SolarContactSection = () => {
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    formData.append('access_key', WEB3FORMS_ACCESS_KEY);
+    formData.append('subject', 'New Solar Installation Enquiry');
+    formData.append('from_name', 'Artheon Energy Website');
+
+    setSubmitState('submitting');
+    setMessage('');
+
+    try {
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: formData,
+      });
+      const result = (await response.json()) as { success?: boolean; message?: string };
+
+      if (response.ok && result.success) {
+        setSubmitState('success');
+        setMessage('Enquiry sent. Our solar team will call you shortly.');
+        form.reset();
+        return;
+      }
+
+      setSubmitState('error');
+      setMessage(result.message ?? 'Could not send enquiry. Please try again.');
+    } catch {
+      setSubmitState('error');
+      setMessage('Network issue while sending enquiry. Please try again.');
+    }
+  };
+
+  return (
+    <section className="section-block contact-section solar-contact-section" id="contact">
+      <div>
+        <p className="eyebrow">Start your project</p>
+        <h2>Tell us where you want solar power.</h2>
+        <p>
+          Share the site type, location, and billing requirement. We will call back with the
+          right installation model for your home, land, building, or factory.
+        </p>
+      </div>
+
+      <form className="contact-form" onSubmit={handleSubmit}>
+        <label>
+          Name or Company
+          <input name="name" type="text" required />
+        </label>
+        <label>
+          Phone Number
+          <input name="phone" type="tel" inputMode="tel" required />
+        </label>
+        <label>
+          Project Type
+          <select name="project_type" defaultValue="" required>
+            <option value="" disabled>Select project type</option>
+            <option value="residential">Residential Rooftop Solar</option>
+            <option value="agricultural">Agricultural Land Solar</option>
+            <option value="commercial">Commercial Building Solar</option>
+            <option value="factory-ev">Factory Solar + EV Charging</option>
+            <option value="vendor">Vendor / Partnership Enquiry</option>
+          </select>
+        </label>
+        <label>
+          Location
+          <input name="location" type="text" required />
+        </label>
+        <label>
+          Monthly Electricity Bill
+          <input name="monthly_bill" type="text" />
+        </label>
+        <label>
+          Project Notes
+          <textarea name="message" rows={4} />
+        </label>
+        <button type="submit" disabled={submitState === 'submitting'}>
+          {submitState === 'submitting' ? 'Sending...' : 'Request Solar Consultation'}
+        </button>
+        <p className={`form-message ${submitState}`} aria-live="polite">
+          {message}
+        </p>
+      </form>
+    </section>
+  );
+};
+
+const RegenerationPage = ({ navigate }: { navigate: (href: string) => void }) => (
   <main>
     <HeroSection navigate={navigate} />
     <ProcessSection />
@@ -309,7 +588,7 @@ const HeroSection = ({ navigate }: { navigate: (href: string) => void }) => (
           with a cleaner regeneration process.
         </p>
         <div className="hero-actions">
-          <button className="primary-action" type="button" onClick={() => navigate('/#contact')}>
+          <button className="primary-action" type="button" onClick={() => navigate('/regeneration#contact')}>
             Book Checkup
           </button>
           <button className="ghost-action" type="button" onClick={() => navigate('/blog')}>
@@ -656,14 +935,31 @@ const TermsPage = ({ navigate }: { navigate: (href: string) => void }) => (
   </main>
 );
 
-const SiteFooter = ({ navigate }: { navigate: (href: string) => void }) => (
-  <footer className="site-footer">
-    <p>© {new Date().getFullYear()} Artheon Energy. Battery Regeneration Systems.</p>
-    <nav aria-label="Footer navigation">
-      <button type="button" onClick={() => navigate('/blog')}>Blog</button>
-      <button type="button" onClick={() => navigate('/terms')}>Terms</button>
-    </nav>
-  </footer>
-);
+const SiteFooter = ({
+  navigate,
+  path,
+}: {
+  navigate: (href: string) => void;
+  path: string;
+}) => {
+  const footerLine =
+    path === '/'
+      ? 'Solar EPC & EV Charging Infrastructure.'
+      : path === '/regeneration'
+        ? 'Battery Regeneration Systems.'
+        : 'Solar EPC, EV Charging & Battery Regeneration.';
+
+  return (
+    <footer className="site-footer">
+      <p>© {new Date().getFullYear()} Artheon Energy. {footerLine}</p>
+      <nav aria-label="Footer navigation">
+        <button type="button" onClick={() => navigate('/')}>Solar</button>
+        <button type="button" onClick={() => navigate('/regeneration')}>Regeneration</button>
+        <button type="button" onClick={() => navigate('/blog')}>Blog</button>
+        <button type="button" onClick={() => navigate('/terms')}>Terms</button>
+      </nav>
+    </footer>
+  );
+};
 
 export default App;
