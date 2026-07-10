@@ -21,9 +21,18 @@ type BlogPost = {
   }>;
 };
 
+type ThemeMode = 'light' | 'dark';
+
 const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
 const WEB3FORMS_ACCESS_KEY = 'd562401f-b04b-458d-b550-b9f5622c836a';
 const STAGE_DURATION_MS = 4000;
+
+const getInitialTheme = (): ThemeMode => {
+  const savedTheme = window.localStorage.getItem('artheon-theme');
+  if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
+
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+};
 
 const BATTERY_STAGES = [
   {
@@ -231,6 +240,13 @@ const useRoute = () => {
 const App = () => {
   const { path, navigate } = useRoute();
   const routePath = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
+  const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    window.localStorage.setItem('artheon-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const pageTitle =
@@ -259,7 +275,12 @@ const App = () => {
 
   return (
     <div className="site-shell">
-      <SiteHeader navigate={navigate} path={routePath} />
+      <SiteHeader
+        navigate={navigate}
+        onToggleTheme={() => setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))}
+        path={routePath}
+        theme={theme}
+      />
       {page}
       <SiteFooter navigate={navigate} path={routePath} />
     </div>
@@ -268,10 +289,14 @@ const App = () => {
 
 const SiteHeader = ({
   navigate,
+  onToggleTheme,
   path,
+  theme,
 }: {
   navigate: (href: string) => void;
+  onToggleTheme: () => void;
   path: string;
+  theme: ThemeMode;
 }) => {
   const onLinkClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
     event.preventDefault();
@@ -284,7 +309,7 @@ const SiteHeader = ({
   return (
     <header className="site-header">
       <a className="brand-mark" href="/" onClick={(event) => onLinkClick(event, '/')}>
-        <img src="/logo.svg" alt="Artheon Energy" />
+        <img src="/logo.png" alt="Artheon Energy" />
         <span>Artheon Energy</span>
       </a>
 
@@ -295,9 +320,22 @@ const SiteHeader = ({
         <a href="/terms" aria-current={path === '/terms' ? 'page' : undefined} onClick={(event) => onLinkClick(event, '/terms')}>Terms</a>
       </nav>
 
-      <a className="header-cta" href={headerCtaHref} onClick={(event) => onLinkClick(event, headerCtaHref)}>
-        {headerCtaLabel}
-      </a>
+      <div className="header-actions">
+        <button
+          className="theme-toggle"
+          type="button"
+          onClick={onToggleTheme}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        >
+          <span className="theme-toggle-track" aria-hidden="true">
+            <span className="theme-toggle-thumb" />
+          </span>
+          <span>{theme === 'dark' ? 'Dark' : 'Light'}</span>
+        </button>
+        <a className="header-cta" href={headerCtaHref} onClick={(event) => onLinkClick(event, headerCtaHref)}>
+          {headerCtaLabel}
+        </a>
+      </div>
     </header>
   );
 };
@@ -343,10 +381,6 @@ const SolarHeroSection = ({ navigate }: { navigate: (href: string) => void }) =>
           <p>Survey, design, installation, monitoring, and long-term operation under one accountable team.</p>
         </div>
         <div className="solar-showcase-metrics" aria-label="Solar project highlights">
-          <div>
-            <span>Turnkey</span>
-            <strong>EPC</strong>
-          </div>
           <div>
             <span>Factory</span>
             <strong>EV-ready</strong>

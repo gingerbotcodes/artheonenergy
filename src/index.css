@@ -15,9 +15,28 @@
   --shadow: 0 28px 80px rgba(0, 0, 0, 0.36);
   --radius: 18px;
   --container: min(1120px, calc(100vw - 32px));
+  --hero-photo-opacity: 0.18;
+  --hero-photo-blend: screen;
   --font-body: Manrope, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: Sora, Manrope, ui-sans-serif, system-ui, sans-serif;
   font-family: var(--font-body);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f7f9f4;
+  --bg-soft: #eef5ed;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --line: rgba(8, 35, 31, 0.14);
+  --text: #08211f;
+  --muted: #60706f;
+  --muted-strong: #263c3a;
+  --accent: #006d88;
+  --accent-green: #009f63;
+  --shadow: 0 24px 70px rgba(25, 54, 45, 0.14);
+  --hero-photo-opacity: 0.28;
+  --hero-photo-blend: multiply;
 }
 
 * {
@@ -43,6 +62,13 @@ body {
   color: var(--text);
   font-family: inherit;
   overflow-x: hidden;
+}
+
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 72% 8%, rgba(0, 109, 136, 0.13), transparent 34rem),
+    radial-gradient(circle at 12% 24%, rgba(0, 159, 99, 0.13), transparent 30rem),
+    var(--bg);
 }
 
 #root {
@@ -111,7 +137,7 @@ h3,
 .brand-mark {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   min-width: max-content;
   color: var(--text);
   font-weight: 800;
@@ -119,10 +145,11 @@ h3,
 }
 
 .brand-mark img {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  box-shadow: 0 0 22px rgba(0, 212, 255, 0.22);
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 0;
+  filter: drop-shadow(0 0 16px rgba(0, 212, 255, 0.18));
 }
 
 .site-nav {
@@ -170,6 +197,16 @@ h3,
   background: rgba(0, 212, 255, 0.12);
 }
 
+:root[data-theme="light"] .site-nav a[aria-current="page"] {
+  background: rgba(0, 109, 136, 0.1);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .header-cta,
 .primary-action,
 .blog-card button,
@@ -206,6 +243,53 @@ h3,
 .contact-form button:hover,
 .text-link:hover {
   transform: translateY(-2px);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  color: var(--muted-strong);
+  padding: 0 12px 0 9px;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+:root[data-theme="light"] .site-nav,
+:root[data-theme="light"] .theme-toggle,
+:root[data-theme="light"] .ghost-action {
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 36px rgba(15, 52, 43, 0.08);
+}
+
+.theme-toggle-track {
+  position: relative;
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.32), rgba(0, 255, 136, 0.22));
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.32);
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+:root[data-theme="light"] .theme-toggle-thumb {
+  background: #ffb22c;
+  transform: translateX(14px);
 }
 
 .hero-section {
@@ -313,14 +397,30 @@ h3,
     #03060a;
 }
 
+:root[data-theme="light"] .solar-hero-section {
+  background:
+    radial-gradient(circle at 86% 18%, rgba(0, 159, 99, 0.16), transparent 25rem),
+    radial-gradient(circle at 64% 64%, rgba(0, 109, 136, 0.14), transparent 32rem),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.68), transparent 42%),
+    #f6faf3;
+}
+
+:root[data-theme="light"] .solar-hero-section::before {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.28) 46%, rgba(255, 255, 255, 0.56)),
+    url("/solar/solar-farm.jpg") center / cover no-repeat;
+}
+
 .solar-hero-section::before {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   background:
-    linear-gradient(115deg, rgba(0, 0, 0, 0.34), transparent 45%),
-    radial-gradient(circle at 48% 18%, rgba(255, 255, 255, 0.06), transparent 18rem);
+    linear-gradient(115deg, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.24) 45%, rgba(0, 0, 0, 0.48)),
+    url("/solar/solar-farm.jpg") center / cover no-repeat;
+  mix-blend-mode: var(--hero-photo-blend);
+  opacity: var(--hero-photo-opacity);
 }
 
 .solar-hero-section::after {
@@ -334,7 +434,7 @@ h3,
 .solar-ambient-grid {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   opacity: 0.32;
   background:
     linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
@@ -346,6 +446,7 @@ h3,
 
 .solar-hero-content {
   position: relative;
+  z-index: 1;
   display: grid;
   align-items: center;
   gap: 42px;
@@ -433,7 +534,7 @@ h3,
 
 .solar-showcase-overlay span,
 .solar-showcase-metrics span {
-  color: var(--muted-strong);
+  color: #c4ced8;
   font-size: 0.72rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -446,7 +547,7 @@ h3,
 }
 
 .solar-showcase-overlay p {
-  color: var(--text);
+  color: #f5f8fb;
   line-height: 1.55;
 }
 
@@ -455,7 +556,7 @@ h3,
   left: 22px;
   right: 22px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -470,7 +571,7 @@ h3,
 .solar-showcase-metrics strong {
   display: block;
   margin-top: 12px;
-  color: var(--text);
+  color: #f5f8fb;
   font-size: clamp(1.05rem, 2vw, 1.38rem);
 }
 
@@ -488,6 +589,26 @@ h3,
     0 30px 90px rgba(0, 0, 0, 0.38),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(22px);
+}
+
+:root[data-theme="light"] .solar-command-panel,
+:root[data-theme="light"] .process-item,
+:root[data-theme="light"] .metric-strip div,
+:root[data-theme="light"] .contact-form,
+:root[data-theme="light"] .blog-card,
+:root[data-theme="light"] .factory-model-card,
+:root[data-theme="light"] .delivery-step {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.66)),
+    rgba(255, 255, 255, 0.78);
+}
+
+:root[data-theme="light"] .contact-form input,
+:root[data-theme="light"] .contact-form select,
+:root[data-theme="light"] .contact-form textarea,
+:root[data-theme="light"] .blog-controls input {
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text);
 }
 
 .solar-command-panel::before {
