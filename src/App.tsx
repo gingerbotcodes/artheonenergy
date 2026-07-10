@@ -430,12 +430,12 @@ const SolarAudienceSection = () => {
 };
 
 const SOLAR_PARTNERS = [
-  { name: 'Virgin Power & Engineering', logo: '/partners/virgin-power-engineering.svg' },
+  { name: 'Virgin Power & Engineering', logo: '/partners/virgin-power-engineering.png', logoClass: 'partner-logo-tall' },
   { name: 'Waaree', logo: '/partners/waaree.svg' },
-  { name: 'Adani Solar', logo: '/partners/adani-solar.svg' },
-  { name: 'Power One', logo: '/partners/power-one.svg' },
+  { name: 'Adani Solar', logo: '/partners/adani-solar.png' },
+  { name: 'Power One', logo: '/partners/power-one.png' },
   { name: 'Havells', logo: '/partners/havells.svg' },
-  { name: 'Polycab', logo: '/partners/polycab.svg' },
+  { name: 'Polycab', logo: '/partners/polycab.png' },
   { name: 'Finolex', logo: '/partners/finolex.svg' },
 ];
 
@@ -449,12 +449,23 @@ const SolarPartnersSection = () => (
         to keep every installation dependable from survey to handover.
       </p>
     </div>
-    <div className="partner-grid" aria-label="Artheon Energy partner companies">
-      {SOLAR_PARTNERS.map((partner) => (
-        <article className="partner-card" key={partner.name}>
-          <img src={partner.logo} alt={`${partner.name} logo`} loading="lazy" />
-        </article>
-      ))}
+    <div className="partner-marquee" aria-label="Artheon Energy partner companies">
+      <div className="partner-track">
+        {[0, 1].map((loopIndex) => (
+          <div className="partner-set" key={loopIndex} aria-hidden={loopIndex === 1}>
+            {SOLAR_PARTNERS.map((partner) => (
+              <article className="partner-card" key={`${loopIndex}-${partner.name}`}>
+                <img
+                  src={partner.logo}
+                  alt={loopIndex === 0 ? `${partner.name} logo` : ''}
+                  className={partner.logoClass}
+                  loading="lazy"
+                />
+              </article>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 );
