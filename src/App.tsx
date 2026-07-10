@@ -344,6 +344,7 @@ const SolarHomePage = ({ navigate }: { navigate: (href: string) => void }) => (
   <main>
     <SolarHeroSection navigate={navigate} />
     <SolarAudienceSection />
+    <SolarPartnersSection />
     <FactoryEnergySection navigate={navigate} />
     <SolarDeliverySection />
     <SolarContactSection />
@@ -427,6 +428,36 @@ const SolarAudienceSection = () => {
     </section>
   );
 };
+
+const SOLAR_PARTNERS = [
+  { name: 'Virgin Power & Engineering', logo: '/partners/virgin-power-engineering.svg' },
+  { name: 'Waaree', logo: '/partners/waaree.svg' },
+  { name: 'Adani Solar', logo: '/partners/adani-solar.svg' },
+  { name: 'Power One', logo: '/partners/power-one.svg' },
+  { name: 'Havells', logo: '/partners/havells.svg' },
+  { name: 'Polycab', logo: '/partners/polycab.svg' },
+  { name: 'Finolex', logo: '/partners/finolex.svg' },
+];
+
+const SolarPartnersSection = () => (
+  <section className="section-block solar-partner-section" aria-labelledby="solar-partner-heading">
+    <div className="section-heading">
+      <p className="eyebrow">Our partners</p>
+      <h2 id="solar-partner-heading">Trusted energy brands in our project ecosystem.</h2>
+      <p>
+        We coordinate with established solar, power electronics, electrical, and cabling brands
+        to keep every installation dependable from survey to handover.
+      </p>
+    </div>
+    <div className="partner-grid" aria-label="Artheon Energy partner companies">
+      {SOLAR_PARTNERS.map((partner) => (
+        <article className="partner-card" key={partner.name}>
+          <img src={partner.logo} alt={`${partner.name} logo`} loading="lazy" />
+        </article>
+      ))}
+    </div>
+  </section>
+);
 
 const FactoryEnergySection = ({ navigate }: { navigate: (href: string) => void }) => (
   <section className="section-block factory-model-section" id="factory-model">

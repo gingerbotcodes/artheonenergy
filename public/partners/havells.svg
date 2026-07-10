@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="120" viewBox="0 0 360 120" role="img" aria-labelledby="title">
+  <title id="title">Havells</title>
+  <rect width="360" height="120" rx="18" fill="#ffffff"/>
+  <text x="56" y="73" fill="#e30613" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="900" letter-spacing="-1">HAVELLS</text>
+  <path d="M55 82h247" stroke="#e30613" stroke-width="5" stroke-linecap="round" opacity="0.35"/>
+</svg>

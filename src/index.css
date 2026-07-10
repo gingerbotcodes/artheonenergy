@@ -1350,6 +1350,7 @@ h3,
 .metric-strip,
 .blog-grid,
 .solar-audience-grid,
+.partner-grid,
 .delivery-rail {
   display: grid;
   gap: 14px;
@@ -1361,6 +1362,7 @@ h3,
 .contact-form,
 .blog-card,
 .solar-audience-card,
+.partner-card,
 .factory-model-card,
 .delivery-step {
   border: 1px solid var(--line);
@@ -1370,6 +1372,7 @@ h3,
 }
 
 .solar-audience-card,
+.partner-card,
 .factory-model-card,
 .delivery-step,
 .solar-contact-section .contact-form {
@@ -1447,6 +1450,73 @@ h3,
   color: #d7e2e8;
   line-height: 1.65;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.46);
+}
+
+.solar-partner-section {
+  position: relative;
+}
+
+.solar-partner-section::before {
+  content: "";
+  position: absolute;
+  inset: 52px auto auto 50%;
+  z-index: -1;
+  width: min(760px, 78vw);
+  height: 260px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(0, 212, 255, 0.13), transparent 68%);
+  transform: translateX(-50%);
+}
+
+.partner-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.partner-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 122px;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.partner-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, transparent 12%, rgba(255, 255, 255, 0.12) 38%, transparent 58%);
+  opacity: 0;
+  transform: translateX(-30%);
+  transition: opacity 220ms ease, transform 520ms ease;
+}
+
+.partner-card:hover::after {
+  opacity: 1;
+  transform: translateX(30%);
+}
+
+.partner-card img {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 190px);
+  height: 66px;
+  object-fit: contain;
+  border-radius: 12px;
+  filter: saturate(0.96) contrast(1.02);
+}
+
+:root[data-theme="light"] .partner-card {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 247, 0.78)),
+    rgba(255, 255, 255, 0.84);
+}
+
+:root[data-theme="light"] .partner-card::after {
+  background:
+    linear-gradient(120deg, transparent 12%, rgba(0, 159, 99, 0.12) 38%, transparent 58%);
 }
 
 .factory-model-section {
@@ -2188,6 +2258,21 @@ h3,
 
   .solar-audience-card > div {
     min-height: 174px;
+  }
+
+  .partner-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .partner-card {
+    min-height: 96px;
+    padding: 10px;
+  }
+
+  .partner-card img {
+    height: 54px;
+    border-radius: 10px;
   }
 
   .factory-model-image {
