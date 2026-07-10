@@ -15,7 +15,9 @@
   --shadow: 0 28px 80px rgba(0, 0, 0, 0.36);
   --radius: 18px;
   --container: min(1120px, calc(100vw - 32px));
-  font-family: Inter, Poppins, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: Manrope, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: Sora, Manrope, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-body);
 }
 
 * {
@@ -76,6 +78,18 @@ p {
   margin: 0;
 }
 
+h1,
+h2,
+h3,
+.brand-mark,
+.header-cta,
+.primary-action,
+.ghost-action,
+.site-nav a,
+.eyebrow {
+  font-family: var(--font-display);
+}
+
 .site-shell {
   min-height: 100vh;
 }
@@ -101,6 +115,7 @@ p {
   min-width: max-content;
   color: var(--text);
   font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
 .brand-mark img {
@@ -141,7 +156,8 @@ p {
 .site-nav a {
   padding: 10px 14px;
   color: var(--muted-strong);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+  letter-spacing: -0.02em;
 }
 
 .site-nav a:hover,
@@ -252,14 +268,15 @@ p {
   color: var(--text);
   font-size: clamp(3.4rem, 15vw, 8rem);
   line-height: 0.88;
-  letter-spacing: 0;
+  letter-spacing: -0.07em;
   overflow-wrap: break-word;
 }
 
 .solar-hero-copy h1 {
   max-width: 14ch;
-  font-size: clamp(3rem, 8.5vw, 6.8rem);
-  letter-spacing: -0.055em;
+  font-size: clamp(3rem, 8vw, 6.35rem);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
 }
 
 .hero-lede,
@@ -296,6 +313,16 @@ p {
     #03060a;
 }
 
+.solar-hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(115deg, rgba(0, 0, 0, 0.34), transparent 45%),
+    radial-gradient(circle at 48% 18%, rgba(255, 255, 255, 0.06), transparent 18rem);
+}
+
 .solar-hero-section::after {
   content: "";
   position: absolute;
@@ -330,6 +357,121 @@ p {
 
 .solar-hero-copy {
   max-width: 760px;
+}
+
+.solar-showcase {
+  position: relative;
+  isolation: isolate;
+  min-height: 560px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow:
+    0 38px 100px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.solar-showcase::before,
+.solar-showcase::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.solar-showcase::before {
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(2, 6, 12, 0.08), rgba(2, 6, 12, 0.82)),
+    radial-gradient(circle at 82% 18%, rgba(0, 255, 136, 0.24), transparent 20rem);
+}
+
+.solar-showcase::after {
+  inset: auto 24px 24px auto;
+  z-index: 2;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.26), transparent 68%);
+  filter: blur(10px);
+}
+
+.solar-showcase > img {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.02);
+}
+
+.solar-showcase-overlay,
+.solar-showcase-metrics {
+  position: absolute;
+  z-index: 3;
+  backdrop-filter: blur(20px);
+}
+
+.solar-showcase-overlay {
+  left: 22px;
+  right: 22px;
+  bottom: 22px;
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  background: rgba(3, 11, 17, 0.64);
+}
+
+.solar-showcase-overlay div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.solar-showcase-overlay span,
+.solar-showcase-metrics span {
+  color: var(--muted-strong);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.solar-showcase-overlay strong {
+  color: var(--accent-green);
+  text-align: right;
+}
+
+.solar-showcase-overlay p {
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.solar-showcase-metrics {
+  top: 22px;
+  left: 22px;
+  right: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.solar-showcase-metrics div {
+  min-height: 104px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  background: rgba(2, 8, 12, 0.62);
+}
+
+.solar-showcase-metrics strong {
+  display: block;
+  margin-top: 12px;
+  color: var(--text);
+  font-size: clamp(1.05rem, 2vw, 1.38rem);
 }
 
 .solar-command-panel {
@@ -1175,7 +1317,7 @@ p {
 }
 
 .section-block {
-  padding: 78px 0;
+  padding: 88px 0;
 }
 
 .section-heading {
@@ -1233,23 +1375,47 @@ p {
 
 .solar-audience-grid {
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
 }
 
 .solar-audience-card {
   position: relative;
   min-height: 250px;
   overflow: hidden;
-  padding: 24px;
+  padding: 0;
 }
 
 .solar-audience-card::before {
   content: "";
   position: absolute;
-  inset: -30% -35% auto auto;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 255, 136, 0.2), transparent 64%);
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, transparent 18%, rgba(3, 7, 12, 0.92) 72%),
+    radial-gradient(circle at 88% 12%, rgba(0, 255, 136, 0.22), transparent 13rem);
+}
+
+.solar-audience-card > img {
+  display: block;
+  width: 100%;
+  height: 168px;
+  object-fit: cover;
+  filter: saturate(0.95) contrast(1.05);
+  transition: transform 420ms ease, filter 420ms ease;
+}
+
+.solar-audience-card:hover > img {
+  filter: saturate(1.1) contrast(1.08);
+  transform: scale(1.035);
+}
+
+.solar-audience-card > div {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-content: end;
+  min-height: 196px;
+  padding: 22px;
 }
 
 .solar-audience-card span {
@@ -1261,10 +1427,11 @@ p {
 }
 
 .solar-audience-card h3 {
-  margin-top: 34px;
+  margin-top: 18px;
   color: var(--text);
   font-size: clamp(1.5rem, 4vw, 2.15rem);
   line-height: 1.05;
+  letter-spacing: -0.045em;
 }
 
 .solar-audience-card p {
@@ -1299,6 +1466,46 @@ p {
   display: grid;
   gap: 14px;
   padding: 18px;
+}
+
+.factory-model-image {
+  position: relative;
+  min-height: 260px;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.factory-model-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 38%, rgba(2, 6, 11, 0.88)),
+    radial-gradient(circle at 78% 22%, rgba(0, 212, 255, 0.22), transparent 16rem);
+}
+
+.factory-model-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  object-fit: cover;
+}
+
+.factory-model-image figcaption {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.04em;
 }
 
 .model-step {
@@ -1346,6 +1553,7 @@ p {
 
 .delivery-rail {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
 }
 
 .delivery-step {
@@ -1964,6 +2172,56 @@ p {
   .solar-flow-map {
     min-height: 118px;
     padding: 12px;
+  }
+
+  .solar-showcase {
+    width: min(100%, 358px);
+    min-height: 560px;
+    border-radius: 28px;
+  }
+
+  .solar-showcase-overlay {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    padding: 16px;
+  }
+
+  .solar-showcase-overlay div {
+    display: grid;
+    gap: 6px;
+  }
+
+  .solar-showcase-overlay strong {
+    text-align: left;
+  }
+
+  .solar-showcase-metrics {
+    left: 14px;
+    right: 14px;
+    top: 14px;
+    gap: 8px;
+  }
+
+  .solar-showcase-metrics div {
+    min-height: 86px;
+    padding: 12px;
+  }
+
+  .solar-showcase-metrics strong {
+    font-size: 0.98rem;
+  }
+
+  .solar-audience-card > img {
+    height: 178px;
+  }
+
+  .solar-audience-card > div {
+    min-height: 174px;
+  }
+
+  .factory-model-image {
+    min-height: 220px;
   }
 
   .battery-stage {

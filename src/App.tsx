@@ -320,8 +320,8 @@ const SolarHeroSection = ({ navigate }: { navigate: (href: string) => void }) =>
         <p className="eyebrow">Solar EPC + EV charging infrastructure</p>
         <h1>Premium solar power for homes, farms, and factories.</h1>
         <p className="hero-lede">
-          Artheon Energy designs, installs, and operates clean energy systems for
-          residential rooftops, agricultural lands, commercial buildings, and industrial EV charging.
+          Artheon Energy delivers vendor-grade solar installations for residential rooftops,
+          agricultural lands, commercial buildings, and industrial EV charging infrastructure.
         </p>
         <div className="hero-actions">
           <button className="primary-action" type="button" onClick={() => navigate('/#contact')}>
@@ -333,37 +333,30 @@ const SolarHeroSection = ({ navigate }: { navigate: (href: string) => void }) =>
         </div>
       </div>
 
-      <div className="solar-command-panel" aria-label="Solar infrastructure command panel">
-        <div className="solar-panel-header">
-          <span>Artheon Grid Desk</span>
-          <strong>Live Project Model</strong>
+      <aside className="solar-showcase" aria-label="Solar infrastructure project preview">
+        <img src="/solar/solar-farm.jpg" alt="Large solar farm installation under a clear sky" />
+        <div className="solar-showcase-overlay">
+          <div>
+            <span>Artheon project desk</span>
+            <strong>Solar EPC + EV infra</strong>
+          </div>
+          <p>Survey, design, installation, monitoring, and long-term operation under one accountable team.</p>
         </div>
-        <div className="solar-kpi-grid">
+        <div className="solar-showcase-metrics" aria-label="Solar project highlights">
           <div>
-            <span>Solar EPC</span>
-            <strong>Turnkey</strong>
+            <span>Turnkey</span>
+            <strong>EPC</strong>
           </div>
           <div>
-            <span>EV charging</span>
-            <strong>Factory-ready</strong>
+            <span>Factory</span>
+            <strong>EV-ready</strong>
           </div>
           <div>
-            <span>Operating term</span>
+            <span>Model</span>
             <strong>5 years</strong>
           </div>
         </div>
-        <div className="solar-flow-map" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="solar-status-list">
-          <p><span /> Rooftop and land survey</p>
-          <p><span /> Engineering, approvals, procurement</p>
-          <p><span /> Installation, monitoring, maintenance</p>
-        </div>
-      </div>
+      </aside>
     </div>
   </section>
 );
@@ -373,21 +366,29 @@ const SolarAudienceSection = () => {
     {
       title: 'Residential Homes',
       metric: 'Lower bills',
+      image: '/solar/rooftop-installation.jpg',
+      alt: 'Solar installers placing panels on a residential rooftop',
       text: 'Rooftop systems planned around your monthly usage, roof layout, and long-term savings.',
     },
     {
       title: 'Agricultural Lands',
       metric: 'Field ready',
+      image: '/solar/solar-farm.jpg',
+      alt: 'Solar panels installed across open agricultural land',
       text: 'Solar for farms, pumps, sheds, cold storage, and open land with durable outdoor execution.',
     },
     {
       title: 'Commercial Buildings',
       metric: 'Business power',
+      image: '/solar/commercial-solar.jpg',
+      alt: 'Commercial solar panels being installed by a technician',
       text: 'High-usage buildings get structured generation, clean monitoring, and professional handover.',
     },
     {
       title: 'Factories + EV',
       metric: 'EV enabled',
+      image: '/solar/ev-charging.jpg',
+      alt: 'Electric vehicle connected to a charging station',
       text: 'Solar-backed charging stations for factory fleets, staff vehicles, logistics, and visitors.',
     },
   ];
@@ -401,9 +402,12 @@ const SolarAudienceSection = () => {
       <div className="solar-audience-grid">
         {audiences.map((item) => (
           <article className="solar-audience-card" key={item.title}>
-            <span>{item.metric}</span>
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
+            <img src={item.image} alt={item.alt} loading="lazy" />
+            <div>
+              <span>{item.metric}</span>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
           </article>
         ))}
       </div>
@@ -428,6 +432,10 @@ const FactoryEnergySection = ({ navigate }: { navigate: (href: string) => void }
     </div>
 
     <div className="factory-model-card" aria-label="Five year factory installation model">
+      <figure className="factory-model-image">
+        <img src="/solar/ev-charging.jpg" alt="EV charging station connected to a car outside a building" loading="lazy" />
+        <figcaption>Industrial EV charging, planned with solar generation and site load.</figcaption>
+      </figure>
       <div className="model-step">
         <span>01</span>
         <strong>No heavy upfront install burden</strong>
@@ -460,7 +468,7 @@ const SolarDeliverySection = () => {
     <section className="section-block solar-delivery-section">
       <div className="section-heading">
         <p className="eyebrow">Premium delivery</p>
-        <h2>A clean process vendors, families, and factory teams can trust.</h2>
+        <h2>A clean process vendors, homeowners, and factory teams can trust.</h2>
       </div>
       <div className="delivery-rail">
         {steps.map((step, index) => (
