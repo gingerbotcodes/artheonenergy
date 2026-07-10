@@ -370,27 +370,6 @@ const SolarHeroSection = ({ navigate }: { navigate: (href: string) => void }) =>
           </button>
         </div>
       </div>
-
-      <aside className="solar-showcase" aria-label="Solar infrastructure project preview">
-        <img src="/solar/solar-farm.jpg" alt="Large solar farm installation under a clear sky" />
-        <div className="solar-showcase-overlay">
-          <div>
-            <span>Artheon project desk</span>
-            <strong>Solar EPC + EV infra</strong>
-          </div>
-          <p>Survey, design, installation, monitoring, and long-term operation under one accountable team.</p>
-        </div>
-        <div className="solar-showcase-metrics" aria-label="Solar project highlights">
-          <div>
-            <span>Factory</span>
-            <strong>EV-ready</strong>
-          </div>
-          <div>
-            <span>Model</span>
-            <strong>5 years</strong>
-          </div>
-        </div>
-      </aside>
     </div>
   </section>
 );
