@@ -1425,25 +1425,28 @@ h3,
 }
 
 .solar-audience-card span {
-  color: var(--accent-green);
+  color: #00ff88;
   font-size: 0.78rem;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.42);
 }
 
 .solar-audience-card h3 {
   margin-top: 18px;
-  color: var(--text);
+  color: #f7fbff;
   font-size: clamp(1.5rem, 4vw, 2.15rem);
   line-height: 1.05;
   letter-spacing: -0.045em;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.56);
 }
 
 .solar-audience-card p {
   margin-top: 14px;
-  color: var(--muted-strong);
+  color: #d7e2e8;
   line-height: 1.65;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.46);
 }
 
 .factory-model-section {

@@ -356,7 +356,7 @@ const SolarHeroSection = ({ navigate }: { navigate: (href: string) => void }) =>
     <div className="solar-hero-content">
       <div className="solar-hero-copy">
         <p className="eyebrow">Solar EPC + EV charging infrastructure</p>
-        <h1>Premium solar power for homes, farms, and factories.</h1>
+        <h1>Engineered solar for homes, farms, and industry.</h1>
         <p className="hero-lede">
           Artheon Energy delivers vendor-grade solar installations for residential rooftops,
           agricultural lands, commercial buildings, and industrial EV charging infrastructure.
