@@ -1551,7 +1551,7 @@ h3,
 
 @media (prefers-reduced-motion: reduce) {
   .partner-track {
-    animation-duration: 72s;
+    animation-duration: 38s;
   }
 }
 
@@ -2351,5 +2351,9 @@ h3,
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .partner-track {
+    animation: partner-scroll 38s linear infinite !important;
   }
 }
