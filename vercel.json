@@ -1,16 +1,5 @@
 {
-  "rewrites": [
-    {
-      "source": "/regeneration",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/blog/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/terms",
-      "destination": "/index.html"
-    }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false
 }

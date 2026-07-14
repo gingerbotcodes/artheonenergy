@@ -167,9 +167,11 @@ h3,
 .primary-action,
 .ghost-action,
 .blog-card button,
+.blog-card a,
 .contact-form button,
 .text-link,
-.site-footer button {
+.site-footer button,
+.site-footer a {
   min-height: 42px;
   border: 0;
   border-radius: 999px;
@@ -189,7 +191,8 @@ h3,
 
 .site-nav a:hover,
 .site-nav a[aria-current="page"],
-.site-footer button:hover {
+.site-footer button:hover,
+.site-footer a:hover {
   color: var(--accent);
 }
 
@@ -210,6 +213,7 @@ h3,
 .header-cta,
 .primary-action,
 .blog-card button,
+.blog-card a,
 .contact-form button {
   display: inline-flex;
   align-items: center;
@@ -240,6 +244,7 @@ h3,
 .ghost-action:hover,
 .header-cta:hover,
 .blog-card button:hover,
+.blog-card a:hover,
 .contact-form button:hover,
 .text-link:hover {
   transform: translateY(-2px);
@@ -2056,7 +2061,8 @@ h3,
   gap: 12px;
 }
 
-.site-footer button {
+.site-footer button,
+.site-footer a {
   border: 0;
   background: transparent;
   color: var(--muted);

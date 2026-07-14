@@ -1,6 +1,6 @@
-# Artheon Energy Scrolltelling Site
+# Artheon Energy Website
 
-Marketing website for Artheon Energy's battery regeneration service.
+Marketing website for Artheon Energy's solar EPC, EV charging, and battery regeneration services.
 
 ## Stack
 
@@ -23,21 +23,29 @@ Site runs at `http://localhost:5173` by default.
 
 - `npm run dev` starts Vite dev server.
 - `npm run lint` runs ESLint.
-- `npm run build` compiles TypeScript project references and builds production assets.
+- `npm run build` compiles the app and generates SEO-ready HTML for every public route.
+- `npm run seo:check` validates route metadata, canonicals, structured data, sitemap coverage, and social images.
 - `npm run preview` serves the production build locally.
 
 ## Project Structure
 
-- `src/App.tsx` main scrolltelling layout and chapter content.
+- `src/App.tsx` page content, routing, forms, and navigation.
+- `src/seo.ts` runtime route metadata and structured data.
+- `scripts/generate-seo-pages.mjs` build-time route HTML generator.
+- `scripts/validate-seo.mjs` production SEO validator.
 - `src/components/BatteryGraphic.tsx` scroll-reactive battery visualization.
 - `src/components/Header.tsx` top navigation, mobile menu, and progress indicator.
 - `src/components/Footer.tsx` contact CTA and callback form.
 - `src/index.css` design tokens, typography, and global styles.
 
-## Notes
+## Public Routes
 
-- The website is designed as a single-page narrative with anchor-based section navigation.
-- Contact form submits directly to Web3Forms (no backend required).
+- `/` solar EPC and EV charging homepage.
+- `/regeneration` battery regeneration service.
+- `/blog` and `/blog/:slug` educational content.
+- `/terms` terms and conditions.
+
+Each route receives unique titles, descriptions, canonicals, social metadata, and JSON-LD. `public/sitemap.xml` and `public/robots.txt` are deployed at the site root.
 
 ## Web3Forms Setup
 

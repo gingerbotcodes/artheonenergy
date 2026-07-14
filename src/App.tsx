@@ -6,6 +6,7 @@ import {
   type FormEvent,
   type MouseEvent,
 } from 'react';
+import { applySeoMetadata, getSeoPage } from './seo';
 
 type BlogPost = {
   slug: string;
@@ -241,6 +242,12 @@ const App = () => {
   const { path, navigate } = useRoute();
   const routePath = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
   const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
+  const articleSlug = routePath.startsWith('/blog/') ? routePath.replace('/blog/', '') : '';
+  const seoArticle = BLOG_POSTS.find((post) => post.slug === articleSlug);
+  const seoPage = useMemo(
+    () => getSeoPage(routePath, seoArticle),
+    [routePath, seoArticle],
+  );
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -248,19 +255,7 @@ const App = () => {
     window.localStorage.setItem('artheon-theme', theme);
   }, [theme]);
 
-  useEffect(() => {
-    const pageTitle =
-      routePath === '/blog'
-        ? 'Blog | Artheon Energy'
-        : routePath === '/terms'
-          ? 'Terms & Conditions | Artheon Energy'
-          : routePath === '/regeneration'
-            ? 'Battery Regeneration | Artheon Energy'
-            : routePath.startsWith('/blog/')
-            ? 'Article | Artheon Energy'
-            : 'Artheon Energy | Solar Installations & EV Charging';
-    document.title = pageTitle;
-  }, [routePath]);
+  useEffect(() => applySeoMetadata(seoPage), [seoPage]);
 
   const page = (() => {
     if (routePath === '/blog') return <BlogPage navigate={navigate} />;
@@ -270,7 +265,8 @@ const App = () => {
     }
     if (routePath === '/terms') return <TermsPage navigate={navigate} />;
     if (routePath === '/regeneration') return <RegenerationPage navigate={navigate} />;
-    return <SolarHomePage navigate={navigate} />;
+    if (routePath === '/') return <SolarHomePage navigate={navigate} />;
+    return <NotFoundPage navigate={navigate} />;
   })();
 
   return (
@@ -1026,9 +1022,15 @@ const BlogPage = ({ navigate }: { navigate: (href: string) => void }) => {
               <time dateTime={post.date}>{formatDate(post.date)}</time>
               <small>{post.readTime}</small>
             </div>
-            <button type="button" onClick={() => navigate(`/blog/${post.slug}`)}>
+            <a
+              href={`/blog/${post.slug}`}
+              onClick={(event) => {
+                event.preventDefault();
+                navigate(`/blog/${post.slug}`);
+              }}
+            >
               Read more
-            </button>
+            </a>
           </article>
         ))}
       </section>
@@ -1051,9 +1053,16 @@ const BlogPostPage = ({
         <section className="page-hero">
           <p className="eyebrow">Article not found</p>
           <h1>This post is not available.</h1>
-          <button className="primary-action" type="button" onClick={() => navigate('/blog')}>
+          <a
+            className="primary-action"
+            href="/blog"
+            onClick={(event) => {
+              event.preventDefault();
+              navigate('/blog');
+            }}
+          >
             Back to Blog
-          </button>
+          </a>
         </section>
       </main>
     );
@@ -1062,9 +1071,16 @@ const BlogPostPage = ({
   return (
     <main className="page-main">
       <article className="article-page">
-        <button className="text-link" type="button" onClick={() => navigate('/blog')}>
+        <a
+          className="text-link"
+          href="/blog"
+          onClick={(event) => {
+            event.preventDefault();
+            navigate('/blog');
+          }}
+        >
           Back to Blog
-        </button>
+        </a>
         <p className="eyebrow">{post.category}</p>
         <h1>{post.title}</h1>
         <div className="article-meta">
@@ -1112,10 +1128,36 @@ const TermsPage = ({ navigate }: { navigate: (href: string) => void }) => (
         ))}
       </ol>
 
-      <button className="primary-action" type="button" onClick={() => navigate('/')}>
+      <a
+        className="primary-action"
+        href="/"
+        onClick={(event) => {
+          event.preventDefault();
+          navigate('/');
+        }}
+      >
         Return Home
-      </button>
+      </a>
     </article>
+  </main>
+);
+
+const NotFoundPage = ({ navigate }: { navigate: (href: string) => void }) => (
+  <main className="page-main">
+    <section className="page-hero">
+      <p className="eyebrow">Page not found</p>
+      <h1>This page is not available.</h1>
+      <a
+        className="primary-action"
+        href="/"
+        onClick={(event) => {
+          event.preventDefault();
+          navigate('/');
+        }}
+      >
+        Return Home
+      </a>
+    </section>
   </main>
 );
 
@@ -1132,15 +1174,19 @@ const SiteFooter = ({
       : path === '/regeneration'
         ? 'Battery Regeneration Systems.'
         : 'Solar EPC, EV Charging & Battery Regeneration.';
+  const onFooterLinkClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    navigate(href);
+  };
 
   return (
     <footer className="site-footer">
       <p>© {new Date().getFullYear()} Artheon Energy. {footerLine}</p>
       <nav aria-label="Footer navigation">
-        <button type="button" onClick={() => navigate('/')}>Solar</button>
-        <button type="button" onClick={() => navigate('/regeneration')}>Regeneration</button>
-        <button type="button" onClick={() => navigate('/blog')}>Blog</button>
-        <button type="button" onClick={() => navigate('/terms')}>Terms</button>
+        <a href="/" onClick={(event) => onFooterLinkClick(event, '/')}>Solar</a>
+        <a href="/regeneration" onClick={(event) => onFooterLinkClick(event, '/regeneration')}>Regeneration</a>
+        <a href="/blog" onClick={(event) => onFooterLinkClick(event, '/blog')}>Blog</a>
+        <a href="/terms" onClick={(event) => onFooterLinkClick(event, '/terms')}>Terms</a>
       </nav>
     </footer>
   );
