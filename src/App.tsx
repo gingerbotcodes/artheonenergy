@@ -347,6 +347,7 @@ const SolarHomePage = ({ navigate }: { navigate: (href: string) => void }) => (
     <SolarPartnersSection />
     <FactoryEnergySection navigate={navigate} />
     <SolarDeliverySection />
+    <SolarProjectGallery />
     <SolarContactSection />
   </main>
 );
@@ -537,6 +538,112 @@ const SolarDeliverySection = () => {
   );
 };
 
+const SOLAR_PROJECTS = [
+  {
+    image: '/gallery/rooftop-panels.webp',
+    alt: 'Completed rooftop solar panels overlooking a green landscape',
+    caption: 'Rooftop solar array',
+  },
+  {
+    image: '/gallery/solar-canopy-underside.webp',
+    alt: 'Steel support structure beneath an elevated rooftop solar canopy',
+    caption: 'Elevated solar canopy',
+  },
+  {
+    image: '/gallery/mounting-rails.webp',
+    alt: 'Solar panel mounting rails prepared for installation',
+    caption: 'Certified mounting system',
+  },
+  {
+    image: '/gallery/rooftop-canopy.webp',
+    alt: 'Solar canopy installed above a residential terrace',
+    caption: 'Terrace solar structure',
+  },
+  {
+    image: '/gallery/sunset-rooftop.webp',
+    alt: 'Residential solar panels reflecting the evening sun',
+    caption: 'Residential rooftop system',
+  },
+  {
+    image: '/gallery/ground-mount-array.webp',
+    alt: 'Large ground-mounted solar panel installation',
+    caption: 'Ground-mounted solar array',
+  },
+  {
+    image: '/gallery/industrial-solar-overview.webp',
+    alt: 'Wide solar array installed beside an industrial facility',
+    caption: 'Industrial solar installation',
+  },
+  {
+    image: '/gallery/neighborhood-rooftop.webp',
+    alt: 'Rooftop solar array installed above a residential neighborhood',
+    caption: 'Neighborhood rooftop system',
+  },
+  {
+    image: '/gallery/industrial-solar-closeup.webp',
+    alt: 'Close view of solar panels installed at an industrial site',
+    caption: 'Industrial rooftop array',
+  },
+  {
+    image: '/gallery/industrial-installation-team.webp',
+    alt: 'Installation team assembling solar panel supports at an industrial site',
+    caption: 'On-site installation team',
+  },
+  {
+    image: '/gallery/facility-rooftop-arrays.webp',
+    alt: 'Two solar arrays installed across a facility rooftop',
+    caption: 'Facility rooftop system',
+  },
+  {
+    image: '/gallery/industrial-rooftop-array.webp',
+    alt: 'Completed solar panel array in front of an industrial building',
+    caption: 'Completed industrial array',
+  },
+  {
+    image: '/gallery/residential-rooftop.webp',
+    alt: 'Solar panels installed above a modern residential building',
+    caption: 'Home energy installation',
+  },
+  {
+    image: '/gallery/residential-solar-canopy.webp',
+    alt: 'Wide solar canopy installed across a residential rooftop',
+    caption: 'Completed rooftop canopy',
+  },
+];
+
+const SolarProjectGallery = () => (
+  <section className="section-block project-gallery-section" aria-labelledby="project-gallery-heading">
+    <div className="section-heading">
+      <p className="eyebrow">Our work</p>
+      <h2 id="project-gallery-heading">Solar installations built for real sites.</h2>
+      <p>
+        A closer look at rooftop, elevated, and ground-mounted systems delivered across
+        residential and commercial projects.
+      </p>
+    </div>
+
+    <div className="project-gallery-marquee" aria-label="Artheon Energy solar project gallery">
+      <div className="project-gallery-track">
+        {[0, 1].map((loopIndex) => (
+          <div className="project-gallery-set" key={loopIndex} aria-hidden={loopIndex === 1}>
+            {SOLAR_PROJECTS.map((project) => (
+              <figure className="project-gallery-item" key={`${loopIndex}-${project.image}`}>
+                <img
+                  src={project.image}
+                  alt={loopIndex === 0 ? project.alt : ''}
+                  loading="eager"
+                  decoding="async"
+                />
+                <figcaption>{project.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
 const SolarContactSection = () => {
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -578,13 +685,23 @@ const SolarContactSection = () => {
 
   return (
     <section className="section-block contact-section solar-contact-section" id="contact">
-      <div>
-        <p className="eyebrow">Start your project</p>
+      <div className="solar-contact-copy">
+        <p className="eyebrow">Contact us</p>
         <h2>Tell us where you want solar power.</h2>
         <p>
           Share the site type, location, and billing requirement. We will call back with the
           right installation model for your home, land, building, or factory.
         </p>
+        <div className="solar-contact-details" aria-label="Artheon Energy contact details">
+          <a href="mailto:care@artheonenergy.com">
+            <span>Email</span>
+            <strong>care@artheonenergy.com</strong>
+          </a>
+          <a href="tel:+919916890049">
+            <span>Call</span>
+            <strong>+91 99168 90049</strong>
+          </a>
+        </div>
       </div>
 
       <form className="contact-form" onSubmit={handleSubmit}>
@@ -595,6 +712,10 @@ const SolarContactSection = () => {
         <label>
           Phone Number
           <input name="phone" type="tel" inputMode="tel" required />
+        </label>
+        <label>
+          Email Address
+          <input name="email" type="email" inputMode="email" required />
         </label>
         <label>
           Project Type

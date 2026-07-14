@@ -1544,6 +1544,111 @@ h3,
   }
 }
 
+.project-gallery-section {
+  position: relative;
+}
+
+.project-gallery-section::before {
+  content: "";
+  position: absolute;
+  inset: 20% auto auto 50%;
+  z-index: -1;
+  width: min(960px, 90vw);
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.1), transparent 68%);
+  transform: translateX(-50%);
+}
+
+.project-gallery-marquee {
+  position: relative;
+  width: 100%;
+  margin-top: 34px;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.project-gallery-track {
+  display: flex;
+  width: max-content;
+  gap: 16px;
+  animation: project-gallery-scroll 118s linear infinite;
+  will-change: transform;
+}
+
+.project-gallery-marquee:hover .project-gallery-track,
+.project-gallery-marquee:focus-within .project-gallery-track {
+  animation-play-state: paused;
+}
+
+.project-gallery-set {
+  display: flex;
+  gap: 16px;
+}
+
+.project-gallery-item {
+  position: relative;
+  flex: 0 0 clamp(280px, 34vw, 420px);
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--bg-soft);
+  box-shadow: var(--shadow);
+}
+
+.project-gallery-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 48%, rgba(2, 8, 12, 0.78) 100%),
+    linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(0, 255, 136, 0.08));
+  pointer-events: none;
+}
+
+.project-gallery-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.74;
+  filter: saturate(0.82) contrast(1.04);
+  transform: scale(1.015);
+  transition: opacity 480ms ease, filter 480ms ease, transform 700ms ease;
+}
+
+.project-gallery-item:hover img {
+  opacity: 1;
+  filter: saturate(1.05) contrast(1.04);
+  transform: scale(1.055);
+}
+
+.project-gallery-item figcaption {
+  position: absolute;
+  right: 20px;
+  bottom: 18px;
+  left: 20px;
+  z-index: 1;
+  color: #f7fbff;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.68);
+}
+
+@keyframes project-gallery-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(-50% - 8px), 0, 0);
+  }
+}
+
 :root[data-theme="light"] .partner-card::after {
   background:
     linear-gradient(120deg, transparent 12%, rgba(0, 159, 99, 0.12) 38%, transparent 58%);
@@ -1744,6 +1849,49 @@ h3,
   display: grid;
   gap: 24px;
   align-items: start;
+}
+
+.solar-contact-copy > p:not(.eyebrow) {
+  max-width: 560px;
+  margin-top: 20px;
+  color: var(--muted-strong);
+  line-height: 1.7;
+}
+
+.solar-contact-details {
+  display: grid;
+  margin-top: 30px;
+  border-top: 1px solid var(--line);
+}
+
+.solar-contact-details a {
+  display: grid;
+  gap: 7px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+  transition: padding-left 180ms ease, color 180ms ease;
+}
+
+.solar-contact-details a:hover,
+.solar-contact-details a:focus-visible {
+  padding-left: 8px;
+  color: var(--accent-green);
+}
+
+.solar-contact-details span {
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.solar-contact-details strong {
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 3vw, 1.28rem);
+  overflow-wrap: anywhere;
 }
 
 .contact-form {
@@ -2325,6 +2473,32 @@ h3,
     height: 62px;
   }
 
+  .project-gallery-marquee {
+    margin-top: 28px;
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+
+  .project-gallery-track,
+  .project-gallery-set {
+    gap: 10px;
+  }
+
+  .project-gallery-track {
+    animation-duration: 106s;
+  }
+
+  .project-gallery-item {
+    flex-basis: min(82vw, 310px);
+    border-radius: 18px;
+  }
+
+  .project-gallery-item figcaption {
+    right: 16px;
+    bottom: 14px;
+    left: 16px;
+    font-size: 0.78rem;
+  }
+
   .factory-model-image {
     min-height: 220px;
   }
@@ -2355,5 +2529,9 @@ h3,
 
   .partner-track {
     animation: partner-scroll 38s linear infinite !important;
+  }
+
+  .project-gallery-track {
+    animation: project-gallery-scroll 124s linear infinite !important;
   }
 }
